@@ -5,12 +5,12 @@
 -- Names say shape: tb col row; v = one cell value, b = a bin #,
 -- n = a count, s = a string; fn mk = functions; plurals are lists;
 -- sym1, sym2 where only Syms will do; y reads a row's label.
--- Everything counted is a small int, assigned at load in file
--- order, ONE convention: known values index 1..n (x cells get bin
--- #s 1..nbins, class cells get 1..nk, legends kept in each
--- col's .labels); unknown ? is -1, everywhere. So hot loops
--- walk arrays 1..n and never pairs(), whose order is the
--- version's hash seed, not ours: same seed, same model, any Lua.
+-- Everything counted is a small int LABEL, assigned at load, ONE
+-- convention: known values get 1..n (x cells bin #s 1..nbins,
+-- class cells 1..nk; each col's legend in its .labels); unknown ?
+-- is -1, everywhere. So hot loops walk arrays 1..n and never
+-- pairs(), whose order is the version's hash seed, not ours:
+-- same seed, same model, on any Lua.
 -- (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 local floor, sqrt, max, min, log = math.floor, math.sqrt, math.max, math.min, math.log
 local LOG2 = log(2)
@@ -390,59 +390,56 @@ tolabel = function(col, v)
   return #col.labels + 1
 end
 
-local labelx
-labelx = function(tb)
-  local _list_0 = tb.cols.x
-  for _index_0 = 1, #_list_0 do
-    local col = _list_0[_index_0]
-    col.labels = mklabels(col, tb.rows, k.bins)
+local labelall
+labelall = function(tb)
+  local kl = tb.cols.klass
+  local cols
+  do
+    local _accum_0 = { }
+    local _len_0 = 1
+    local _list_0 = tb.cols.x
+    for _index_0 = 1, #_list_0 do
+      local col = _list_0[_index_0]
+      _accum_0[_len_0] = col
+      _len_0 = _len_0 + 1
+    end
+    cols = _accum_0
   end
-  local _list_1 = tb.rows
-  for _index_0 = 1, #_list_1 do
-    local row = _list_1[_index_0]
+  if kl then
+    cols[#cols + 1] = kl
+  end
+  for _index_0 = 1, #cols do
+    local col = cols[_index_0]
+    local n
+    if col == kl then
+      n = 1 / 0
+    else
+      n = k.bins
+    end
+    col.labels = mklabels(col, tb.rows, n)
+  end
+  local _list_0 = tb.rows
+  for _index_0 = 1, #_list_0 do
+    local row = _list_0[_index_0]
     row.labels = { }
-    local _list_2 = tb.cols.x
-    for _index_1 = 1, #_list_2 do
-      local col = _list_2[_index_1]
+    for _index_1 = 1, #cols do
+      local col = cols[_index_1]
       row.labels[col.at] = tolabel(col, row[col.at])
     end
   end
-end
-
-local labelklass
-labelklass = function(tb, rows)
-  local kl = tb.cols.klass
-  if not kl then
-    return
+  if kl then
+    tb.nk = #kl.labels
+  else
+    tb.nk = 0
   end
-  kl.labels = { }
-  local code = { }
-  for i = 2, #rows do
-    local v = rows[i][kl.at]
-    if v == "?" then
-      rows[i][kl.at] = -1
-    else
-      if not code[v] then
-        do
-          local _obj_0 = kl.labels
-          _obj_0[#_obj_0 + 1] = v
-        end
-        code[v] = #kl.labels
-      end
-      rows[i][kl.at] = code[v]
-    end
-  end
-  tb.nk = #kl.labels
 end
 
 local Tbl
 Tbl = function(rows)
   local tb = {
     cols = Cols(rows[1]),
-    rows = { },
-    nk = 0
+    rows = { }
   }
-  labelklass(tb, rows)
   for i = #rows, 2, -1 do
     local row = rows[i]
     do
@@ -455,7 +452,7 @@ Tbl = function(rows)
       add(col, row[col.at])
     end
   end
-  labelx(tb)
+  labelall(tb)
   return tb
 end
 

@@ -5,12 +5,12 @@
 -- Names say shape: tb col row; v = one cell value, b = a bin #,
 -- n = a count, s = a string; fn mk = functions; plurals are lists;
 -- sym1, sym2 where only Syms will do; y reads a row's label.
--- Everything counted is a small int, assigned at load in file
--- order, ONE convention: known values index 1..n (x cells get bin
--- #s 1..nbins, class cells get 1..nk, legends kept in each
--- col's .labels); unknown ? is -1, everywhere. So hot loops
--- walk arrays 1..n and never pairs(), whose order is the
--- version's hash seed, not ours: same seed, same model, any Lua.
+-- Everything counted is a small int LABEL, assigned at load, ONE
+-- convention: known values get 1..n (x cells bin #s 1..nbins,
+-- class cells 1..nk; each col's legend in its .labels); unknown ?
+-- is -1, everywhere. So hot loops walk arrays 1..n and never
+-- pairs(), whose order is the version's hash seed, not ours:
+-- same seed, same model, on any Lua.
 -- (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 import floor, sqrt, max, min, log from math
 LOG2 = log 2
@@ -162,38 +162,25 @@ tolabel = (col, v) ->                   -- v -> its label 1..; ? = -1
     if u == v then return i
   #col.labels + 1                       -- rare sym values pool here
 
-labelx = (tb) ->                        -- once per tbl: each x col's
-  for col in *tb.cols.x                 -- legend, then every cell's
-    col.labels = mklabels col, tb.rows, k.bins  -- label, onto the row
+labelall = (tb) ->                      -- once per tbl: a legend per
+  kl = tb.cols.klass                    -- col (klass keeps EVERY
+  cols = [col for col in *tb.cols.x]    -- value), then every cell's
+  if kl then cols[] = kl                -- label, onto the row
+  for col in *cols
+    n = if col == kl then 1/0 else k.bins
+    col.labels = mklabels col, tb.rows, n
   for row in *tb.rows
     row.labels = {}
-    row.labels[col.at] = tolabel col, row[col.at] for col in *tb.cols.x
-
-labelklass = (tb, rows) ->              -- class cells -> ints 1..nk,
-  kl = tb.cols.klass                    -- in file order; ? -> -1;
-  if not kl                             -- kl.labels[i] = the name
-    return
-  kl.labels = {}
-  code = {}
-  for i = 2, #rows
-    v = rows[i][kl.at]
-    if v == "?"
-      rows[i][kl.at] = -1
-    else
-      if not code[v]
-        kl.labels[] = v
-        code[v] = #kl.labels
-      rows[i][kl.at] = code[v]
-  tb.nk = #kl.labels
+    row.labels[col.at] = tolabel col, row[col.at] for col in *cols
+  tb.nk = if kl then #kl.labels else 0
 
 Tbl = (rows) ->
-  tb = {cols: Cols(rows[1]), rows: {}, nk: 0}
-  labelklass tb, rows
+  tb = {cols: Cols(rows[1]), rows: {}}
   for i = #rows, 2, -1                  -- newest first, like the lisp
     row = rows[i]
     tb.rows[] = row
     add col, row[col.at] for col in *tb.cols.all
-  labelx tb
+  labelall tb
   tb
 
 --------------------------------------------------------------- tree

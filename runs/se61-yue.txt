@@ -63,7 +63,7 @@ se/static/cooked/tomcat            73.1        82.9        93.4        95.5!
 
 #wins                                 1          10           6          57       
 #mean auc                          68.6        79.4        78.8        83.9       
-#secs (all data)                    5.3        18.9        12.9       5667.2       
+#secs (all data)                    5.5        19.6        12.9       5667.2       
 %folds se/defect/ant 1:q16 67.3 69.9 68.6 72.6 66.7 69.9 68.6 63.8 66.1 60.3
 %folds se/defect/ant n30 84.7 79.7 80.9 82.2 79.2 81.6 81.8 80.4 81.6 81.5
 %folds se/defect/ant lgbm 82.3 75.8 79.9 81.3 77.5 80.0 79.7 77.3 79.7 76.2

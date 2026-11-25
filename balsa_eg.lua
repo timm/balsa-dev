@@ -148,7 +148,7 @@ ens = function(sets)
     local at = tb.cols.klass.at
     local kl
     kl = function(row)
-      return row[at]
+      return row.labels[at]
     end
     xval(tb.rows, function(train, test)
       local t0 = os.clock()
@@ -183,7 +183,7 @@ replay = function(dat)
       local at = tb.cols.klass.at
       local kl
       kl = function(row)
-        return row[at]
+        return row.labels[at]
       end
       local test, inh = { }, { }
       for s in ids:gmatch("%d+") do
