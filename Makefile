@@ -23,7 +23,11 @@ run: ## run every eg (sbcl --script bald.lisp all)
 yue: ## rebuild balsa.lua + balsa_eg.lua from the .yue sources
 	yue -c -s balsa.yue && yue -c -s balsa_eg.yue
 
-package: yue ## copy learner into ../balsa, rebuild its .lua there
+docs: ## render balsa.yue + balsa_eg.yue 3-col into ../balsa/docs
+	mkdir -p $(HOME)/gh/balsa/docs
+	python3 hi.py 3 balsa.yue balsa_eg.yue > $(HOME)/gh/balsa/docs/index.html
+
+package: yue docs ## copy learner into ../balsa, rebuild its .lua there
 	cp balsa.yue $(HOME)/gh/balsa/
 	cd $(HOME)/gh/balsa && yue -c -s balsa.yue && \
 	  echo "balsa.lua  $$(shasum -a1 balsa.lua | cut -c1-12)  $$(wc -l < balsa.lua) lines" && \
