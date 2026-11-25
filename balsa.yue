@@ -84,9 +84,7 @@ adds = (vs, col=Col!) ->
 
 div = (col) ->                          -- sd for Nums, entropy for Syms
   if col.nm
-    if col.n < 2
-      return 0
-    return sqrt(col.m2 / (col.n - 1))
+    return if col.n < 2 then 0 else sqrt(col.m2 / (col.n - 1))
   e = 0
   e -= m/col.n * log(m/col.n) for _, m in pairs col.has when m > 0
   e / LOG2

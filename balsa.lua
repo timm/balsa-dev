@@ -175,8 +175,9 @@ div = function(col)
   if col.nm then
     if col.n < 2 then
       return 0
+    else
+      return sqrt(col.m2 / (col.n - 1))
     end
-    return sqrt(col.m2 / (col.n - 1))
   end
   local e = 0
   for _, m in pairs(col.has) do
