@@ -6,10 +6,11 @@
 -- n = a count, s = a string; fn mk = functions; plurals are lists;
 -- sym1, sym2 where only Syms will do; y reads a row's label.
 -- Everything counted is a small int, assigned at load in file
--- order: x cells become bin #s, class cells become labels 1..nk
--- (names in klass.labels), ? becomes -1. So the hot loops walk
--- arrays 1..nk and never pairs(), whose order is the version's
--- hash seed, not ours: same seed, same model, on any Lua.
+-- order, ONE convention: known values index 1..n (x cells get bin
+-- #s 1..nbins, class cells get labels 1..nk, names in
+-- klass.labels); unknown ? is -1, everywhere. So the hot loops
+-- walk arrays 1..n and never pairs(), whose order is the
+-- version's hash seed, not ours: same seed, same model, any Lua.
 -- (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 local floor, sqrt, max, min, log = math.floor, math.sqrt, math.max, math.min, math.log
 local LOG2 = log(2)
@@ -379,14 +380,14 @@ cook = function(col, v)
     return -1
   end
   if col.nm then
-    return max(0, bisect(col.bins, v, true) - 1)
+    return max(1, bisect(col.bins, v, true))
   end
   for i, b in ipairs(col.bins) do
     if b == v then
-      return i - 1
+      return i
     end
   end
-  return #col.bins
+  return #col.bins + 1
 end
 
 local discretize
@@ -482,7 +483,7 @@ cuts = function(col, rows, ys, mk, leaf, best)
   do
     local _accum_0 = { }
     local _len_0 = 1
-    for _ = 0, nb do
+    for _ = 1, nb + 1 do
       _accum_0[_len_0] = mk()
       _len_0 = _len_0 + 1
     end
@@ -490,8 +491,8 @@ cuts = function(col, rows, ys, mk, leaf, best)
   end
   for i, row in ipairs(rows) do
     local b = row.cooked[col.at]
-    if b >= 0 then
-      yadd(bins[b + 1], ys[i])
+    if b > 0 then
+      yadd(bins[b], ys[i])
     end
   end
   local yes = mk()
@@ -500,8 +501,8 @@ cuts = function(col, rows, ys, mk, leaf, best)
     local bin = bins[_index_0]
     yfold(no, bin)
   end
-  for b = 0, nb - 1 do
-    local bin = bins[b + 1]
+  for b = 1, nb do
+    local bin = bins[b]
     yfold(no, bin, -1)
     if not col.has then
       yfold(yes, bin)
