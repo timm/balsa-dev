@@ -82,7 +82,7 @@ replay = (dat) ->                       -- rerun DAT's recorded folds:
   print "#1:q16 n30 "                   -- 1 tree all-cols, 30 rf
   tb, v, name = nil, nil, nil
   for line in io.lines dat
-    continue if line\match "^#"
+    if line\match "^#" then continue
     f = line\match "^([^|]*)|"
     ids = line\match "|([^|]*)$"
     if f != name

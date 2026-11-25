@@ -20,8 +20,8 @@ push: ## git add this dir, commit (msg="..."), push
 run: ## run every eg (sbcl --script bald.lisp all)
 	sbcl --script bald.lisp all
 
-yue: ## rebuild balsa.lua + balsa_eg.lua from the .yue sources
-	yue -c -s balsa.yue && yue -c -s balsa_eg.yue
+yue: ## rebuild balsa.lua + balsa_eg.lua (5.1-safe: no goto)
+	yue -c -s --target=5.1 balsa.yue && yue -c -s --target=5.1 balsa_eg.yue
 
 docs: ## render balsa.yue + balsa_eg.yue 3-col into ../balsa/docs
 	mkdir -p $(HOME)/gh/balsa/docs
@@ -29,7 +29,7 @@ docs: ## render balsa.yue + balsa_eg.yue 3-col into ../balsa/docs
 
 package: yue docs ## copy learner into ../balsa, rebuild its .lua there
 	cp balsa.yue $(HOME)/gh/balsa/
-	cd $(HOME)/gh/balsa && yue -c -s balsa.yue && \
+	cd $(HOME)/gh/balsa && yue -c -s --target=5.1 balsa.yue && \
 	  echo "balsa.lua  $$(shasum -a1 balsa.lua | cut -c1-12)  $$(wc -l < balsa.lua) lines" && \
 	  git status --short
 	echo "now: cd ~/gh/balsa && git commit -am ... && git push"
