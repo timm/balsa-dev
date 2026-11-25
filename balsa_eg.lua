@@ -28,11 +28,9 @@ median = function(xs)
 end
 
 local cohen
-cohen = function(xs, ys)
-  local a = adds(xs)
-  local c = adds(ys)
-  local sp = sqrt(((a.n - 1) * div(a) ^ 2 + (c.n - 1) * div(c) ^ 2) / max(1, a.n + c.n - 2))
-  return math.abs(a.mu - c.mu) / (sp + 1e-32)
+cohen = function(num1, num2)
+  local sp = sqrt(((num1.n - 1) * div(num1) ^ 2 + (num2.n - 1) * div(num2) ^ 2) / max(1, num1.n + num2.n - 2))
+  return math.abs(num1.mu - num2.mu) / (sp + 1e-32)
 end
 
 local cliffs
@@ -63,9 +61,12 @@ ks = function(xs, ys)
 end
 
 local same
-same = function(xs, ys, eps)
+same = function(xs, ys, eps, prudence)
   if eps == nil then
     eps = k.eps
+  end
+  if prudence == nil then
+    prudence = 0.01
   end
   do
     local _accum_0 = { }
@@ -89,7 +90,12 @@ same = function(xs, ys, eps)
   end
   table.sort(xs)
   table.sort(ys)
-  return cohen(xs, ys) <= eps and cliffs(xs, ys) <= 0.195 and ks(xs, ys) <= 1.36
+  local num1 = adds(xs)
+  local num2 = adds(ys)
+  if math.abs(num1.mu - num2.mu) < prudence then
+    return true
+  end
+  return cohen(num1, num2) <= eps and cliffs(xs, ys) <= 0.195 and ks(xs, ys) <= 1.36
 end
 
 local rank
