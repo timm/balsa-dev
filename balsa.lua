@@ -501,17 +501,22 @@ cuts = function(col, rows, ys, mk, leaf, best)
   for b = 1, nb do
     local bin = bins[b]
     yfold(no, bin, -1)
-    if not col.has then
+    if col.isnum then
       yfold(yes, bin)
     end
-    local lhs = col.has and bin or yes
+    local lhs
+    if col.isnum then
+      lhs = yes
+    else
+      lhs = bin
+    end
     if leaf <= min(lhs.n, no.n) then
       best({
         col,
         b
       }, xpect(lhs, no))
     end
-    if col.has then
+    if not col.isnum then
       yfold(no, bin)
     end
   end
@@ -531,10 +536,10 @@ best_cut = function(xcols, rows, ys, mk, m, leaf)
 end
 
 local _anon_func_1 = function(b, col, w)
-  if col.has then
-    return w == b
-  else
+  if col.isnum then
     return w <= b
+  else
+    return w == b
   end
 end
 local yes_
@@ -567,7 +572,7 @@ tree = function(rows, y, xcols, mk, m, leaf, maxd, lvl)
   if cut then
     local col, b = cut[1], cut[2]
     node.v = b
-    node.ati, node.sym = col.at, col.has ~= nil
+    node.ati, node.isnum = col.at, col.isnum
     local yes
     do
       local _accum_0 = { }
@@ -601,10 +606,10 @@ tree = function(rows, y, xcols, mk, m, leaf, maxd, lvl)
 end
 
 local _anon_func_2 = function(node, w)
-  if node.sym then
-    return w == node.v
-  else
+  if node.isnum then
     return w <= node.v
+  else
+    return w == node.v
   end
 end
 local leaf_of

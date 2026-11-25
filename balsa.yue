@@ -205,11 +205,11 @@ cuts = (col, rows, ys, mk, leaf, best) ->
   for b = 1, nb
     bin = bins[b]
     yfold no, bin, -1                   -- syms: bin vs rest
-    if not col.has then yfold yes, bin  -- nums: bins <= b
-    lhs = col.has and bin or yes
+    if col.isnum then yfold yes, bin    -- nums: bins <= b
+    lhs = if col.isnum then yes else bin
     if leaf <= min lhs.n, no.n
       best {col, b}, xpect lhs, no
-    if col.has then yfold no, bin
+    if not col.isnum then yfold no, bin
 
 best_cut = (xcols, rows, ys, mk, m, leaf) ->
   best = argmost (a, b) -> a < b
@@ -219,7 +219,7 @@ best_cut = (xcols, rows, ys, mk, m, leaf) ->
 
 yes_ = (col, b, row) ->                 -- row on the yes side of cut?
   w = row.labels[col.at]
-  w < 0 or (if col.has then w == b else w <= b)
+  w < 0 or (if col.isnum then w <= b else w == b)
 
 tree = (rows, y, xcols, mk, m, leaf, maxd, lvl=0) ->
   ys = [y row for row in *rows]
@@ -228,7 +228,7 @@ tree = (rows, y, xcols, mk, m, leaf, maxd, lvl=0) ->
   if cut
     col, b = cut[1], cut[2]
     node.v = b
-    node.ati, node.sym = col.at, col.has != nil
+    node.ati, node.isnum = col.at, col.isnum
     yes = [row for row in *rows when yes_ col, b, row]
     no  = [row for row in *rows when not yes_ col, b, row]
     node.yes = tree yes, y, xcols, mk, m, leaf, maxd, lvl + 1
@@ -238,7 +238,7 @@ tree = (rows, y, xcols, mk, m, leaf, maxd, lvl=0) ->
 leaf_of = (node, row) ->                -- flat fields: no col deref
   while node.ati
     w = row.labels[node.ati]
-    ok = w < 0 or (if node.sym then w == node.v else w <= node.v)
+    ok = w < 0 or (if node.isnum then w <= node.v else w == node.v)
     node = ok and node.yes or node.no
   node
 
