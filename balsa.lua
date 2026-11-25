@@ -7,8 +7,8 @@
 -- sym1, sym2 where only Syms will do; y reads a row's label.
 -- Everything counted is a small int, assigned at load in file
 -- order, ONE convention: known values index 1..n (x cells get bin
--- #s 1..nbins, class cells get labels 1..nk, names in
--- klass.labels); unknown ? is -1, everywhere. So the hot loops
+-- #s 1..nbins, class cells get 1..nk, legends kept in each
+-- col's .labels); unknown ? is -1, everywhere. So hot loops
 -- walk arrays 1..n and never pairs(), whose order is the
 -- version's hash seed, not ours: same seed, same model, any Lua.
 -- (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
@@ -113,7 +113,7 @@ end
 --------------------------------------------------------------- data
 -- Header: Uppercase = Num, else Sym. Last char: ! class, X skip.
 -- "?" cells unknown. A row IS its csv cells (numeric indexes),
--- plus one named field: cooked, its bin # per x column.
+-- plus one named field: labels, its label per x column.
 local Col
 Col = function(txt, at)
   if txt == nil then
@@ -300,7 +300,7 @@ Cols = function(names)
   }
 end
 
-------------------- bins: discretize once; trees then cut on bin #s
+------------- labels: made once at load; trees cut on label #s
 local bisect
 bisect = function(vs, v, le)
   local lo, hi = 1, #vs + 1
@@ -321,8 +321,8 @@ bisect = function(vs, v, le)
   return lo - 1
 end
 
-local choices
-choices = function(col, rows, n)
+local mklabels
+mklabels = function(col, rows, n)
   if col.isnum then
     local vs
     do
@@ -374,43 +374,43 @@ choices = function(col, rows, n)
   end
 end
 
-local cook
-cook = function(col, v)
+local tolabel
+tolabel = function(col, v)
   if v == "?" then
     return -1
   end
   if col.isnum then
-    return max(1, bisect(col.bins, v, true))
+    return max(1, bisect(col.labels, v, true))
   end
-  for i, b in ipairs(col.bins) do
-    if b == v then
+  for i, u in ipairs(col.labels) do
+    if u == v then
       return i
     end
   end
-  return #col.bins + 1
+  return #col.labels + 1
 end
 
-local discretize
-discretize = function(tb)
+local labelx
+labelx = function(tb)
   local _list_0 = tb.cols.x
   for _index_0 = 1, #_list_0 do
     local col = _list_0[_index_0]
-    col.bins = choices(col, tb.rows, k.bins)
+    col.labels = mklabels(col, tb.rows, k.bins)
   end
   local _list_1 = tb.rows
   for _index_0 = 1, #_list_1 do
     local row = _list_1[_index_0]
-    row.cooked = { }
+    row.labels = { }
     local _list_2 = tb.cols.x
     for _index_1 = 1, #_list_2 do
       local col = _list_2[_index_1]
-      row.cooked[col.at] = cook(col, row[col.at])
+      row.labels[col.at] = tolabel(col, row[col.at])
     end
   end
 end
 
-local label
-label = function(tb, rows)
+local labelklass
+labelklass = function(tb, rows)
   local kl = tb.cols.klass
   if not kl then
     return
@@ -442,7 +442,7 @@ Tbl = function(rows)
     rows = { },
     nk = 0
   }
-  label(tb, rows)
+  labelklass(tb, rows)
   for i = #rows, 2, -1 do
     local row = rows[i]
     do
@@ -455,7 +455,7 @@ Tbl = function(rows)
       add(col, row[col.at])
     end
   end
-  discretize(tb)
+  labelx(tb)
   return tb
 end
 
@@ -478,7 +478,7 @@ end
 
 local cuts
 cuts = function(col, rows, ys, mk, leaf, best)
-  local nb = #col.bins
+  local nb = #col.labels
   local bins
   do
     local _accum_0 = { }
@@ -490,7 +490,7 @@ cuts = function(col, rows, ys, mk, leaf, best)
     bins = _accum_0
   end
   for i, row in ipairs(rows) do
-    local b = row.cooked[col.at]
+    local b = row.labels[col.at]
     if b > 0 then
       yadd(bins[b], ys[i])
     end
@@ -542,7 +542,7 @@ local _anon_func_1 = function(b, col, w)
 end
 local yes_
 yes_ = function(col, b, row)
-  local w = row.cooked[col.at]
+  local w = row.labels[col.at]
   return w < 0 or (_anon_func_1(b, col, w))
 end
 
@@ -613,7 +613,7 @@ end
 local leaf_of
 leaf_of = function(node, row)
   while node.ati do
-    local w = row.cooked[node.ati]
+    local w = row.labels[node.ati]
     local ok = w < 0 or (_anon_func_2(node, w))
     node = ok and node.yes or node.no
   end

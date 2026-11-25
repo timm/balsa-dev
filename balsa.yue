@@ -7,8 +7,8 @@
 -- sym1, sym2 where only Syms will do; y reads a row's label.
 -- Everything counted is a small int, assigned at load in file
 -- order, ONE convention: known values index 1..n (x cells get bin
--- #s 1..nbins, class cells get labels 1..nk, names in
--- klass.labels); unknown ? is -1, everywhere. So the hot loops
+-- #s 1..nbins, class cells get 1..nk, legends kept in each
+-- col's .labels); unknown ? is -1, everywhere. So hot loops
 -- walk arrays 1..n and never pairs(), whose order is the
 -- version's hash seed, not ours: same seed, same model, any Lua.
 -- (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
@@ -61,7 +61,7 @@ csv = (file) ->
 --------------------------------------------------------------- data
 -- Header: Uppercase = Num, else Sym. Last char: ! class, X skip.
 -- "?" cells unknown. A row IS its csv cells (numeric indexes),
--- plus one named field: cooked, its bin # per x column.
+-- plus one named field: labels, its label per x column.
 Col = (txt="N", at=0) ->                -- no args: an anonymous Num
   if txt\match "^%u"
     {:at, :txt, isnum: true, n: 0, mu: 0, m2: 0}  -- a Num
@@ -129,7 +129,7 @@ Cols = (names) ->
       x[] = col
   {:names, :all, :x, :y, :klass}
 
-------------------- bins: discretize once; trees then cut on bin #s
+------------- labels: made once at load; trees cut on label #s
 bisect = (vs, v, le) ->                 -- #items in sorted vs below v
   lo, hi = 1, #vs + 1
   while lo < hi
@@ -138,7 +138,7 @@ bisect = (vs, v, le) ->                 -- #items in sorted vs below v
     if below then lo = mid + 1 else hi = mid
   lo - 1
 
-choices = (col, rows, n) ->
+mklabels = (col, rows, n) ->
   if col.isnum                             -- n bins, equal #known in each
     vs = [row[col.at] for row in *rows when row[col.at] != "?"]
     table.sort vs
@@ -155,21 +155,21 @@ choices = (col, rows, n) ->
       a[2] > b[2] or (a[2] == b[2] and tostring(a[1]) < tostring(b[1]))
     [vs[i][1] for i = 1, min n - 1, #vs]
 
-cook = (col, v) ->                      -- v -> bin # 1..; ? = -1
+tolabel = (col, v) ->                   -- v -> its label 1..; ? = -1
   if v == "?" then return -1
-  if col.isnum then return max 1, bisect(col.bins, v, true)
-  for i, b in ipairs col.bins
-    if b == v then return i
-  #col.bins + 1                         -- rare sym values pool here
+  if col.isnum then return max 1, bisect(col.labels, v, true)
+  for i, u in ipairs col.labels
+    if u == v then return i
+  #col.labels + 1                       -- rare sym values pool here
 
-discretize = (tb) ->                    -- once per tbl: bins, then
-  for col in *tb.cols.x                 -- each row's bin # per x col
-    col.bins = choices col, tb.rows, k.bins
+labelx = (tb) ->                        -- once per tbl: each x col's
+  for col in *tb.cols.x                 -- legend, then every cell's
+    col.labels = mklabels col, tb.rows, k.bins  -- label, onto the row
   for row in *tb.rows
-    row.cooked = {}
-    row.cooked[col.at] = cook col, row[col.at] for col in *tb.cols.x
+    row.labels = {}
+    row.labels[col.at] = tolabel col, row[col.at] for col in *tb.cols.x
 
-label = (tb, rows) ->                   -- class cells -> ints 1..nk,
+labelklass = (tb, rows) ->              -- class cells -> ints 1..nk,
   kl = tb.cols.klass                    -- in file order; ? -> -1;
   if not kl                             -- kl.labels[i] = the name
     return
@@ -188,12 +188,12 @@ label = (tb, rows) ->                   -- class cells -> ints 1..nk,
 
 Tbl = (rows) ->
   tb = {cols: Cols(rows[1]), rows: {}, nk: 0}
-  label tb, rows
+  labelklass tb, rows
   for i = #rows, 2, -1                  -- newest first, like the lisp
     row = rows[i]
     tb.rows[] = row
     add col, row[col.at] for col in *tb.cols.all
-  discretize tb
+  labelx tb
   tb
 
 --------------------------------------------------------------- tree
@@ -207,10 +207,10 @@ xpect = (a, b) ->                       -- size-weighted spread
   (a.n * ydiv(a) + b.n * ydiv(b)) / (a.n + b.n + 1e-32)
 
 cuts = (col, rows, ys, mk, leaf, best) ->
-  nb = #col.bins
+  nb = #col.labels
   bins = [mk! for _ = 1, nb + 1]        -- sym "rare" pool at nb+1
   for i, row in ipairs rows
-    b = row.cooked[col.at]
+    b = row.labels[col.at]
     if b > 0 then yadd bins[b], ys[i]
   yes = mk!
   no = mk!
@@ -231,7 +231,7 @@ best_cut = (xcols, rows, ys, mk, m, leaf) ->
   best!
 
 yes_ = (col, b, row) ->                 -- row on the yes side of cut?
-  w = row.cooked[col.at]
+  w = row.labels[col.at]
   w < 0 or (if col.has then w == b else w <= b)
 
 tree = (rows, y, xcols, mk, m, leaf, maxd, lvl=0) ->
@@ -250,7 +250,7 @@ tree = (rows, y, xcols, mk, m, leaf, maxd, lvl=0) ->
 
 leaf_of = (node, row) ->                -- flat fields: no col deref
   while node.ati
-    w = row.cooked[node.ati]
+    w = row.labels[node.ati]
     ok = w < 0 or (if node.sym then w == node.v else w <= node.v)
     node = ok and node.yes or node.no
   node
