@@ -1,7 +1,9 @@
 #!/usr/bin/env python3 -B
-"""variance: where does an AUC move come from?  One stacked bar per group of
-data sets, each summing to 100%: the data set, the learner, the fold, and
-the interaction between learner and data set.
+"""variance: where does an AUC move come from?  Splits the variance inside
+each group of data sets four ways -- the data set, the learner, the fold,
+and the interaction between learner and data set -- each group summing to
+100%.  Prints the LaTeX rows the paper's table is built from, so that table
+cannot drift from these numbers; --png also draws them as stacked bars.
 
 This is a two-way ANOVA with replication (data set x learner, R folds per
 cell), reported as eta-squared.  balsa(1), the deliberately crippled single
@@ -10,13 +12,18 @@ tree, is left out: the question is what separates learners anyone would use.
 Bars are sorted by the learner share, so the groups that trouble the claim
 sit at the bottom.
 
-usage: python3 variance.py runs/nose39-yue.txt runs/se61-yue.txt variance.png
+usage: python3 variance.py runs/nose39-yue.txt runs/se61-yue.txt
+       python3 variance.py runs/nose39-yue.txt runs/se61-yue.txt --png F.png
 """
 import sys, statistics as st
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 ARMS = ["lgbm", "n30", "tabicl"]        # the three a reader would consider
+# TabICL did not finish ten folds on these two (its per-fold timeout fired),
+# which would leave the design unbalanced -- and an unbalanced two-way layout
+# does not decompose orthogonally, so the shares would not sum to 100.
+PARTIAL = {"bank-marketing", "adult"}
 # group name -> how to recognise its data sets in the two run files
 NOSE = [("numeric", 0, 10), ("symbolic", 10, 20), ("mixed", 20, 30),
         ("large", 30, 39)]
@@ -57,15 +64,31 @@ def split(sets, src):
             for f in sets for a in ARMS))]
 
 
+def tex(rows):
+  "The table body, sorted so the learner column runs low to high."
+  def line(name, n, v):
+    out = [v[0], v[2], v[3], v[1]]            # data, fold, other, learner
+    hi  = max(out)
+    cs  = " & ".join((r"\cellcolor{gray!25}" + f"{x:.0f}") if x == hi
+                     else f"{x:.0f}" for x in out)
+    return f"{name} & {n} & {cs} & {v[0] / v[1]:.0f} " + r"\\"
+  for name, n, v in rows[:-1]: print(line(name, n, v))
+  print(r"\cmidrule{1-7}")
+  print(line(*rows[-1]))
+
+
 def main():
   nose, se = folds(sys.argv[1]), folds(sys.argv[2])
-  order = list(nose)
+  order   = [f for f in nose if f not in PARTIAL]
   groups  = [(n, order[a:b], nose) for n, a, b in NOSE]
   groups += [(n, [f for f in se if f.startswith(p)], se) for n, p in SE]
-  rows = [(f"{n} ({len(s)})", split(s, src)) for n, s, src in groups]
-  rows.sort(key=lambda r: -r[1][1])      # most learner-effect at the top
+  rows = [(n, len(s), split(s, src)) for n, s, src in groups]
+  rows.sort(key=lambda r: r[2][1])       # least learner-effect first
   allsets = {f: src[f] for _, s, src in groups for f in s}
-  rows.append((f"ALL ({len(allsets)})", split(list(allsets), allsets)))
+  rows.append(("all", len(allsets), split(list(allsets), allsets)))
+  if "--png" not in sys.argv:
+    return tex(rows)
+  rows = [(f"{n} ({c})", v) for n, c, v in rows][::-1]
 
   # drawn at 2x a one-column figure, so a 12pt label prints at 6pt
   f, ax = plt.subplots(figsize=(6.6, 4.2))

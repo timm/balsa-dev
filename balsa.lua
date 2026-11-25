@@ -17,7 +17,6 @@ local LOG2 = log(2)
 
 local the = {
   seed = 1234567891,
-  eps = 0.35,
   prudence = 0.01,
   bins = 16,
   trees = 30,

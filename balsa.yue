@@ -15,7 +15,7 @@
 import floor, sqrt, max, min, log from math
 LOG2 = log 2
 
-the = {seed: 1234567891, eps: 0.35, prudence: 0.01, bins: 16,
+the = {seed: 1234567891, prudence: 0.01, bins: 16,
        trees: 30, cap: 200, leaf: 2, maxd: 30, rf: true}
 
 ------------------------------------------------------------- random
