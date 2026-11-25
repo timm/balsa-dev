@@ -9,6 +9,12 @@ points, because a point is worth different amounts on different data sets:
 the per-set fold sd runs from 0.31 to 14.18 points, a 45-fold spread, so one
 absolute threshold is strict on a quiet set and vacuous on a noisy one.
 
+k runs .1 to 1.  Below .1 the floor does nothing (k=0, the three tests
+alone, gives 0/9/13/93 against k=.1's 0/10/13/94).  Above 1 it does too
+much: one fold sd is already 2.3 AUC points on the median set, and a floor
+of four sds would be discarding nine-point gaps, which is not prudence but
+indifference.  The range is also Cohen's: .2 small, .5 medium, .8 large.
+
 WHICH sd matters.  Dividing the gap by the POOLED sd of the two arms being
 compared gives Cohen's d exactly (checked: the two agree to 0.0), so that
 choice would merely restate the cohen test already inside `same`.  The
@@ -28,7 +34,7 @@ import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 EPS, CLIFF, KS = 0.35, 0.195, 1.36      # balsa_eg.yue's thresholds
-PRU = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4]   # in set sds
+PRU = [i / 10 for i in range(1, 11)]    # prudence = k * sd, k = .1 .. 1
 # name, key in the .txt, colour and marker: the same ink as the AUC figures
 ARMS = [("balsa(1)",  "1:q16",  "#2ca02c", "^"),
         ("lgbm(100)", "lgbm",   "#2a6fdb", "o"),
@@ -121,14 +127,14 @@ def main():
   for name, a, c, m in ARMS:
     ax.plot(PRU, pcts[a], color=c, marker=m, lw=2.2, ms=7, label=name)
   ax.set_xlabel("prudence: smallest gap we call a difference,\n"
-                "in multiples of that data set's own fold sd", fontsize=12)
+                "as a fraction $k$ of that data set's own fold sd", fontsize=12)
   ax.set_ylabel(f"% of {len(sets)} data sets ranked best", fontsize=12)
-  ax.set_xticks([0.5, 1, 1.5, 2, 2.5, 3, 4]); ax.set_ylim(-3, 103); ax.set_yticks(range(0, 101, 20))
+  ax.set_xticks([.1,.2,.3,.4,.5,.6,.7,.8,.9,1]); ax.set_ylim(-3, 103); ax.set_yticks(range(0, 101, 20))
   ax.tick_params(labelsize=12)
   ax.grid(axis="y", color="#ddd")
   for s in ("top", "right"): ax.spines[s].set_visible(False)
-  ax.legend(fontsize=11, frameon=False, loc="upper left",
-            bbox_to_anchor=(.02, .93), handlelength=2.4)
+  ax.legend(fontsize=11, frameon=False, loc="center left",
+            bbox_to_anchor=(.03, .62), handlelength=2.4)
   f.set_facecolor("#fcfcfa"); ax.set_facecolor("#fcfcfa")
   f.tight_layout(pad=.3)
   f.savefig(sys.argv[-1], dpi=200)
