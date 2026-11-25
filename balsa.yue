@@ -15,11 +15,11 @@
 import floor, sqrt, max, min, log from math
 LOG2 = log 2
 
-k = {seed: 1234567891, eps: 0.35, bins: 16,
-     trees: 30, cap: 200, leaf: 2, maxd: 30, rf: true}
+the = {seed: 1234567891, eps: 0.35, prudence: 0.01, bins: 16,
+       trees: 30, cap: 200, leaf: 2, maxd: 30, rf: true}
 
 ------------------------------------------------------------- random
-seed = k.seed
+seed = the.seed
 srand = (n) -> seed = n
 rand = (n=1) ->
   seed = (16807 * seed) % 2147483647
@@ -167,7 +167,7 @@ labelall = (tb) ->                      -- once per tbl: a legend per
   cols = [col for col in *tb.cols.x]    -- value), then every cell's
   if kl then cols[] = kl                -- label, onto the row
   for col in *cols
-    n = if col == kl then 1/0 else k.bins
+    n = if col == kl then 1/0 else the.bins
     col.labels = mklabels col, tb.rows, n
   for row in *tb.rows
     row.labels = {}
@@ -257,17 +257,17 @@ capped = (rows, y, n) ->                -- <= n random rows per class
 
 forest = (tb, rows, y) ->
   xcols = tb.cols.x
-  m = k.rf and math.ceil sqrt #xcols
+  m = the.rf and math.ceil sqrt #xcols
   mk = -> Ys tb.nk
-  if k.cap
-    rows = capped rows, y, k.cap
+  if the.cap
+    rows = capped rows, y, the.cap
   half = ->
     u = shuffle rows
     [u[i] for i = 1, floor #rows / 2]
   out = {}
-  for _ = 1, k.trees
-    out[] = tree k.trees == 1 and rows or half!, y, xcols, mk, m,
-                 k.leaf, k.maxd
+  for _ = 1, the.trees
+    out[] = tree the.trees == 1 and rows or half!, y, xcols, mk, m,
+                 the.leaf, the.maxd
   out
 
 vote = (trees, row) ->                  -- label -> mean leaf share
@@ -304,5 +304,5 @@ aucs = (wps) ->                         -- expected 1-vs-rest, 0..100
   100 * sum / max n, 1
 
 -- the module: what balsa_eg.yue (and any other rig) may touch
-{:k, :srand, :rand, :shuffle, :bisect, :csv, :Tbl, :adds, :div,
+{:the, :srand, :rand, :shuffle, :bisect, :csv, :Tbl, :adds, :div,
  :tree, :leaf_of, :forest, :votes, :auc, :aucs}

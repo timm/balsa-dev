@@ -15,9 +15,10 @@
 local floor, sqrt, max, min, log = math.floor, math.sqrt, math.max, math.min, math.log
 local LOG2 = log(2)
 
-local k = {
+local the = {
   seed = 1234567891,
   eps = 0.35,
+  prudence = 0.01,
   bins = 16,
   trees = 30,
   cap = 200,
@@ -27,7 +28,7 @@ local k = {
 }
 
 ------------------------------------------------------------- random
-local seed = k.seed
+local seed = the.seed
 local srand
 srand = function(n)
   seed = n
@@ -416,7 +417,7 @@ labelall = function(tb)
     if col == kl then
       n = 1 / 0
     else
-      n = k.bins
+      n = the.bins
     end
     col.labels = mklabels(col, tb.rows, n)
   end
@@ -639,13 +640,13 @@ end
 local forest
 forest = function(tb, rows, y)
   local xcols = tb.cols.x
-  local m = k.rf and math.ceil(sqrt(#xcols))
+  local m = the.rf and math.ceil(sqrt(#xcols))
   local mk
   mk = function()
     return Ys(tb.nk)
   end
-  if k.cap then
-    rows = capped(rows, y, k.cap)
+  if the.cap then
+    rows = capped(rows, y, the.cap)
   end
   local half
   half = function()
@@ -659,8 +660,8 @@ forest = function(tb, rows, y)
     return _accum_0
   end
   local out = { }
-  for _ = 1, k.trees do
-    out[#out + 1] = tree(k.trees == 1 and rows or half(), y, xcols, mk, m, k.leaf, k.maxd)
+  for _ = 1, the.trees do
+    out[#out + 1] = tree(the.trees == 1 and rows or half(), y, xcols, mk, m, the.leaf, the.maxd)
   end
   return out
 end
@@ -759,7 +760,7 @@ end
 
 -- the module: what balsa_eg.yue (and any other rig) may touch
 return {
-  k = k,
+  the = the,
   srand = srand,
   rand = rand,
   shuffle = shuffle,

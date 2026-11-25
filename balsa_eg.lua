@@ -6,7 +6,7 @@
 -- (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 local floor, sqrt, max = math.floor, math.sqrt, math.max
 local b = require("balsa")
-local k, srand, shuffle, bisect, csv, Tbl, adds, div, forest, votes, aucs = b.k, b.srand, b.shuffle, b.bisect, b.csv, b.Tbl, b.adds, b.div, b.forest, b.votes, b.aucs
+local the, srand, shuffle, bisect, csv, Tbl, adds, div, forest, votes, aucs = b.the, b.srand, b.shuffle, b.bisect, b.csv, b.Tbl, b.adds, b.div, b.forest, b.votes, b.aucs
 local fmt = string.format
 
 -------------------------------------------------------------- stats
@@ -63,10 +63,10 @@ end
 local same
 same = function(xs, ys, eps, prudence)
   if eps == nil then
-    eps = k.eps
+    eps = the.eps
   end
   if prudence == nil then
-    prudence = 0.01
+    prudence = the.prudence
   end
   do
     local _accum_0 = { }
@@ -224,7 +224,7 @@ replay = function(dat)
       }
       for _index_0 = 1, #_list_0 do
         local arm = _list_0[_index_0]
-        k.trees, k.rf = arm[1], arm[2]
+        the.trees, the.rf = arm[1], arm[2]
         local t0 = os.clock()
         aucs_[#aucs_ + 1] = aucs(votes(forest(tb, train, kl), test, kl))
         secs[#secs + 1] = os.clock() - t0
@@ -281,7 +281,7 @@ local ENS = {
   "adult"
 }
 
-srand(k.seed)
+srand(the.seed)
 if arg[1] == "--replay" then
   return replay(arg[2])
 else

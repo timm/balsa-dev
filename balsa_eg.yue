@@ -6,7 +6,7 @@
 -- (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 import floor, sqrt, max from math
 b = require "balsa"
-import k, srand, shuffle, bisect, csv, Tbl, adds, div,
+import the, srand, shuffle, bisect, csv, Tbl, adds, div,
        forest, votes, aucs from b
 fmt = string.format
 
@@ -36,7 +36,7 @@ ks = (xs, ys) ->                        -- units of the .05 critical
                           bisect(ys, x, true) / m)
   d / sqrt((n + m) / (n * m))
 
-same = (xs, ys, eps=k.eps, prudence=0.01) ->
+same = (xs, ys, eps=the.eps, prudence=the.prudence) ->
   xs = [x for x in *xs]
   ys = [y for y in *ys]
   table.sort xs
@@ -103,7 +103,7 @@ replay = (dat) ->                       -- rerun DAT's recorded folds:
     train = [row for row in *tb.rows when not inh[row]]
     aucs_, secs = {}, {}
     for arm in *{{1, false}, {30, true}}
-      k.trees, k.rf = arm[1], arm[2]
+      the.trees, the.rf = arm[1], arm[2]
       t0 = os.clock!
       aucs_[] = aucs votes forest(tb, train, kl), test, kl
       secs[] = os.clock! - t0
@@ -121,7 +121,7 @@ ENS = {"balance.scale", "blood-transfusion-service-center",
   "Internet-Advertisements", "churn", "COMPAS53", "nomao",
   "bank-marketing", "electricity", "adult"}
 
-srand k.seed
+srand the.seed
 if arg[1] == "--replay"
   replay arg[2]
 else
