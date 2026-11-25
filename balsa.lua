@@ -227,16 +227,18 @@ yadds = function(vs, ys)
 end
 
 local yfold
-yfold = function(ys1, ys2, inc)
+yfold = function(ys1, ys2, inc, out)
   if inc == nil then
     inc = 1
   end
-  for i = 1, ys1.nk do
-    local _obj_0 = ys1.has
-    _obj_0[i] = _obj_0[i] + (inc * ys2.has[i])
+  if out == nil then
+    out = ys1
   end
-  ys1.n = ys1.n + (inc * ys2.n)
-  return ys1
+  for i = 1, ys1.nk do
+    out.has[i] = ys1.has[i] + inc * ys2.has[i]
+  end
+  out.n = ys1.n + inc * ys2.n
+  return out
 end
 
 local ydiv
@@ -494,28 +496,26 @@ cuts = function(col, rows, ys, mk, leaf, best)
   end
   local yes = mk()
   local no = mk()
+  local rest = mk()
   for _index_0 = 1, #bins do
     local bin = bins[_index_0]
     yfold(no, bin)
   end
   for b = 1, nb do
     local bin = bins[b]
-    yfold(no, bin, -1)
-    local lhs
+    local lhs, rhs
     if col.isnum then
       yfold(yes, bin)
-      lhs = yes
+      yfold(no, bin, -1)
+      lhs, rhs = yes, no
     else
-      lhs = bin
+      lhs, rhs = bin, yfold(no, bin, -1, rest)
     end
-    if leaf <= min(lhs.n, no.n) then
+    if leaf <= min(lhs.n, rhs.n) then
       best({
         col,
         b
-      }, xpect(lhs, no))
-    end
-    if not col.isnum then
-      yfold(no, bin)
+      }, xpect(lhs, rhs))
     end
   end
 end

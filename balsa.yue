@@ -102,11 +102,11 @@ yadds = (vs, ys) ->
   yadd ys, v for v in *vs
   ys
 
-yfold = (ys1, ys2, inc=1) ->            -- add (inc=-1: take) 2 into 1
-  for i = 1, ys1.nk
-    ys1.has[i] += inc * ys2.has[i]
-  ys1.n += inc * ys2.n
-  ys1
+yfold = (ys1, ys2, inc=1, out=ys1) ->   -- out = 1 + inc*2; out
+  for i = 1, ys1.nk                     -- defaults to 1: fold in place
+    out.has[i] = ys1.has[i] + inc * ys2.has[i]
+  out.n = ys1.n + inc * ys2.n
+  out
 
 ydiv = (ys) ->                          -- entropy of the counts
   if ys.n < 2
@@ -200,21 +200,20 @@ cuts = (col, rows, ys, mk, leaf, best) ->
     b = row.labels[col.at]
     if b > 0 then yadd bins[b], ys[i]
   yes = mk!
-  no = mk!
+  no = mk!                              -- nums: the sliding right side
+  rest = mk!                            -- syms: scratch, remade per value
   yfold no, bin for bin in *bins
   for b = 1, nb
     bin = bins[b]
-    yfold no, bin, -1
-    local lhs
+    local lhs, rhs
     if col.isnum
-      yfold yes, bin                    -- lhs: all bins <= b
-      lhs = yes
+      yfold yes, bin                    -- slide: yes grows,
+      yfold no, bin, -1                 -- no shrinks, no undo
+      lhs, rhs = yes, no                -- bins <= b, vs bins > b
     else
-      lhs = bin                         -- lhs: this value alone
-    if leaf <= min lhs.n, no.n          -- both: lhs vs the rest
-      best {col, b}, xpect lhs, no
-    if not col.isnum
-      yfold no, bin                     -- syms: restore the rest
+      lhs, rhs = bin, yfold(no, bin, -1, rest)  -- value, vs others
+    if leaf <= min lhs.n, rhs.n
+      best {col, b}, xpect lhs, rhs
 
 best_cut = (xcols, rows, ys, mk, m, leaf) ->
   best = argmost (a, b) -> a < b
