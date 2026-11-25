@@ -204,12 +204,17 @@ cuts = (col, rows, ys, mk, leaf, best) ->
   yfold no, bin for bin in *bins
   for b = 1, nb
     bin = bins[b]
-    yfold no, bin, -1                   -- syms: bin vs rest
-    if col.isnum then yfold yes, bin    -- nums: bins <= b
-    lhs = if col.isnum then yes else bin
-    if leaf <= min lhs.n, no.n
+    yfold no, bin, -1
+    local lhs
+    if col.isnum
+      yfold yes, bin                    -- lhs: all bins <= b
+      lhs = yes
+    else
+      lhs = bin                         -- lhs: this value alone
+    if leaf <= min lhs.n, no.n          -- both: lhs vs the rest
       best {col, b}, xpect lhs, no
-    if not col.isnum then yfold no, bin
+    if not col.isnum
+      yfold no, bin                     -- syms: restore the rest
 
 best_cut = (xcols, rows, ys, mk, m, leaf) ->
   best = argmost (a, b) -> a < b

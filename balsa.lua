@@ -501,11 +501,9 @@ cuts = function(col, rows, ys, mk, leaf, best)
   for b = 1, nb do
     local bin = bins[b]
     yfold(no, bin, -1)
-    if col.isnum then
-      yfold(yes, bin)
-    end
     local lhs
     if col.isnum then
+      yfold(yes, bin)
       lhs = yes
     else
       lhs = bin
