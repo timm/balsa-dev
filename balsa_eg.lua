@@ -27,12 +27,6 @@ median = function(xs)
   return ys[1 + floor(#ys / 2)]
 end
 
-local cohen
-cohen = function(num1, num2)
-  local sp = sqrt(((num1.n - 1) * div(num1) ^ 2 + (num2.n - 1) * div(num2) ^ 2) / max(1, num1.n + num2.n - 2))
-  return math.abs(num1.mu - num2.mu) / (sp + 1e-32)
-end
-
 local cliffs
 cliffs = function(xs, ys)
   local d = 0
@@ -60,11 +54,14 @@ ks = function(xs, ys)
   return d / sqrt((n + m) / (n * m))
 end
 
+-- Three questions, and they have to be different ones.  prudence asks if
+-- the gap is big enough to bother reporting, in the units we report.
+-- cliffs asks about order, ks about shape.  Cohen's d used to sit here too
+-- and was dropped: gap over pooled sd is a second opinion on what cliffs
+-- already counts, and the part only it supplied -- a floor in raw units --
+-- is what prudence now says outright.
 local same
-same = function(xs, ys, eps, prudence)
-  if eps == nil then
-    eps = the.eps
-  end
+same = function(xs, ys, prudence)
   if prudence == nil then
     prudence = the.prudence
   end
@@ -90,12 +87,10 @@ same = function(xs, ys, eps, prudence)
   end
   table.sort(xs)
   table.sort(ys)
-  local num1 = adds(xs)
-  local num2 = adds(ys)
-  if math.abs(num1.mu - num2.mu) < prudence then
+  if math.abs(adds(xs).mu - adds(ys).mu) < prudence then
     return true
   end
-  return cohen(num1, num2) <= eps and cliffs(xs, ys) <= 0.195 and ks(xs, ys) <= 1.36
+  return cliffs(xs, ys) <= 0.195 and ks(xs, ys) <= 1.36
 end
 
 local rank
@@ -170,72 +165,65 @@ replay = function(dat)
   print("#1:q16 n30 ")
   local tb, v, name = nil, nil, nil
   for line in io.lines(dat) do
-    local _continue_0 = false
-    repeat
-      if line:match("^#") then
-        _continue_0 = true
-        break
-      end
-      local f = line:match("^([^|]*)|")
-      local ids = line:match("|([^|]*)$")
-      if f ~= name then
-        name = f
-        tb = Tbl(csv("~/gits/moot/classify/" .. tostring(f) .. ".csv"))
-        v = { }
-        for i, row in ipairs(tb.rows) do
-          v[#tb.rows - i] = row
-        end
-      end
-      local at = tb.cols.klass.at
-      local kl
-      kl = function(row)
-        return row.labels[at]
-      end
-      local test, inh = { }, { }
-      for s in ids:gmatch("%d+") do
-        local row = v[tonumber(s)]
-        test[#test + 1] = row
-        inh[row] = true
-      end
-      local train
-      do
-        local _accum_0 = { }
-        local _len_0 = 1
-        local _list_0 = tb.rows
-        for _index_0 = 1, #_list_0 do
-          local row = _list_0[_index_0]
-          if not inh[row] then
-            _accum_0[_len_0] = row
-            _len_0 = _len_0 + 1
-          end
-        end
-        train = _accum_0
-      end
-      local aucs_, secs = { }, { }
-      local _list_0 = {
-        {
-          1,
-          false
-        },
-        {
-          30,
-          true
-        }
-      }
-      for _index_0 = 1, #_list_0 do
-        local arm = _list_0[_index_0]
-        the.trees, the.rf = arm[1], arm[2]
-        local t0 = os.clock()
-        aucs_[#aucs_ + 1] = aucs(votes(forest(tb, train, kl), test, kl))
-        secs[#secs + 1] = os.clock() - t0
-      end
-      io.write(fmt("%s|%.3f %.3f |%.3f %.3f |%s\n", f, aucs_[1], aucs_[2], secs[1], secs[2], ids))
-      io.flush()
-      _continue_0 = true
-    until true
-    if not _continue_0 then
-      break
+    if line:match("^#") then
+      goto _continue_0
     end
+    local f = line:match("^([^|]*)|")
+    local ids = line:match("|([^|]*)$")
+    if f ~= name then
+      name = f
+      tb = Tbl(csv("~/gits/moot/classify/" .. tostring(f) .. ".csv"))
+      v = { }
+      for i, row in ipairs(tb.rows) do
+        v[#tb.rows - i] = row
+      end
+    end
+    local at = tb.cols.klass.at
+    local kl
+    kl = function(row)
+      return row.labels[at]
+    end
+    local test, inh = { }, { }
+    for s in ids:gmatch("%d+") do
+      local row = v[tonumber(s)]
+      test[#test + 1] = row
+      inh[row] = true
+    end
+    local train
+    do
+      local _accum_0 = { }
+      local _len_0 = 1
+      local _list_0 = tb.rows
+      for _index_0 = 1, #_list_0 do
+        local row = _list_0[_index_0]
+        if not inh[row] then
+          _accum_0[_len_0] = row
+          _len_0 = _len_0 + 1
+        end
+      end
+      train = _accum_0
+    end
+    local aucs_, secs = { }, { }
+    local _list_0 = {
+      {
+        1,
+        false
+      },
+      {
+        30,
+        true
+      }
+    }
+    for _index_0 = 1, #_list_0 do
+      local arm = _list_0[_index_0]
+      the.trees, the.rf = arm[1], arm[2]
+      local t0 = os.clock()
+      aucs_[#aucs_ + 1] = aucs(votes(forest(tb, train, kl), test, kl))
+      secs[#secs + 1] = os.clock() - t0
+    end
+    io.write(fmt("%s|%.3f %.3f |%.3f %.3f |%s\n", f, aucs_[1], aucs_[2], secs[1], secs[2], ids))
+    io.flush()
+    ::_continue_0::
   end
 end
 

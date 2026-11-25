@@ -17,11 +17,6 @@ median = (xs) ->
   table.sort ys
   ys[1 + floor #ys / 2]
 
-cohen = (num1, num2) ->                 -- d, from two Num summaries
-  sp = sqrt(((num1.n - 1) * div(num1)^2 + (num2.n - 1) * div(num2)^2) /
-            max(1, num1.n + num2.n - 2))
-  math.abs(num1.mu - num2.mu) / (sp + 1e-32)
-
 cliffs = (xs, ys) ->                    -- xs, ys sorted
   d = 0
   for x in *xs
@@ -36,17 +31,20 @@ ks = (xs, ys) ->                        -- units of the .05 critical
                           bisect(ys, x, true) / m)
   d / sqrt((n + m) / (n * m))
 
-same = (xs, ys, eps=the.eps, prudence=the.prudence) ->
+-- Three questions, and they have to be different ones.  prudence asks if
+-- the gap is big enough to bother reporting, in the units we report.
+-- cliffs asks about order, ks about shape.  Cohen's d used to sit here too
+-- and was dropped: gap over pooled sd is a second opinion on what cliffs
+-- already counts, and the part only it supplied -- a floor in raw units --
+-- is what prudence now says outright.
+same = (xs, ys, prudence=the.prudence) ->
   xs = [x for x in *xs]
   ys = [y for y in *ys]
   table.sort xs
   table.sort ys
-  num1 = adds xs
-  num2 = adds ys
-  if math.abs(num1.mu - num2.mu) < prudence
+  if math.abs(adds(xs).mu - adds(ys).mu) < prudence
     return true                         -- too small to care about
-  cohen(num1, num2) <= eps and cliffs(xs, ys) <= 0.195 and
-                               ks(xs, ys) <= 1.36
+  cliffs(xs, ys) <= 0.195 and ks(xs, ys) <= 1.36
 
 rank = (d) ->                           -- {{name, nums}...} -> ranks
   table.sort d, (x, y) -> median(x[2]) < median(y[2])
