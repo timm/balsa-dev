@@ -64,7 +64,7 @@ csv = (file) ->
 -- plus one named field: cooked, its bin # per x column.
 Col = (txt="N", at=0) ->                -- no args: an anonymous Num
   if txt\match "^%u"
-    {:at, :txt, nm: true, n: 0, mu: 0, m2: 0}  -- a Num
+    {:at, :txt, isnum: true, n: 0, mu: 0, m2: 0}  -- a Num
   else
     {:at, :txt, n: 0, has: {}}                 -- a Sym
 
@@ -72,7 +72,7 @@ add = (col, v, inc=1) ->
   if v == "?"
     return
   col.n += inc
-  if col.nm
+  if col.isnum
     d = v - col.mu
     col.mu += inc * d / col.n
     col.m2 = max 0, col.m2 + inc * d * (v - col.mu)
@@ -84,7 +84,7 @@ adds = (vs, col=Col!) ->
   col
 
 div = (col) ->                          -- sd for Nums, entropy for Syms
-  if col.nm
+  if col.isnum
     return if col.n < 2 then 0 else sqrt(col.m2 / (col.n - 1))
   e = 0
   e -= m/col.n * log(m/col.n) for _, m in pairs col.has when m > 0
@@ -139,7 +139,7 @@ bisect = (vs, v, le) ->                 -- #items in sorted vs below v
   lo - 1
 
 choices = (col, rows, n) ->
-  if col.nm                             -- n bins, equal #known in each
+  if col.isnum                             -- n bins, equal #known in each
     vs = [row[col.at] for row in *rows when row[col.at] != "?"]
     table.sort vs
     out, b4 = {}, nil
@@ -157,7 +157,7 @@ choices = (col, rows, n) ->
 
 cook = (col, v) ->                      -- v -> bin # 1..; ? = -1
   if v == "?" then return -1
-  if col.nm then return max 1, bisect(col.bins, v, true)
+  if col.isnum then return max 1, bisect(col.bins, v, true)
   for i, b in ipairs col.bins
     if b == v then return i
   #col.bins + 1                         -- rare sym values pool here

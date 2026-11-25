@@ -126,7 +126,7 @@ Col = function(txt, at)
     return {
       at = at,
       txt = txt,
-      nm = true,
+      isnum = true,
       n = 0,
       mu = 0,
       m2 = 0
@@ -150,7 +150,7 @@ add = function(col, v, inc)
     return
   end
   col.n = col.n + inc
-  if col.nm then
+  if col.isnum then
     local d = v - col.mu
     col.mu = col.mu + (inc * d / col.n)
     col.m2 = max(0, col.m2 + inc * d * (v - col.mu))
@@ -173,7 +173,7 @@ end
 
 local div
 div = function(col)
-  if col.nm then
+  if col.isnum then
     if col.n < 2 then
       return 0
     else
@@ -323,7 +323,7 @@ end
 
 local choices
 choices = function(col, rows, n)
-  if col.nm then
+  if col.isnum then
     local vs
     do
       local _accum_0 = { }
@@ -379,7 +379,7 @@ cook = function(col, v)
   if v == "?" then
     return -1
   end
-  if col.nm then
+  if col.isnum then
     return max(1, bisect(col.bins, v, true))
   end
   for i, b in ipairs(col.bins) do
