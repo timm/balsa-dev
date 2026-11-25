@@ -100,8 +100,8 @@ replay = (dat) ->                       -- rerun DAT's recorded folds:
       inh[row] = true
     train = [row for row in *tb.rows when not inh[row]]
     aucs_, secs = {}, {}
-    for arm in *{{1, false}, {30, true}}
-      the.trees, the.rf = arm[1], arm[2]
+    for treat in *{{1, false}, {30, true}}
+      the.trees, the.rf = treat[1], treat[2]
       t0 = os.clock!
       aucs_[] = aucs votes forest(tb, train, kl), test, kl
       secs[] = os.clock! - t0

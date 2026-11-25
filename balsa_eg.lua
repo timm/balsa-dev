@@ -215,8 +215,8 @@ replay = function(dat)
       }
     }
     for _index_0 = 1, #_list_0 do
-      local arm = _list_0[_index_0]
-      the.trees, the.rf = arm[1], arm[2]
+      local treat = _list_0[_index_0]
+      the.trees, the.rf = treat[1], treat[2]
       local t0 = os.clock()
       aucs_[#aucs_ + 1] = aucs(votes(forest(tb, train, kl), test, kl))
       secs[#secs + 1] = os.clock() - t0
