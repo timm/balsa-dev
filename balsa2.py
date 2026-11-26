@@ -1,5 +1,8 @@
 # vim: set ts=2 sw=2 sts=2 et cc=75:
-"""Balsa learner for Python 3.11+. Column positions are zero-based."""
+"""Label cells once, grow trees over the labels, and combine predictions.
+
+Balsa for Python 3.11+. Column positions are zero-based.
+"""
 # (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 from bisect import bisect_left, bisect_right
 from math import ceil, copysign, exp, floor, inf, log, nan, sqrt
@@ -8,65 +11,24 @@ from types import SimpleNamespace
 
 the = SimpleNamespace(seed=1234567891, prudence=0.01, bins=16, trees=30,
                       cap=200, leaf=2, maxd=30, rf=True)
-_seed = the.seed
 
-def srand(n):
-  global _seed
-  _seed = n
-
-def rand(n=1):
-  global _seed
-  _seed = 16807 * _seed % 2147483647
-  return 1 + floor(n * _seed / 2147483647)
-
-def shuffle(t):
-  u = t[:1]
-  for j in range(1, len(t)):
-    k = rand(j + 1) - 1
-    u.append(u[k] if k < j else t[j])
-    u[k] = t[j]
-  return u
-
-def pick(t, n=None):
-  if n is None or n is False or not n < len(t): return t[:]
-  return shuffle(t)[:ceil(n)] if n > 0 else []
-
+# CSV rows. Headers start uppercase for numbers. Suffixes !, +, -, and X
+# mark the class, goals to maximize or minimize, and columns to skip.
 class Row(list):
   __slots__ = ("labels",)
 
-def thing(v):
-  v = v.strip()
-  if "_" in v or v.lower().lstrip("+-") in ("nan", "inf", "infinity"):
-    return v
-  try: return int(v)
-  except ValueError: pass
-  try:
-    if v.lower().lstrip("+-").startswith("0x"): return float.fromhex(v)
-    return float(v)
-  except ValueError: return v
+def thing(s):
+  for f in (int, float):
+    try: return f(s)
+    except ValueError: pass
+  return s.strip()
 
 def csv(file):
   with open(expanduser(file), encoding="utf-8") as f:
     return [Row(thing(v) for v in line.split(","))
             for s in f if (line := s.replace("\r", "").strip())]
 
-def bisect(t, v, le=False):
-  return (bisect_right if le else bisect_left)(t, v)
-
-def adds(vs, col=None):
-  col = Num() if col is None else col
-  for v in vs: col.add(v)
-  return col
-
-def yfold(ys, other, inc=1, u=None):
-  return ys.fold(other, inc, ys if u is None else u)
-
-def tolabel(col, v): return -1 if v == "?" else col.label(v)
-
-def xpect(left, right):
-  return ((left.n * left.div() + right.n * right.div())
-          / (left.n + right.n + 1e-32))
-
+# Column and target summaries. Known labels start at 1, and "?" gets -1.
 class Column:
   def __init__(i, txt, at): i.txt, i.at, i.n = txt, at, 0
 
@@ -75,7 +37,7 @@ class Column:
       i.n += inc
       i.add_known(v, inc)
 
-  def cuts(i, rows, targets, mk, leaf, best):
+  def cuts(i, rows, targets, mk, leaf):
     bins = [mk() for _ in range(len(i.labels) + 1)]
     for row, y in zip(rows, targets):
       b = row.labels[i.at]
@@ -84,7 +46,8 @@ class Column:
     for bin in bins: yfold(total, bin)
     for b, bin in enumerate(bins[:-1], 1):
       left, right = i.split_bin(bin, prefix, total, rest)
-      if min(left.n, right.n) >= leaf: best((i, b), xpect(left, right))
+      if min(left.n, right.n) >= leaf:
+        yield (i, b), xpect(left, right)
 
 class Num(Column):
   def __init__(i, txt="N", at=0):
@@ -185,6 +148,17 @@ class Ys:
     u.n = i.n + inc * b.n
     return u
 
+def adds(vs, col=None):
+  col = Num() if col is None else col
+  for v in vs: col.add(v)
+  return col
+
+def yfold(ys, other, inc=1, u=None):
+  return ys.fold(other, inc, ys if u is None else u)
+
+def tolabel(col, v): return -1 if v == "?" else col.label(v)
+
+# Tables. Each row keeps its original cells and a list of labels.
 class Cols:
   def __init__(i, names):
     i.names, i.x, i.y, i.klass = names, [], [], None
@@ -223,15 +197,16 @@ class Tbl:
         n += 1
     return sqrt(d / max(n, 1))
 
+# Split search and trees. Numeric cuts use a threshold, symbolic cuts
+# use equality, and unknowns go left.
+def xpect(left, right):
+  return ((left.n * left.div() + right.n * right.div())
+          / (left.n + right.n + 1e-32))
+
 def best_cut(xcols, rows, targets, mk, m, leaf):
-  cut, score = None, None
-
-  def best(candidate, s):
-    nonlocal cut, score
-    if score is None or s < score: cut, score = candidate, s
-
-  for col in pick(xcols, m): col.cuts(rows, targets, mk, leaf, best)
-  return cut
+  cuts = (c for col in pick(xcols, m)
+          for c in col.cuts(rows, targets, mk, leaf))
+  return min(cuts, key=lambda c: c[1], default=(None, None))[0]
 
 class Tree:
   def __init__(i, rows, y, xcols, mk, m, leaf, maxd, lvl=0):
@@ -256,6 +231,30 @@ class Tree:
     while i.ati is not None: i = i.yes if i.goes_left(row) else i.no
     return i
 
+# Sampling. The Park–Miller generator makes the samples repeatable.
+_seed = the.seed
+
+def srand(n):
+  global _seed
+  _seed = n
+
+def rand(n=1):
+  global _seed
+  _seed = 16807 * _seed % 2147483647
+  return 1 + floor(n * _seed / 2147483647)
+
+def shuffle(t):
+  u = t[:1]
+  for j in range(1, len(t)):
+    k = rand(j + 1) - 1
+    u.append(u[k] if k < j else t[j])
+    u[k] = t[j]
+  return u
+
+def pick(t, n=None):
+  if n is None or n is False or not n < len(t): return t[:]
+  return shuffle(t)[:ceil(n)] if n > 0 else []
+
 def capped(rows, y, n, nk=None):
   shuffled = shuffle(rows)
   if nk is None or nk is False: return shuffled[:max(0, floor(n))]
@@ -266,6 +265,7 @@ def capped(rows, y, n, nk=None):
     if counts[label] <= n: kept.append(row)
   return kept
 
+# Forests. Votes are pairs of the true label and class probabilities.
 class Forest(list):
   def __init__(i, tb, rows, y, mk=None):
     if mk is None: mk = lambda: Ys(tb.nk)
@@ -293,6 +293,10 @@ class Forest(list):
   def predict(i, row):
     if not i: return nan
     return sum(node.leaf_of(row).ys.mid() for node in i) / len(i)
+
+# Scoring. Average class AUCs by their positive counts.
+def bisect(t, v, le=False):
+  return (bisect_right if le else bisect_left)(t, v)
 
 def auc(pos, neg):
   if not pos or not neg: return None
