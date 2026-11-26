@@ -87,8 +87,8 @@ def main():
                           st.fmean([mu[(s, a)] for s in sets]),
                           st.fmean([sd[(s, a)] for s in sets])))
         ax.text(xs.mean(), 1.53, g, ha="center", va="bottom", fontsize=FS["head"])
-        ticks += list(xs); labs += fs; x0 += len(fs) + 1
-        if gi < len(G) - 1: ax.axvline(x0 - 1, color="#555", lw=1)
+        ticks += list(xs); labs += fs; x0 += len(fs) + 3
+        if gi < len(G) - 1: ax.axvline(x0 - 2, color="#555", lw=1)
 
     ax.axhline(1.0, color="#999", lw=1.4, ls=(0, (6, 4)))
     ax.text(x0 - 1.6, 1.02, "predict the mean", ha="right", va="bottom",
@@ -96,13 +96,16 @@ def main():
     ax.set_xticks(ticks)
     ax.set_xticklabels(labs, rotation=60, ha="right", rotation_mode="anchor",
                        fontsize=10)
-    ax.set_ylim(0, 1.5); ax.set_xlim(-.7, x0 - 1.3)
+    ax.set_ylim(0, 1.5); ax.set_xlim(-.9, x0 - 2.1)
     ax.set_yticks([0, .25, .5, .75, 1, 1.25, 1.5])
-    ax.grid(axis="y", color="#ddd")
+    ax.set_yticks([.125, .375, .625, .875, 1.125, 1.375], minor=True)
+    ax.tick_params(axis="y", which="minor", length=0)
+    ax.grid(axis="y", which="major", color="#ddd")
+    ax.grid(axis="y", which="minor", color="#b0b0b0", ls=(0, (4, 4)), lw=1)
     ax.set_ylabel("MAE / MAE(predict the mean)\nlower is better, 5x2 folds",
                   fontsize=FS["lab"], labelpad=6)
     ax.tick_params(axis="y", labelsize=FS["tick"])
-    for s_ in ("top", "right"): ax.spines[s_].set_visible(False)
+    ax.spines["top"].set_visible(False)
 
     tx = ax.inset_axes((.035, .615, .36, .31))
     tx.set_xlim(0, 30); tx.set_ylim(0, 4.6)
