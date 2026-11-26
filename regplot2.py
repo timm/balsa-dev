@@ -107,25 +107,27 @@ def main():
     ax.tick_params(axis="y", labelsize=FS["tick"])
     ax.spines["top"].set_visible(False)
 
-    # top left.  It runs a little past the first panel, because the text is
-    # fixed in points and the panel is not wide enough for it; nothing is up
-    # there to collide with, since every panel is sorted best LightGBM first
-    tx = ax.inset_axes((.015, .74, .40, .22))
-    tx.set_xlim(0, 30); tx.set_ylim(0, 4.6)
+    # top left, and wholly inside the first panel.  Legend text is fixed in
+    # points while the panel is only as wide as its share of the sets, so the
+    # layout has to earn its width: one swatch, not two.  The sd column says
+    # it is the dashed series by underlining its heading in dashes.
+    wide = len(G[0][1]) / (x0 - 1.2)
+    tx = ax.inset_axes((.012, .74, wide - .025, .22))
+    tx.set_xlim(0, 24); tx.set_ylim(0, 4.6)
     tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
     for s_ in tx.spines.values(): s_.set_visible(False)
     mono = dict(family="monospace", fontsize=FS["mono"] - 2,
                 bbox=dict(fc="#fcfcfa", ec="none", pad=1))
-    tx.text(17.5, 4.1, "mean", ha="right", va="center", **mono)
-    tx.text(29.5, 4.1, "sd", ha="right", va="center", **mono)
+    tx.text(17.2, 4.1, "mean", ha="right", va="center", **mono)
+    tx.text(23.8, 4.1, "sd", ha="right", va="center", **mono)
+    tx.plot([21.4, 23.8], [3.5, 3.5], color="#555", lw=1.4, ls=(0, (3, 2)))
     for k, (lab, c, m, a, b) in enumerate(H):
         y = 2.9 - 1.1 * k
         tx.text(0, y, lab, ha="left", va="center", **mono)
-        tx.plot([9.6, 12.2], [y, y], color=c, lw=2.2)
-        tx.plot(10.9, y, m, color=c, ms=6)
-        tx.text(17.5, y, f"{a:.2f}", ha="right", va="center", **mono)
-        tx.plot([20.3, 23.3], [y, y], color=c, lw=2, ls="--")
-        tx.text(29.5, y, f"{b:.2f}", ha="right", va="center", **mono)
+        tx.plot([9.4, 11.4], [y, y], color=c, lw=2.2)
+        tx.plot(10.4, y, m, color=c, ms=6)
+        tx.text(17.2, y, f"{a:.2f}", ha="right", va="center", **mono)
+        tx.text(23.8, y, f"{b:.2f}", ha="right", va="center", **mono)
 
     if sum(secs.get(a, 0) for a, *_ in ARMS) > 0:
         bt = sorted((secs[a], lab, c) for a, lab, c, _ in ARMS if a in secs)
