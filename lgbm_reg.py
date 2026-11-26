@@ -62,7 +62,14 @@ def main():
       train = [i for i in ok if i not in tset]
       te    = [i for i in ok if i in tset]
       t0 = time.time()
-      m = lgb.LGBMRegressor(verbose=-1, n_jobs=1)
+      # min_child_samples defaults to 20, so a split needs 40 rows.  Half
+      # this corpus trains on fewer than that, where LightGBM made no split
+      # at all and every tree was a bare leaf predicting the training mean
+      # -- 130 of 590 folds scored exactly 1.000, by configuration rather
+      # than by weakness.  The balsa arms have no such floor (the.leaf=2),
+      # so relaxing this removes a handicap, it does not grant an edge.
+      m = lgb.LGBMRegressor(verbose=-1, n_jobs=1,
+                            min_child_samples=1, min_child_weight=0.0)
       m.fit(X[train], y[train], categorical_feature=cats)
       got = m.predict(X[te])
       secs["lgbm"] += time.time() - t0
