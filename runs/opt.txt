@@ -1,0 +1,644 @@
+#data                             balsa(1)    balsa(30)   random      lgbm        
+behavior_data/player_statistics_cleaned_final  90.6        90.0        84.7        84.6      
+process/nasa93dem                   82.5        74.9        74.5        54.7      
+config/Apache_AllMeasurements       98.8        96.6        85.5        97.3      
+config/wc+rs-3d-c4-obj1             99.7        99.0        74.0        97.7      
+config/wc+sol-3d-c4-obj1            99.9        99.7        83.8        99.5      
+config/wc+wc-3d-c4-obj1             99.9        99.2        83.8        99.0      
+config/SS-D                         94.8        81.1        54.4        82.0      
+config/SS-F                         97.0        97.0        53.8        96.3      
+config/SS-G                         95.5        84.8        62.6        88.6      
+misc/Car_price_cleaned              62.8        73.2        24.2        66.5      
+config/SS-B                         98.6        98.6        65.9        98.1      
+rl/A2C_Acrobot                      57.3        72.9        35.4        76.7      
+sales_data/wallpaper                93.9        88.3        79.7        88.8      
+config/SS-H                         99.5        99.5        60.8        99.5      
+rl/A2C_CartPole                     61.6        53.0        29.8        49.8      
+sales_data/socks                    98.6        85.0        60.5        97.4      
+misc/auto93                         91.5        93.6        38.3        88.7      
+misc/multiLabel                    100.0       100.0        71.5       100.0      
+process/pom3d                       84.4        95.0        46.3        74.5      
+behavior_data/student_dropout      100.0       100.0        52.7       100.0      
+config/SS-E                         97.7        91.0        76.1        98.3      
+config/SS-M                         99.7        99.6        84.7        99.4      
+systems/HSQLDB                      99.7        99.1        94.3        99.3      
+sales_data/dress-up                 65.4        60.9        49.4        61.0      
+config/SS-O                         96.2        96.4        64.1        95.7      
+binary_config/Scrum1k               80.1        93.3        29.2        97.2      
+process/coc1000                     35.1        52.3        33.1        63.9      
+config/SS-P                         98.8        98.4        38.7        99.4      
+config/SS-L                         98.4        98.0        43.6        99.4      
+systems/LLVM                        99.2        99.6        88.8        99.7      
+config/SS-I                         99.3        99.8        52.5        99.9      
+sales_data/accessories              45.0        36.5        21.2        20.4      
+config/X264_AllMeasurements         99.9        99.8        90.8       100.0      
+config/SS-A                         96.9        96.7        87.0        99.4      
+financial_data/home_data_for_ml_course  70.8        79.5        15.8        90.6      
+behavior_data/WA_Fn-UseC_-HR-Employee-Attrition  90.8        94.1        61.5        89.3      
+config/SS-C                         96.2        95.2        84.2        96.7      
+systems/storm                      100.0        99.8        76.7        99.9      
+misc/Wine_quality                   70.7        82.7        43.8        88.9      
+sales_data/Marketing_Analytics      60.7        72.2        39.4        94.5      
+systems/BDBC                        99.9        99.5        98.3        99.9      
+config/SS-Q                         98.6        98.4        70.2        98.3      
+config/sol-6d-c2-obj1               96.5        95.5        93.4        98.2      
+config/wc-6d-c1-obj1                99.9        99.9        68.2        97.8      
+config/SS-K                         96.2        93.6        63.1        97.6      
+health_data/Life_Expectancy_Data    97.6        98.4        73.3        98.2      
+config/SS-R                         76.3        77.5        62.4        79.1      
+config/HSMGP_num                    97.2        99.5        79.2        99.8      
+config/rs-6d-c3_obj1                99.9        99.9        97.2        99.7      
+config/rs-6d-c3_obj2               100.0       100.0        97.7        97.6      
+config/SS-S                         98.7        96.6        80.6        98.5      
+config/SS-J                         98.7        96.7        83.0        98.3      
+systems/deeparch                   100.0        99.9        77.6       100.0      
+systems/redis                       86.2        93.8        59.5        99.0      
+config/SS-U                         95.7        97.3        64.7        98.9      
+config/SQL_AllMeasurements          84.7        86.0        66.1        95.8      
+test/dataset120                     93.2       100.0        26.1       100.0      
+test/dataset600                     96.1       100.0        46.8       100.0      
+config/SS-T                         98.4        97.1        70.5        98.2      
+systems/dconvert                    97.3        97.3        72.9        96.9      
+config/SS-V                         99.1        95.4        66.4        99.5      
+financial_data/WA_Fn-UseC_-Telco-Customer-Churn  99.9        99.8        87.6        99.2      
+binary_config/billing10k            80.1        93.9        42.0        99.4      
+binary_config/FFM-1000-200-0.50-SAT-1  77.8        82.3        38.8        98.8      
+binary_config/FFM-125-25-0.50-SAT-1  81.6        92.0        42.2        99.4      
+binary_config/FFM-250-50-0.50-SAT-1  83.0        86.9        34.4        98.6      
+binary_config/FFM-500-100-0.50-SAT-1  79.8        92.5        41.6        99.9      
+binary_config/FM-500-100-0.25-SAT-1  82.2        89.3        29.2        99.5      
+binary_config/FM-500-100-0.50-SAT-1  87.6        93.8        41.5        99.9      
+binary_config/FM-500-100-0.75-SAT-1  77.1        96.7        23.1        97.9      
+binary_config/FM-500-100-1.00-SAT-1  73.2        94.9        41.1        99.7      
+binary_config/Scrum10k              79.3        92.7        38.4        95.7      
+hpo/Health-ClosedIssues0000         99.3        98.9        38.9        99.5      
+hpo/Health-ClosedIssues0001         54.2        50.8        51.1        54.2      
+hpo/Health-ClosedIssues0002         93.2        93.2        93.2        93.9      
+hpo/Health-ClosedIssues0003         89.2        91.2        52.8        95.9      
+hpo/Health-ClosedIssues0004         44.2        28.5        25.4        39.1      
+hpo/Health-ClosedIssues0005         73.8        66.3        44.4        80.8      
+hpo/Health-ClosedIssues0006         89.7        80.6        54.7        89.3      
+hpo/Health-ClosedIssues0007         55.2        51.3        20.2        89.6      
+hpo/Health-ClosedIssues0008         82.7        82.4        37.9        84.6      
+hpo/Health-ClosedIssues0009         25.4        48.6        21.6        63.8      
+hpo/Health-ClosedIssues0010         58.7        55.9        46.8        63.2      
+hpo/Health-ClosedIssues0011        100.0       100.0        46.0       100.0      
+hpo/Health-ClosedPRs0000           100.0       100.0       100.0       100.0      
+hpo/Health-ClosedPRs0002            80.8        82.3        68.7        95.8      
+hpo/Health-ClosedPRs0003            97.9        97.9        97.9        97.9      
+hpo/Health-ClosedPRs0004            93.8        93.8        34.2       100.0      
+hpo/Health-ClosedPRs0005           100.0       100.0        85.6       100.0      
+hpo/Health-ClosedPRs0006           100.0        92.4        23.3        91.9      
+hpo/Health-ClosedPRs0007            90.6       100.0        37.6       100.0      
+hpo/Health-ClosedPRs0008            21.2        26.5        11.2        84.2      
+hpo/Health-ClosedPRs0009            62.8        54.0        48.0        97.7      
+hpo/Health-ClosedPRs0010            49.5        47.8        28.1        80.2      
+hpo/Health-ClosedPRs0011           100.0       100.0       100.0       100.0      
+hpo/Health-Commits0000              97.8        97.5        58.4        98.2      
+hpo/Health-Commits0001              98.5        98.5        61.6        98.5      
+hpo/Health-Commits0002              37.5        54.5        18.1        99.2      
+hpo/Health-Commits0003              80.3        77.1        48.6        88.0      
+hpo/Health-Commits0004              48.5        40.9        35.1        48.9      
+hpo/Health-Commits0005              37.1        47.4        31.6        61.4      
+hpo/Health-Commits0006              70.8        71.1        62.4        76.6      
+hpo/Health-Commits0007              87.2        61.0        31.4        85.1      
+hpo/Health-Commits0008              42.0        61.7        37.4        79.9      
+hpo/Health-Commits0009              91.6        91.9        79.6        93.7      
+hpo/Health-Commits0010              91.8        89.2        56.0        91.4      
+hpo/Health-Commits0011             100.0       100.0        75.9       100.0      
+process/xomo_flight                 97.7        99.1        57.9        99.6      
+process/xomo_ground                 93.2        98.1        56.1        99.5      
+process/xomo_osp                    94.3        98.4        62.3        99.4      
+process/xomo_osp2                   79.7        92.5        50.8        94.0      
+financial_data/BankChurners         64.0        70.2        41.5        84.8      
+behavior_data/all_players           87.9        95.8        27.2        98.3      
+systems/PostgreSQL                  91.7        91.1        86.9        93.4      
+financial_data/Loan                 76.8        88.5        28.6        98.0      
+process/pom3a                       74.7        83.6        47.7        94.6      
+process/pom3b                       73.1        89.3        42.6        87.1      
+process/pom3c                       65.1        78.4        20.9        87.0      
+health_data/Data_COVID19_Indonesia  94.9        99.4        26.9       100.0      
+health_data/Medical_Data_and_Hospital_Readmissions 100.0       100.0       100.0       100.0      
+config/SS-N                         87.3        75.6        65.5        95.3      
+systems/x264                        95.8        98.5        55.3        99.2      
+config/SS-W                         67.3        77.4        52.4        85.2      
+systems/7z                          99.6        96.0        89.9        99.4      
+config/SS-X                         96.2        96.2        63.2        99.7      
+systems/exastencils                 96.4        93.6        65.8        98.4      
+binary_config/Scrum100k             58.2        91.2        33.3        99.5      
+systems/javagc                      95.4        94.2        89.1        98.2      
+
+#mean score                         84.8        86.7        57.0        91.4      
+#secs (all data)                    25.7       141.7         0.0        55.5      
+%folds behavior_data/player_statistics_cleaned_final balsa(1) 88.89 100.00 89.90 100.00 100.00 89.90 65.67 89.90 94.27 87.10
+%folds behavior_data/player_statistics_cleaned_final balsa(30) 88.89 94.27 71.33 94.27 94.27 89.90 94.27 89.90 94.27 88.89
+%folds behavior_data/player_statistics_cleaned_final random 87.47 94.27 76.37 92.65 92.65 75.30 94.27 74.76 89.90 68.89
+%folds behavior_data/player_statistics_cleaned_final lgbm 88.89 94.27 89.90 94.27 88.89 77.93 94.27 89.90 94.27 33.01
+%folds process/nasa93dem balsa(1) 59.19 100.00 100.00 59.19 69.16 100.00 100.00 89.97 47.64 100.00
+%folds process/nasa93dem balsa(30) 89.97 100.00 89.97 59.19 59.19 89.97 47.64 89.97 54.49 68.27
+%folds process/nasa93dem random 86.59 90.95 56.46 86.59 45.83 46.93 90.95 89.97 50.99 100.00
+%folds process/nasa93dem lgbm 40.24 54.49 38.00 59.19 35.83 33.18 90.95 54.49 54.49 86.59
+%folds config/Apache_AllMeasurements balsa(1) 100.00 96.95 100.00 96.95 100.00 100.00 96.95 100.00 100.00 96.95
+%folds config/Apache_AllMeasurements balsa(30) 90.07 96.95 96.95 96.95 96.95 96.95 96.95 100.00 96.95 96.95
+%folds config/Apache_AllMeasurements random 93.65 93.65 93.65 90.07 82.07 93.65 90.07 50.85 77.63 90.07
+%folds config/Apache_AllMeasurements lgbm 100.00 96.95 96.95 96.95 96.95 96.95 96.95 96.95 96.95 96.95
+%folds config/wc+rs-3d-c4-obj1 balsa(1) 100.00 99.71 99.36 99.65 99.65 100.00 99.65 99.36 100.00 99.65
+%folds config/wc+rs-3d-c4-obj1 balsa(30) 97.37 99.65 97.50 100.00 97.97 100.00 99.10 99.36 100.00 99.37
+%folds config/wc+rs-3d-c4-obj1 random 23.11 97.58 3.92 34.73 99.36 98.68 99.71 84.03 100.00 98.68
+%folds config/wc+rs-3d-c4-obj1 lgbm 99.36 99.10 96.19 99.36 99.36 99.10 99.36 86.20 100.00 99.36
+%folds config/wc+sol-3d-c4-obj1 balsa(1) 100.00 99.85 100.00 99.76 99.76 100.00 100.00 99.85 99.85 100.00
+%folds config/wc+sol-3d-c4-obj1 balsa(30) 100.00 99.64 99.56 99.76 99.76 99.65 99.65 99.85 99.65 99.24
+%folds config/wc+sol-3d-c4-obj1 random 97.63 99.56 85.39 99.64 99.64 99.34 55.06 15.05 89.20 97.89
+%folds config/wc+sol-3d-c4-obj1 lgbm 99.56 99.85 100.00 99.64 99.76 99.64 99.64 99.56 97.54 100.00
+%folds config/wc+wc-3d-c4-obj1 balsa(1) 99.87 100.00 99.87 100.00 100.00 99.87 99.87 100.00 99.68 100.00
+%folds config/wc+wc-3d-c4-obj1 balsa(30) 99.24 99.13 99.49 99.00 99.24 99.13 98.50 99.24 99.68 99.24
+%folds config/wc+wc-3d-c4-obj1 random 98.93 100.00 84.41 99.14 3.07 99.14 88.53 78.88 88.90 97.48
+%folds config/wc+wc-3d-c4-obj1 lgbm 99.24 99.49 99.87 97.22 99.24 99.49 99.68 99.24 97.22 99.49
+%folds config/SS-D balsa(1) 100.00 97.91 98.67 100.00 100.00 97.91 77.89 76.78 100.00 98.67
+%folds config/SS-D balsa(30) 72.86 77.17 72.86 100.00 100.00 73.81 77.17 84.28 77.17 75.46
+%folds config/SS-D random 41.39 63.31 36.10 34.31 84.93 72.86 73.81 19.31 73.75 44.72
+%folds config/SS-D lgbm 72.86 77.17 73.81 100.00 98.67 73.81 77.17 84.28 77.17 84.93
+%folds config/SS-F balsa(1) 99.49 86.59 99.49 100.00 99.49 94.90 100.00 91.04 99.49 100.00
+%folds config/SS-F balsa(30) 99.49 100.00 99.49 100.00 99.49 100.00 100.00 97.74 73.80 100.00
+%folds config/SS-F random 60.45 65.24 33.50 82.14 28.21 100.00 27.57 40.43 67.37 33.50
+%folds config/SS-F lgbm 99.49 67.78 99.49 100.00 99.49 100.00 99.49 97.74 99.49 100.00
+%folds config/SS-G balsa(1) 98.56 100.00 100.00 87.04 98.56 100.00 84.24 100.00 87.04 100.00
+%folds config/SS-G balsa(30) 72.85 78.83 100.00 77.04 80.29 100.00 71.30 98.34 98.34 71.30
+%folds config/SS-G random 69.32 31.46 78.83 69.32 66.77 68.61 77.04 38.16 45.99 80.70
+%folds config/SS-G lgbm 98.56 100.00 78.83 72.85 98.56 100.00 69.32 100.00 98.34 69.32
+%folds misc/Car_price_cleaned balsa(1) 44.12 55.93 100.00 44.12 51.67 44.18 44.12 100.00 44.18 100.00
+%folds misc/Car_price_cleaned balsa(30) 100.00 55.93 100.00 44.12 44.12 100.00 44.12 100.00 44.18 100.00
+%folds misc/Car_price_cleaned random 33.24 13.50 4.16 55.93 33.23 15.09 33.25 -9.30 39.41 23.84
+%folds misc/Car_price_cleaned lgbm 100.00 44.18 44.18 44.12 44.12 100.00 44.12 100.00 44.18 100.00
+%folds config/SS-B balsa(1) 97.60 100.00 100.00 99.57 100.00 96.10 100.00 97.04 100.00 96.10
+%folds config/SS-B balsa(30) 97.60 100.00 100.00 99.57 100.00 96.10 100.00 97.04 100.00 96.10
+%folds config/SS-B random 64.48 79.42 55.22 99.57 77.55 80.56 80.48 -22.85 79.56 64.58
+%folds config/SS-B lgbm 97.60 100.00 100.00 99.57 100.00 96.10 99.57 91.57 100.00 96.10
+%folds rl/A2C_Acrobot balsa(1) 45.46 41.60 77.82 51.92 40.10 96.85 77.82 47.43 50.77 43.35
+%folds rl/A2C_Acrobot balsa(30) 61.72 100.00 77.82 100.00 77.82 45.46 77.82 47.43 40.51 100.00
+%folds rl/A2C_Acrobot random 3.42 42.12 31.37 29.56 50.79 45.46 28.27 27.05 38.93 57.12
+%folds rl/A2C_Acrobot lgbm 59.14 100.00 40.10 100.00 47.43 96.85 77.82 86.05 59.14 100.00
+%folds sales_data/wallpaper balsa(1) 98.38 98.80 100.00 100.00 100.00 100.00 84.08 100.00 83.12 75.03
+%folds sales_data/wallpaper balsa(30) 75.03 100.00 100.00 75.03 75.03 100.00 97.32 78.80 84.08 97.32
+%folds sales_data/wallpaper random 53.81 98.80 84.08 75.03 97.32 62.63 97.32 75.03 98.38 55.04
+%folds sales_data/wallpaper lgbm 50.74 98.80 100.00 75.03 92.48 100.00 97.32 100.00 75.03 98.80
+%folds config/SS-H balsa(1) 100.00 95.26 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds config/SS-H balsa(30) 100.00 95.26 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds config/SS-H random 41.96 46.88 95.26 71.58 73.86 82.71 95.26 46.81 -29.35 82.71
+%folds config/SS-H lgbm 100.00 95.26 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds rl/A2C_CartPole balsa(1) 29.21 40.03 40.41 80.70 100.00 40.41 59.02 80.70 100.00 45.84
+%folds rl/A2C_CartPole balsa(30) 29.21 61.51 29.21 80.70 61.51 59.02 59.02 49.73 41.48 59.02
+%folds rl/A2C_CartPole random 19.71 17.87 58.24 19.71 42.49 17.87 32.75 19.77 40.59 29.21
+%folds rl/A2C_CartPole lgbm 49.43 59.02 40.88 46.40 32.75 49.43 59.02 49.43 61.51 49.73
+%folds sales_data/socks balsa(1) 100.00 100.00 100.00 86.12 100.00 100.00 100.00 100.00 100.00 100.00
+%folds sales_data/socks balsa(30) 86.12 88.07 86.12 79.32 86.12 79.32 100.00 79.32 79.32 86.12
+%folds sales_data/socks random 35.22 35.22 86.12 79.32 100.00 -28.05 88.07 35.22 88.07 86.12
+%folds sales_data/socks lgbm 86.12 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 88.07
+%folds misc/auto93 balsa(1) 93.21 94.55 94.55 85.37 85.37 95.36 94.55 85.53 94.55 91.51
+%folds misc/auto93 balsa(30) 97.16 94.55 91.31 97.16 81.88 97.16 100.00 85.53 94.55 97.16
+%folds misc/auto93 random 25.91 58.80 -5.35 24.24 45.62 79.30 58.98 67.34 7.62 20.43
+%folds misc/auto93 lgbm 97.16 91.31 89.32 97.16 94.55 82.45 75.10 91.31 94.55 73.76
+%folds misc/multiLabel balsa(1) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds misc/multiLabel balsa(30) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds misc/multiLabel random 5.16 100.00 100.00 100.00 100.00 100.00 100.00 5.16 5.16 100.00
+%folds misc/multiLabel lgbm 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds process/pom3d balsa(1) 98.26 90.45 62.42 86.69 96.27 98.26 73.39 86.69 94.60 57.12
+%folds process/pom3d balsa(30) 96.28 86.69 96.27 94.60 100.00 96.28 94.60 93.61 93.61 98.26
+%folds process/pom3d random 94.39 39.44 35.42 31.10 42.45 73.45 35.16 41.24 -7.96 78.55
+%folds process/pom3d lgbm 96.27 35.16 43.48 86.69 96.27 43.48 96.27 93.61 96.27 57.12
+%folds behavior_data/student_dropout balsa(1) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds behavior_data/student_dropout balsa(30) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds behavior_data/student_dropout random 100.00 100.00 100.00 -18.21 -18.21 100.00 100.00 -18.21 100.00 -18.21
+%folds behavior_data/student_dropout lgbm 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds config/SS-E balsa(1) 99.18 92.54 98.23 99.18 100.00 97.82 100.00 92.54 100.00 97.68
+%folds config/SS-E balsa(30) 91.05 97.70 98.23 97.13 88.12 87.70 87.70 88.12 86.10 87.70
+%folds config/SS-E random 94.79 82.69 71.99 88.16 94.19 30.57 85.97 68.33 75.99 68.25
+%folds config/SS-E lgbm 99.18 98.23 98.23 97.13 97.32 97.70 98.23 99.18 100.00 97.70
+%folds config/SS-M balsa(1) 99.88 98.89 99.88 100.00 99.88 100.00 99.47 99.88 99.50 99.88
+%folds config/SS-M balsa(30) 99.88 100.00 99.60 99.08 99.88 99.60 99.50 99.05 99.47 99.88
+%folds config/SS-M random 72.28 88.86 71.76 73.16 98.74 98.89 72.06 74.17 97.50 99.11
+%folds config/SS-M lgbm 99.49 98.94 99.60 99.50 98.94 99.60 98.94 99.60 99.37 100.00
+%folds systems/HSQLDB balsa(1) 99.25 99.75 100.00 99.75 100.00 99.00 100.00 99.75 99.50 99.75
+%folds systems/HSQLDB balsa(30) 98.75 99.75 99.00 99.50 98.49 98.49 99.75 99.50 97.99 99.75
+%folds systems/HSQLDB random 81.68 80.27 96.97 98.24 95.69 95.94 98.49 98.49 98.49 98.49
+%folds systems/HSQLDB lgbm 99.25 99.50 99.50 99.50 98.75 99.50 99.75 98.49 99.50 99.75
+%folds sales_data/dress-up balsa(1) 61.57 61.57 61.57 99.91 61.57 61.57 61.57 61.34 61.57 61.57
+%folds sales_data/dress-up balsa(30) 60.72 61.57 60.72 60.72 60.72 60.72 60.72 60.72 61.57 60.72
+%folds sales_data/dress-up random 60.72 38.10 61.34 50.91 59.36 40.64 46.28 39.39 43.02 54.60
+%folds sales_data/dress-up lgbm 61.57 61.57 60.28 60.72 60.28 61.57 60.72 61.57 61.57 60.28
+%folds config/SS-O balsa(1) 96.05 97.48 99.40 93.21 93.21 93.45 96.05 94.63 100.00 98.31
+%folds config/SS-O balsa(30) 96.05 100.00 97.48 96.50 93.83 93.45 95.13 96.50 97.32 97.48
+%folds config/SS-O random 83.75 51.14 41.17 95.23 -9.93 81.63 100.00 56.46 96.61 45.36
+%folds config/SS-O lgbm 97.38 100.00 94.34 93.63 93.21 93.89 96.05 98.34 97.32 92.93
+%folds binary_config/Scrum1k balsa(1) 78.82 100.00 87.74 67.07 99.34 63.09 44.00 74.25 87.74 99.34
+%folds binary_config/Scrum1k balsa(30) 87.20 99.34 100.00 88.81 99.34 100.00 96.88 74.71 87.74 99.34
+%folds binary_config/Scrum1k random 41.83 20.72 22.19 29.53 35.66 6.12 6.95 56.36 37.71 35.00
+%folds binary_config/Scrum1k lgbm 87.74 100.00 100.00 88.81 99.34 100.00 96.88 100.00 100.00 99.34
+%folds process/coc1000 balsa(1) 79.95 19.78 69.03 50.52 -3.23 24.44 48.44 -16.94 20.47 58.83
+%folds process/coc1000 balsa(30) -3.54 60.81 63.67 32.14 60.76 75.30 60.18 34.92 50.52 88.24
+%folds process/coc1000 random -1.14 47.68 58.83 28.08 37.26 22.36 75.30 27.30 15.74 19.20
+%folds process/coc1000 lgbm 79.64 60.76 63.67 58.02 82.40 37.48 60.76 71.89 35.73 88.24
+%folds config/SS-P balsa(1) 99.29 99.80 99.29 100.00 99.11 98.51 97.18 99.17 97.62 98.14
+%folds config/SS-P balsa(30) 99.29 95.58 98.13 100.00 99.97 100.00 95.58 98.14 99.17 98.14
+%folds config/SS-P random -7.58 94.34 33.72 0.01 63.18 50.78 -3.79 46.15 54.98 55.18
+%folds config/SS-P lgbm 100.00 99.80 99.80 100.00 98.13 100.00 97.18 100.00 99.29 99.97
+%folds config/SS-L balsa(1) 97.02 97.39 97.57 99.80 98.51 99.39 100.00 97.07 99.80 97.07
+%folds config/SS-L balsa(30) 96.92 100.00 99.29 97.07 95.43 98.13 97.62 97.39 99.11 99.29
+%folds config/SS-L random -10.90 94.18 33.72 59.57 5.09 36.96 99.97 7.99 96.93 12.73
+%folds config/SS-L lgbm 98.13 99.80 99.29 100.00 99.17 98.13 99.39 99.80 99.80 100.00
+%folds systems/LLVM balsa(1) 99.36 99.87 99.87 99.41 99.05 98.84 99.87 97.97 99.23 99.02
+%folds systems/LLVM balsa(30) 99.41 100.00 99.87 99.41 99.05 100.00 100.00 99.65 99.65 98.91
+%folds systems/LLVM random 76.66 97.50 76.66 95.48 74.12 98.22 95.41 84.98 99.23 89.61
+%folds systems/LLVM lgbm 99.50 100.00 99.87 99.65 99.87 99.65 99.87 99.65 99.41 100.00
+%folds config/SS-I balsa(1) 99.97 100.00 99.80 99.88 99.68 100.00 99.71 100.00 99.92 94.06
+%folds config/SS-I balsa(30) 99.68 100.00 99.75 99.97 99.75 99.80 99.75 100.00 99.92 99.68
+%folds config/SS-I random 19.52 12.58 52.46 46.40 95.93 94.94 53.06 45.99 79.15 24.49
+%folds config/SS-I lgbm 99.75 100.00 99.75 99.88 99.68 100.00 99.97 100.00 99.75 100.00
+%folds sales_data/accessories balsa(1) 20.73 99.91 21.58 21.58 21.58 21.58 100.00 100.00 21.26 21.58
+%folds sales_data/accessories balsa(30) 100.00 16.19 21.26 21.58 100.00 21.26 21.26 20.76 21.26 21.26
+%folds sales_data/accessories random 21.58 20.93 21.58 21.58 21.26 21.58 20.00 21.26 21.26 21.26
+%folds sales_data/accessories lgbm 20.76 21.58 21.58 21.58 13.06 21.58 19.70 20.73 21.58 21.58
+%folds config/X264_AllMeasurements balsa(1) 100.00 99.98 99.99 99.99 100.00 99.99 100.00 99.99 99.26 99.99
+%folds config/X264_AllMeasurements balsa(30) 99.98 99.56 100.00 99.51 99.98 99.99 99.56 99.98 99.54 99.99
+%folds config/X264_AllMeasurements random 87.12 98.26 96.28 99.49 82.34 95.41 82.48 82.52 95.93 88.53
+%folds config/X264_AllMeasurements lgbm 100.00 99.98 100.00 99.99 100.00 99.99 100.00 99.99 100.00 99.99
+%folds config/SS-A balsa(1) 94.99 93.89 98.61 99.71 97.50 95.82 100.00 99.71 93.53 94.76
+%folds config/SS-A balsa(30) 96.41 100.00 94.87 94.92 98.26 95.85 97.28 97.22 97.50 94.99
+%folds config/SS-A random 87.11 94.92 95.23 79.50 80.19 93.69 97.50 69.36 87.75 85.02
+%folds config/SS-A lgbm 98.48 100.00 100.00 97.42 99.71 100.00 100.00 99.71 98.48 99.71
+%folds financial_data/home_data_for_ml_course balsa(1) 43.00 100.00 47.00 88.85 50.69 97.39 88.85 88.79 32.49 70.60
+%folds financial_data/home_data_for_ml_course balsa(30) 69.17 52.99 69.17 100.00 71.21 70.60 88.85 75.16 97.39 100.00
+%folds financial_data/home_data_for_ml_course random 19.69 21.97 3.70 48.18 -1.80 1.04 5.66 45.28 8.28 6.14
+%folds financial_data/home_data_for_ml_course lgbm 97.39 100.00 97.39 88.85 53.84 97.39 100.00 73.36 97.39 100.00
+%folds behavior_data/WA_Fn-UseC_-HR-Employee-Attrition balsa(1) 84.31 91.73 96.15 87.24 98.35 84.31 90.65 89.12 86.69 99.45
+%folds behavior_data/WA_Fn-UseC_-HR-Employee-Attrition balsa(30) 99.45 94.43 99.45 85.38 89.68 94.90 95.86 90.86 95.86 95.02
+%folds behavior_data/WA_Fn-UseC_-HR-Employee-Attrition random 39.01 76.29 77.27 81.55 56.69 53.62 -3.09 70.22 84.85 78.55
+%folds behavior_data/WA_Fn-UseC_-HR-Employee-Attrition lgbm 88.76 91.73 91.72 95.86 89.63 90.47 89.63 91.73 85.35 78.22
+%folds config/SS-C balsa(1) 97.17 93.99 96.18 94.30 97.73 97.22 95.35 92.86 96.74 100.00
+%folds config/SS-C balsa(30) 91.28 96.90 94.48 96.35 92.92 97.40 97.40 95.85 92.34 97.40
+%folds config/SS-C random 69.35 92.14 83.46 89.42 92.71 46.22 93.12 96.08 88.82 90.18
+%folds config/SS-C lgbm 96.81 95.17 97.00 97.17 97.00 97.17 97.17 95.97 95.87 97.73
+%folds systems/storm balsa(1) 100.00 99.99 99.89 99.97 100.00 99.94 99.96 99.99 99.98 99.98
+%folds systems/storm balsa(30) 99.52 100.00 100.00 99.55 100.00 100.00 100.00 99.66 100.00 99.63
+%folds systems/storm random -34.90 99.89 97.19 99.96 99.41 99.98 99.42 6.20 99.52 99.98
+%folds systems/storm lgbm 100.00 99.69 100.00 100.00 100.00 99.94 100.00 99.93 99.92 100.00
+%folds misc/Wine_quality balsa(1) 50.46 68.09 69.64 69.64 100.00 68.09 69.64 65.58 66.97 79.06
+%folds misc/Wine_quality balsa(30) 67.96 100.00 69.64 71.39 100.00 100.00 73.28 100.00 78.25 66.97
+%folds misc/Wine_quality random 68.09 69.64 63.85 -0.54 56.29 68.61 66.97 -0.54 49.07 -3.87
+%folds misc/Wine_quality lgbm 100.00 100.00 69.64 78.25 100.00 100.00 100.00 100.00 71.39 69.64
+%folds sales_data/Marketing_Analytics balsa(1) 48.72 54.17 57.75 96.60 69.76 57.16 100.00 14.00 57.67 51.41
+%folds sales_data/Marketing_Analytics balsa(30) 87.04 47.36 91.52 60.03 54.17 91.52 59.45 72.38 66.86 91.52
+%folds sales_data/Marketing_Analytics random 59.96 71.66 48.51 18.74 57.75 65.10 14.84 27.53 41.05 -11.55
+%folds sales_data/Marketing_Analytics lgbm 96.60 93.06 100.00 91.52 96.60 91.52 96.60 90.93 91.52 96.60
+%folds systems/BDBC balsa(1) 100.00 99.92 99.89 100.00 100.00 99.87 99.88 99.91 99.89 99.93
+%folds systems/BDBC balsa(30) 98.88 99.83 99.91 99.92 100.00 99.89 98.16 99.58 99.84 98.74
+%folds systems/BDBC random 97.87 97.48 97.91 97.71 99.87 98.55 97.11 98.50 98.02 99.91
+%folds systems/BDBC lgbm 99.89 99.89 99.96 100.00 99.92 99.91 99.96 100.00 100.00 99.92
+%folds config/SS-Q balsa(1) 97.65 99.08 98.31 99.50 99.41 98.46 98.22 97.43 98.10 99.50
+%folds config/SS-Q balsa(30) 98.10 99.07 97.96 99.85 99.50 96.30 98.10 97.22 98.65 99.50
+%folds config/SS-Q random 8.06 78.87 57.45 87.50 58.50 96.43 67.43 71.54 93.66 82.70
+%folds config/SS-Q lgbm 98.86 98.45 98.37 97.76 98.45 98.75 96.74 98.45 98.76 98.75
+%folds config/sol-6d-c2-obj1 balsa(1) 96.66 96.46 95.68 96.33 96.51 96.55 96.24 95.73 97.63 96.85
+%folds config/sol-6d-c2-obj1 balsa(30) 95.55 95.83 95.42 95.51 95.78 95.28 95.39 95.31 95.83 95.55
+%folds config/sol-6d-c2-obj1 random 95.13 81.75 94.35 93.36 95.32 96.21 95.89 95.23 94.91 92.02
+%folds config/sol-6d-c2-obj1 lgbm 96.13 100.00 100.00 96.42 96.42 100.00 100.00 96.13 96.42 100.00
+%folds config/wc-6d-c1-obj1 balsa(1) 99.93 99.95 99.93 99.90 99.43 99.97 99.96 99.95 99.93 99.95
+%folds config/wc-6d-c1-obj1 balsa(30) 99.91 99.90 99.95 99.92 99.93 99.93 99.96 99.94 99.96 99.93
+%folds config/wc-6d-c1-obj1 random 89.71 99.88 15.78 10.68 95.63 36.88 99.39 97.73 40.91 95.82
+%folds config/wc-6d-c1-obj1 lgbm 99.93 95.82 95.85 95.82 95.85 99.48 99.52 95.85 99.92 99.52
+%folds config/SS-K balsa(1) 94.32 99.22 93.45 97.64 92.79 95.17 98.84 99.04 94.74 96.36
+%folds config/SS-K balsa(30) 94.32 95.24 82.74 96.27 97.73 94.56 96.36 92.23 92.70 93.79
+%folds config/SS-K random -34.39 67.63 92.97 64.59 85.99 74.23 62.58 41.58 99.62 75.76
+%folds config/SS-K lgbm 97.73 99.20 96.44 99.31 96.58 97.29 96.36 97.73 97.61 97.73
+%folds health_data/Life_Expectancy_Data balsa(1) 98.95 95.79 99.62 90.14 95.79 99.91 98.61 99.62 99.91 97.41
+%folds health_data/Life_Expectancy_Data balsa(30) 98.08 95.76 99.62 98.95 98.08 99.91 98.61 98.08 99.62 96.89
+%folds health_data/Life_Expectancy_Data random 66.16 23.88 80.27 52.31 96.86 92.90 100.00 90.18 94.04 36.30
+%folds health_data/Life_Expectancy_Data lgbm 98.95 97.58 99.62 97.13 97.77 98.08 99.31 96.23 98.46 98.61
+%folds config/SS-R balsa(1) 75.66 75.87 84.95 72.52 75.78 73.92 73.31 75.80 76.23 78.89
+%folds config/SS-R balsa(30) 74.70 76.30 78.98 71.94 96.91 75.83 81.34 73.31 72.55 73.37
+%folds config/SS-R random 55.32 55.45 54.84 72.52 78.89 77.71 73.22 5.45 56.51 93.92
+%folds config/SS-R lgbm 78.48 75.87 78.93 76.85 75.78 84.95 76.70 75.78 84.95 82.74
+%folds config/HSMGP_num balsa(1) 94.02 98.74 98.84 95.29 99.89 99.68 97.47 94.41 98.72 95.18
+%folds config/HSMGP_num balsa(30) 99.77 99.68 99.28 99.97 99.51 99.67 100.00 98.67 98.74 99.67
+%folds config/HSMGP_num random 77.21 75.24 80.81 62.86 71.86 88.79 94.87 92.54 68.40 79.66
+%folds config/HSMGP_num lgbm 100.00 99.68 100.00 99.68 99.77 100.00 100.00 99.89 99.68 99.68
+%folds config/rs-6d-c3_obj1 balsa(1) 99.61 99.98 100.00 99.97 99.98 99.97 99.98 99.98 99.99 99.98
+%folds config/rs-6d-c3_obj1 balsa(30) 99.97 99.98 99.61 99.96 99.98 99.61 99.98 99.63 99.98 99.99
+%folds config/rs-6d-c3_obj1 random 93.50 96.60 99.66 99.98 98.40 99.10 99.36 87.14 99.11 99.59
+%folds config/rs-6d-c3_obj1 lgbm 99.70 99.43 99.60 99.52 99.65 99.97 99.60 99.70 99.69 99.67
+%folds config/rs-6d-c3_obj2 balsa(1) 100.00 99.99 99.99 99.99 99.98 100.00 99.99 100.00 100.00 100.00
+%folds config/rs-6d-c3_obj2 balsa(30) 99.99 99.99 99.99 99.99 99.99 99.99 100.00 99.99 99.99 100.00
+%folds config/rs-6d-c3_obj2 random 99.99 98.74 99.98 99.99 98.43 95.60 87.18 98.61 98.84 99.97
+%folds config/rs-6d-c3_obj2 lgbm 99.53 98.91 98.27 95.92 94.49 97.54 98.39 99.59 97.54 95.59
+%folds config/SS-S balsa(1) 99.30 98.79 99.03 98.08 95.05 100.00 97.33 99.09 99.96 100.00
+%folds config/SS-S balsa(30) 93.78 94.26 96.96 94.65 94.84 99.21 97.23 100.00 96.16 99.30
+%folds config/SS-S random 66.94 94.62 75.97 28.74 79.88 80.84 94.62 98.89 90.97 95.00
+%folds config/SS-S lgbm 97.53 97.13 97.16 98.79 99.22 99.30 99.24 99.22 99.96 97.16
+%folds config/SS-J balsa(1) 97.88 99.80 98.46 98.55 99.64 99.45 98.97 96.64 97.56 99.64
+%folds config/SS-J balsa(30) 96.91 95.74 96.21 98.17 94.28 97.45 96.59 95.43 97.55 98.69
+%folds config/SS-J random 99.16 96.61 96.67 37.87 47.68 89.26 87.84 91.18 86.28 97.77
+%folds config/SS-J lgbm 97.70 98.45 98.69 97.50 97.98 98.45 98.76 98.79 98.42 97.98
+%folds systems/deeparch balsa(1) 100.00 100.00 99.86 99.99 100.00 99.97 100.00 99.99 99.99 100.00
+%folds systems/deeparch balsa(30) 99.85 99.97 99.86 99.96 99.97 99.84 99.96 100.00 99.96 100.00
+%folds systems/deeparch random 87.52 23.57 99.97 98.73 85.06 83.28 57.01 57.51 83.62 99.98
+%folds systems/deeparch lgbm 99.98 99.99 99.98 99.99 100.00 99.85 99.99 99.84 99.94 99.99
+%folds systems/redis balsa(1) 49.48 95.11 100.00 69.12 83.33 75.63 93.32 99.92 97.30 98.30
+%folds systems/redis balsa(30) 95.81 95.81 91.65 94.73 92.12 94.20 99.89 92.20 94.82 86.30
+%folds systems/redis random -2.88 71.77 90.70 61.80 57.76 94.66 58.81 79.16 78.50 4.74
+%folds systems/redis lgbm 100.00 99.39 99.89 98.30 98.75 99.92 95.81 98.30 99.45 99.92
+%folds config/SS-U balsa(1) 97.45 100.00 97.31 94.86 94.86 95.05 96.24 97.40 96.46 87.20
+%folds config/SS-U balsa(30) 96.85 95.68 96.85 98.47 100.00 95.71 96.61 97.45 96.90 98.20
+%folds config/SS-U random 73.74 65.64 46.38 92.96 84.36 41.39 88.39 64.43 24.27 65.40
+%folds config/SS-U lgbm 98.58 100.00 98.58 98.47 100.00 98.13 98.13 98.58 98.58 100.00
+%folds config/SQL_AllMeasurements balsa(1) 94.22 87.26 93.56 20.81 98.48 95.94 90.10 92.51 84.86 89.48
+%folds config/SQL_AllMeasurements balsa(30) 83.38 85.88 86.58 100.00 82.07 84.08 94.22 57.61 93.13 93.02
+%folds config/SQL_AllMeasurements random 78.15 4.25 76.34 35.87 84.40 91.05 48.56 73.43 85.91 82.81
+%folds config/SQL_AllMeasurements lgbm 94.28 100.00 91.57 100.00 100.00 86.59 93.99 97.36 93.99 100.00
+%folds test/dataset120 balsa(1) 100.00 100.00 100.00 65.94 100.00 100.00 65.94 100.00 100.00 100.00
+%folds test/dataset120 balsa(30) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds test/dataset120 random -34.22 100.00 -34.22 -34.22 100.00 -34.22 65.94 100.00 65.94 -34.22
+%folds test/dataset120 lgbm 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds test/dataset600 balsa(1) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 60.73 100.00 100.00
+%folds test/dataset600 balsa(30) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds test/dataset600 random 60.73 60.73 100.00 -38.18 100.00 100.00 -38.18 60.73 100.00 -38.18
+%folds test/dataset600 lgbm 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds config/SS-T balsa(1) 98.75 99.66 98.22 97.54 99.07 98.56 96.58 98.60 97.06 99.51
+%folds config/SS-T balsa(30) 95.59 97.97 94.74 97.88 97.95 96.42 97.07 97.10 98.10 97.89
+%folds config/SS-T random 70.68 -61.85 94.99 87.71 94.20 97.89 85.75 68.00 83.30 84.70
+%folds config/SS-T lgbm 97.88 97.78 97.92 98.19 100.00 97.54 97.90 97.95 98.45 97.95
+%folds systems/dconvert balsa(1) 96.56 97.01 97.01 97.01 97.01 98.32 96.56 97.89 97.45 98.32
+%folds systems/dconvert balsa(30) 98.32 97.01 97.45 96.11 97.45 96.56 96.56 98.32 96.56 98.32
+%folds systems/dconvert random 85.01 97.01 92.84 65.18 92.84 7.65 74.11 41.27 78.55 94.27
+%folds systems/dconvert lgbm 97.45 96.11 98.32 96.11 97.01 94.74 98.32 97.45 97.01 96.56
+%folds config/SS-V balsa(1) 98.59 98.73 99.12 99.41 98.26 99.82 99.31 99.16 99.50 99.59
+%folds config/SS-V balsa(30) 98.96 97.59 86.07 87.61 98.93 97.96 98.51 90.13 98.55 100.00
+%folds config/SS-V random 19.56 74.96 59.88 88.50 -32.97 97.07 98.03 98.44 97.14 63.32
+%folds config/SS-V lgbm 99.18 99.32 100.00 99.08 99.50 100.00 99.70 99.32 99.16 99.32
+%folds financial_data/WA_Fn-UseC_-Telco-Customer-Churn balsa(1) 99.88 99.99 99.99 99.90 99.81 99.79 99.94 99.78 99.75 99.81
+%folds financial_data/WA_Fn-UseC_-Telco-Customer-Churn balsa(30) 99.79 99.82 99.71 99.79 99.91 99.76 99.79 99.90 99.71 99.67
+%folds financial_data/WA_Fn-UseC_-Telco-Customer-Churn random 97.74 99.13 92.63 37.83 73.09 96.94 90.05 99.78 90.07 98.41
+%folds financial_data/WA_Fn-UseC_-Telco-Customer-Churn lgbm 100.00 99.88 97.84 97.77 99.45 99.88 97.74 99.73 99.67 99.87
+%folds binary_config/billing10k balsa(1) 81.43 92.00 96.22 70.06 92.00 94.35 44.65 60.13 81.43 89.08
+%folds binary_config/billing10k balsa(30) 96.22 100.00 94.35 89.08 97.66 100.00 85.56 89.08 97.66 89.41
+%folds binary_config/billing10k random 71.44 29.27 59.44 44.91 71.44 18.32 13.06 59.93 9.24 43.20
+%folds binary_config/billing10k lgbm 98.76 100.00 100.00 98.76 98.76 100.00 98.76 100.00 98.76 100.00
+%folds binary_config/FFM-1000-200-0.50-SAT-1 balsa(1) 89.65 89.65 84.91 93.85 50.83 80.84 80.84 93.85 72.05 41.24
+%folds binary_config/FFM-1000-200-0.50-SAT-1 balsa(30) 89.65 68.75 55.02 80.84 100.00 100.00 89.65 80.84 75.53 83.12
+%folds binary_config/FFM-1000-200-0.50-SAT-1 random 5.28 42.35 29.48 51.00 14.63 48.84 50.48 40.77 65.01 39.85
+%folds binary_config/FFM-1000-200-0.50-SAT-1 lgbm 93.85 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 93.85
+%folds binary_config/FFM-125-25-0.50-SAT-1 balsa(1) 70.83 66.88 98.50 93.02 84.72 95.80 78.81 99.35 63.90 64.04
+%folds binary_config/FFM-125-25-0.50-SAT-1 balsa(30) 100.00 99.37 95.69 93.82 93.02 97.71 86.53 64.25 91.35 98.50
+%folds binary_config/FFM-125-25-0.50-SAT-1 random 13.88 52.36 52.03 1.25 50.94 60.78 2.50 100.00 72.11 16.20
+%folds binary_config/FFM-125-25-0.50-SAT-1 lgbm 99.37 99.37 99.37 100.00 99.37 98.50 99.37 99.37 99.37 100.00
+%folds binary_config/FFM-250-50-0.50-SAT-1 balsa(1) 86.20 83.63 89.40 86.16 83.63 86.16 83.17 63.30 89.40 78.89
+%folds binary_config/FFM-250-50-0.50-SAT-1 balsa(30) 100.00 88.05 81.71 89.40 86.16 89.40 72.55 88.83 83.63 89.40
+%folds binary_config/FFM-250-50-0.50-SAT-1 random 11.57 47.01 20.83 34.87 74.97 16.57 -5.21 55.17 76.46 11.74
+%folds binary_config/FFM-250-50-0.50-SAT-1 lgbm 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 90.94 95.04
+%folds binary_config/FFM-500-100-0.50-SAT-1 balsa(1) 65.38 98.87 94.75 94.75 79.40 35.72 66.41 66.41 98.87 97.80
+%folds binary_config/FFM-500-100-0.50-SAT-1 balsa(30) 100.00 99.67 100.00 98.87 70.25 100.00 91.23 65.43 100.00 99.48
+%folds binary_config/FFM-500-100-0.50-SAT-1 random 38.74 65.43 69.19 14.30 61.02 20.21 7.88 73.51 -5.20 71.06
+%folds binary_config/FFM-500-100-0.50-SAT-1 lgbm 100.00 99.67 100.00 99.67 99.92 100.00 99.92 100.00 100.00 99.92
+%folds binary_config/FM-500-100-0.25-SAT-1 balsa(1) 91.67 98.37 95.30 97.60 79.07 58.04 48.26 75.30 78.34 99.75
+%folds binary_config/FM-500-100-0.25-SAT-1 balsa(30) 86.32 93.68 79.00 99.42 99.42 69.13 100.00 68.58 98.37 99.42
+%folds binary_config/FM-500-100-0.25-SAT-1 random 26.96 66.52 28.95 21.79 4.69 6.77 27.06 34.73 42.54 31.79
+%folds binary_config/FM-500-100-0.25-SAT-1 lgbm 100.00 98.97 100.00 99.42 100.00 99.75 100.00 98.37 98.37 100.00
+%folds binary_config/FM-500-100-0.50-SAT-1 balsa(1) 99.80 71.21 78.88 100.00 86.65 96.99 94.22 54.26 94.22 99.38
+%folds binary_config/FM-500-100-0.50-SAT-1 balsa(30) 100.00 100.00 99.80 75.13 99.38 95.79 100.00 99.80 68.01 100.00
+%folds binary_config/FM-500-100-0.50-SAT-1 random -10.98 67.32 20.67 26.27 38.68 28.16 76.39 76.39 47.12 45.22
+%folds binary_config/FM-500-100-0.50-SAT-1 lgbm 100.00 100.00 99.80 100.00 99.80 100.00 100.00 99.80 99.80 100.00
+%folds binary_config/FM-500-100-0.75-SAT-1 balsa(1) 70.83 97.44 72.26 82.80 75.02 71.67 72.26 91.32 65.89 71.38
+%folds binary_config/FM-500-100-0.75-SAT-1 balsa(30) 90.39 100.00 91.32 100.00 94.51 97.44 100.00 97.44 95.58 100.00
+%folds binary_config/FM-500-100-0.75-SAT-1 random -3.51 68.71 8.14 42.45 31.89 13.16 -4.51 30.09 26.80 17.55
+%folds binary_config/FM-500-100-0.75-SAT-1 lgbm 94.51 100.00 94.51 100.00 100.00 97.44 100.00 97.44 95.58 100.00
+%folds binary_config/FM-500-100-1.00-SAT-1 balsa(1) 64.45 61.97 64.45 54.83 64.61 66.69 89.22 96.46 79.97 89.22
+%folds binary_config/FM-500-100-1.00-SAT-1 balsa(30) 100.00 99.42 100.00 97.00 99.42 99.42 70.21 96.46 93.06 93.57
+%folds binary_config/FM-500-100-1.00-SAT-1 random 50.28 61.90 36.51 64.85 -8.91 23.09 35.83 64.29 47.07 36.51
+%folds binary_config/FM-500-100-1.00-SAT-1 lgbm 100.00 99.42 100.00 99.42 99.42 100.00 99.42 100.00 99.42 100.00
+%folds binary_config/Scrum10k balsa(1) 62.02 89.32 100.00 81.56 57.26 82.46 55.37 89.35 89.32 86.27
+%folds binary_config/Scrum10k balsa(30) 86.27 82.46 100.00 90.75 96.11 96.11 100.00 86.09 100.00 89.35
+%folds binary_config/Scrum10k random 62.00 -7.50 59.95 55.62 23.14 26.96 37.36 73.51 15.20 38.09
+%folds binary_config/Scrum10k lgbm 91.15 100.00 100.00 91.43 100.00 91.15 100.00 91.43 100.00 91.43
+%folds hpo/Health-ClosedIssues0000 balsa(1) 98.86 99.48 98.16 99.51 98.56 99.67 99.32 100.00 99.72 99.51
+%folds hpo/Health-ClosedIssues0000 balsa(30) 99.68 99.15 99.81 99.46 97.89 99.25 99.81 96.45 99.41 98.16
+%folds hpo/Health-ClosedIssues0000 random 94.94 86.36 90.75 -28.29 -24.12 35.91 32.39 33.12 94.74 -26.50
+%folds hpo/Health-ClosedIssues0000 lgbm 99.52 99.88 98.65 99.46 99.58 99.45 99.55 99.68 99.43 99.84
+%folds hpo/Health-ClosedIssues0001 balsa(1) 57.39 54.29 56.21 50.31 48.02 58.43 44.76 59.29 57.93 55.46
+%folds hpo/Health-ClosedIssues0001 balsa(30) 49.73 48.99 48.29 53.15 55.71 50.14 49.42 49.41 47.83 55.23
+%folds hpo/Health-ClosedIssues0001 random 51.43 51.86 47.55 47.55 53.08 58.97 53.43 50.55 48.37 47.93
+%folds hpo/Health-ClosedIssues0001 lgbm 54.91 54.68 47.37 62.69 59.17 49.50 56.43 57.10 49.50 51.05
+%folds hpo/Health-ClosedIssues0002 balsa(1) 93.20 93.20 93.20 93.20 93.20 93.20 93.20 93.20 93.20 93.20
+%folds hpo/Health-ClosedIssues0002 balsa(30) 93.20 93.20 93.20 93.20 93.20 93.20 93.20 93.20 93.20 93.20
+%folds hpo/Health-ClosedIssues0002 random 93.20 93.20 93.20 93.20 93.20 93.20 93.20 93.20 93.20 93.20
+%folds hpo/Health-ClosedIssues0002 lgbm 93.20 93.20 93.20 93.20 93.20 93.20 93.20 93.20 100.00 93.20
+%folds hpo/Health-ClosedIssues0003 balsa(1) 95.23 42.73 92.73 95.07 95.23 94.61 94.01 95.07 92.16 95.20
+%folds hpo/Health-ClosedIssues0003 balsa(30) 95.20 48.42 95.22 95.07 95.10 95.06 95.22 100.00 95.06 97.54
+%folds hpo/Health-ClosedIssues0003 random 92.49 29.08 23.83 49.16 37.16 48.33 94.00 39.97 95.06 18.96
+%folds hpo/Health-ClosedIssues0003 lgbm 95.16 97.88 95.23 95.23 95.23 98.36 96.51 94.96 95.23 95.03
+%folds hpo/Health-ClosedIssues0004 balsa(1) 27.49 62.99 41.72 37.26 93.86 37.26 40.66 22.60 39.78 38.39
+%folds hpo/Health-ClosedIssues0004 balsa(30) 29.84 29.64 25.38 27.98 35.23 25.56 26.50 20.97 33.10 31.24
+%folds hpo/Health-ClosedIssues0004 random 29.04 27.48 33.09 16.83 21.85 23.88 22.22 16.83 33.58 29.43
+%folds hpo/Health-ClosedIssues0004 lgbm 42.77 41.33 36.08 45.95 40.66 17.39 42.77 45.95 42.77 35.44
+%folds hpo/Health-ClosedIssues0005 balsa(1) 66.53 66.20 64.53 82.50 92.81 66.27 65.78 92.28 75.53 65.51
+%folds hpo/Health-ClosedIssues0005 balsa(30) 67.46 65.79 65.44 66.01 65.41 66.20 66.89 64.86 68.41 66.20
+%folds hpo/Health-ClosedIssues0005 random 66.67 65.05 67.45 64.10 65.67 29.48 -36.93 -12.09 66.49 67.65
+%folds hpo/Health-ClosedIssues0005 lgbm 80.56 79.89 81.51 76.37 80.56 82.72 82.86 75.87 85.02 82.86
+%folds hpo/Health-ClosedIssues0006 balsa(1) 92.69 85.83 92.96 92.30 89.06 91.47 89.58 88.79 88.15 85.69
+%folds hpo/Health-ClosedIssues0006 balsa(30) 88.99 88.27 85.50 88.31 52.31 88.42 88.35 86.30 51.32 88.02
+%folds hpo/Health-ClosedIssues0006 random -9.06 30.12 87.13 50.71 88.82 52.07 51.61 81.59 64.86 49.20
+%folds hpo/Health-ClosedIssues0006 lgbm 89.36 88.74 88.52 88.58 87.93 89.08 88.87 90.53 90.17 91.34
+%folds hpo/Health-ClosedIssues0007 balsa(1) 89.37 38.19 86.36 47.77 34.67 35.72 38.44 47.77 40.89 92.98
+%folds hpo/Health-ClosedIssues0007 balsa(30) 37.38 41.62 38.19 42.33 42.26 42.38 40.81 92.98 41.72 92.98
+%folds hpo/Health-ClosedIssues0007 random -3.91 40.69 42.27 41.37 39.60 -3.63 41.86 0.71 -1.28 4.22
+%folds hpo/Health-ClosedIssues0007 lgbm 92.98 87.78 87.00 92.98 89.37 87.78 87.00 92.98 85.36 92.98
+%folds hpo/Health-ClosedIssues0008 balsa(1) 82.60 86.31 82.60 82.60 82.60 82.60 79.98 82.60 82.60 82.60
+%folds hpo/Health-ClosedIssues0008 balsa(30) 82.60 82.54 82.54 82.47 82.47 82.60 82.60 82.60 82.60 80.56
+%folds hpo/Health-ClosedIssues0008 random 74.35 12.85 51.50 82.57 35.25 15.29 6.65 15.11 2.94 82.59
+%folds hpo/Health-ClosedIssues0008 lgbm 82.58 82.60 82.58 82.60 82.60 99.19 82.60 86.45 82.60 82.50
+%folds hpo/Health-ClosedIssues0009 balsa(1) 55.87 46.36 37.75 18.06 48.20 36.54 3.98 -11.19 38.89 -20.32
+%folds hpo/Health-ClosedIssues0009 balsa(30) 77.47 80.07 15.06 69.87 35.30 16.01 42.77 63.10 65.22 20.93
+%folds hpo/Health-ClosedIssues0009 random 16.08 16.71 24.11 15.88 20.90 12.75 21.23 23.71 45.46 18.94
+%folds hpo/Health-ClosedIssues0009 lgbm 65.22 67.71 41.15 73.90 73.70 56.70 41.15 73.70 69.54 74.96
+%folds hpo/Health-ClosedIssues0010 balsa(1) 65.03 63.05 52.29 66.23 56.05 72.30 60.66 75.64 45.66 30.50
+%folds hpo/Health-ClosedIssues0010 balsa(30) 55.54 63.33 56.33 49.87 63.34 52.31 59.37 45.12 61.91 51.87
+%folds hpo/Health-ClosedIssues0010 random 60.24 60.24 57.92 50.30 59.70 45.75 49.26 -6.20 61.29 29.28
+%folds hpo/Health-ClosedIssues0010 lgbm 65.89 66.17 56.33 59.71 71.54 63.04 67.75 68.35 47.06 65.89
+%folds hpo/Health-ClosedIssues0011 balsa(1) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedIssues0011 balsa(30) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedIssues0011 random 100.00 7.13 6.15 100.00 -31.85 100.00 100.00 -28.47 7.10 100.00
+%folds hpo/Health-ClosedIssues0011 lgbm 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0000 balsa(1) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0000 balsa(30) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0000 random 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0000 lgbm 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0002 balsa(1) 80.75 80.75 80.75 80.75 80.75 80.75 80.75 80.75 80.75 80.75
+%folds hpo/Health-ClosedPRs0002 balsa(30) 80.75 80.75 80.75 80.75 80.75 96.62 80.75 80.75 80.75 80.75
+%folds hpo/Health-ClosedPRs0002 random 80.75 80.75 80.75 80.75 80.75 80.75 -39.71 80.75 80.75 80.75
+%folds hpo/Health-ClosedPRs0002 lgbm 80.75 96.62 100.00 100.00 80.75 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0003 balsa(1) 97.92 97.92 97.92 97.92 97.92 97.92 97.92 97.92 97.92 97.92
+%folds hpo/Health-ClosedPRs0003 balsa(30) 97.92 97.92 97.92 97.92 97.92 97.92 97.92 97.92 97.92 97.92
+%folds hpo/Health-ClosedPRs0003 random 97.92 97.92 97.92 97.92 97.92 97.92 97.92 97.92 97.92 97.92
+%folds hpo/Health-ClosedPRs0003 lgbm 97.92 97.92 97.92 97.92 97.92 97.92 97.92 97.92 97.92 97.92
+%folds hpo/Health-ClosedPRs0004 balsa(1) 100.00 100.00 100.00 100.00 100.00 38.34 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0004 balsa(30) 100.00 100.00 100.00 100.00 37.96 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0004 random 37.63 -1.05 37.71 37.82 34.17 38.10 38.10 38.44 100.00 -18.91
+%folds hpo/Health-ClosedPRs0004 lgbm 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0005 balsa(1) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0005 balsa(30) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0005 random 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 -43.75
+%folds hpo/Health-ClosedPRs0005 lgbm 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0006 balsa(1) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0006 balsa(30) 24.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0006 random 22.48 24.23 22.76 24.58 22.03 24.23 24.23 22.89 22.03 23.35
+%folds hpo/Health-ClosedPRs0006 lgbm 100.00 100.00 100.00 100.00 19.34 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0007 balsa(1) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 6.28 100.00
+%folds hpo/Health-ClosedPRs0007 balsa(30) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0007 random 100.00 100.00 6.23 -15.31 5.51 100.00 5.90 -15.19 -10.72 100.00
+%folds hpo/Health-ClosedPRs0007 lgbm 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0008 balsa(1) 40.04 10.06 -11.15 6.51 -10.08 32.13 6.82 27.43 100.00 10.06
+%folds hpo/Health-ClosedPRs0008 balsa(30) 11.64 7.54 68.91 61.25 37.61 6.96 32.13 24.74 6.96 7.17
+%folds hpo/Health-ClosedPRs0008 random 50.01 6.81 6.87 6.44 10.06 6.59 5.87 6.82 5.91 6.22
+%folds hpo/Health-ClosedPRs0008 lgbm 94.65 96.07 100.00 76.92 96.07 100.00 56.63 44.43 100.00 76.92
+%folds hpo/Health-ClosedPRs0009 balsa(1) 53.80 52.59 98.48 59.51 59.53 50.65 90.37 58.66 53.50 51.34
+%folds hpo/Health-ClosedPRs0009 balsa(30) 52.39 54.35 54.15 54.79 54.15 54.47 53.37 54.47 54.12 53.96
+%folds hpo/Health-ClosedPRs0009 random -0.80 53.32 54.47 59.53 50.48 51.04 29.72 98.33 40.57 43.51
+%folds hpo/Health-ClosedPRs0009 lgbm 98.51 94.05 98.53 92.91 100.00 98.53 98.48 98.53 98.48 98.53
+%folds hpo/Health-ClosedPRs0010 balsa(1) 20.93 53.16 53.17 100.00 53.33 53.32 52.63 51.84 56.81 0.11
+%folds hpo/Health-ClosedPRs0010 balsa(30) 100.00 53.33 53.22 74.33 26.88 25.74 39.09 24.24 39.09 41.86
+%folds hpo/Health-ClosedPRs0010 random 46.44 23.35 28.80 26.06 28.80 21.21 23.35 27.64 31.14 24.51
+%folds hpo/Health-ClosedPRs0010 lgbm 99.69 97.42 53.38 97.42 97.42 53.38 97.42 99.69 53.38 53.22
+%folds hpo/Health-ClosedPRs0011 balsa(1) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0011 balsa(30) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0011 random 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-ClosedPRs0011 lgbm 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-Commits0000 balsa(1) 97.98 98.11 98.55 97.33 96.84 98.41 99.09 97.08 98.62 96.14
+%folds hpo/Health-Commits0000 balsa(30) 98.47 95.79 96.35 98.65 99.66 96.47 98.50 97.74 97.05 96.44
+%folds hpo/Health-Commits0000 random 91.56 -33.20 96.29 97.72 65.98 96.14 93.58 96.88 -33.94 12.81
+%folds hpo/Health-Commits0000 lgbm 98.42 98.30 99.71 98.27 97.79 97.62 98.18 97.51 98.31 97.72
+%folds hpo/Health-Commits0001 balsa(1) 98.54 98.54 98.54 98.54 98.54 98.54 98.54 98.54 98.54 98.54
+%folds hpo/Health-Commits0001 balsa(30) 98.54 98.54 98.54 98.54 98.54 98.54 98.54 98.54 98.54 98.54
+%folds hpo/Health-Commits0001 random 98.54 98.54 98.54 98.54 98.54 13.58 98.54 98.54 -45.49 -41.69
+%folds hpo/Health-Commits0001 lgbm 98.54 98.54 98.54 98.54 98.54 98.54 98.54 98.54 98.54 98.54
+%folds hpo/Health-Commits0002 balsa(1) 21.24 97.40 93.56 21.24 21.24 21.24 21.24 38.85 18.13 21.24
+%folds hpo/Health-Commits0002 balsa(30) 21.24 97.40 97.40 95.94 97.40 21.24 21.24 21.24 21.24 50.27
+%folds hpo/Health-Commits0002 random -10.52 21.24 21.24 21.24 21.24 21.24 21.24 21.24 21.24 21.24
+%folds hpo/Health-Commits0002 lgbm 97.40 100.00 97.40 100.00 100.00 97.40 100.00 100.00 100.00 100.00
+%folds hpo/Health-Commits0003 balsa(1) 91.75 96.19 76.02 84.46 85.89 59.10 65.74 78.93 95.42 69.70
+%folds hpo/Health-Commits0003 balsa(30) 96.65 63.99 78.93 88.32 87.49 66.66 72.93 88.79 63.60 63.26
+%folds hpo/Health-Commits0003 random 11.48 62.43 62.68 49.35 58.62 88.14 58.68 -5.25 38.61 60.81
+%folds hpo/Health-Commits0003 lgbm 87.46 91.67 89.51 88.47 89.51 88.47 86.19 87.46 83.91 87.46
+%folds hpo/Health-Commits0004 balsa(1) 51.24 48.10 29.47 50.03 54.91 43.38 55.71 55.04 47.05 50.28
+%folds hpo/Health-Commits0004 balsa(30) 39.18 44.98 37.69 36.51 53.07 41.91 36.26 37.04 45.96 36.15
+%folds hpo/Health-Commits0004 random 34.91 19.92 35.32 37.79 44.98 33.81 31.83 41.73 36.36 34.79
+%folds hpo/Health-Commits0004 lgbm 48.01 48.15 48.01 48.15 42.95 50.40 48.01 50.28 56.75 48.15
+%folds hpo/Health-Commits0005 balsa(1) 23.47 23.67 39.53 35.96 23.67 71.02 30.63 76.26 23.47 23.24
+%folds hpo/Health-Commits0005 balsa(30) 23.47 76.78 76.78 78.35 23.67 46.24 23.52 23.47 23.40 78.24
+%folds hpo/Health-Commits0005 random 23.18 76.67 23.23 79.74 27.52 27.21 -11.18 23.06 23.17 23.46
+%folds hpo/Health-Commits0005 lgbm 77.60 77.82 77.60 76.80 23.67 23.72 77.13 23.72 77.82 77.82
+%folds hpo/Health-Commits0006 balsa(1) 76.32 65.44 67.74 67.58 76.32 68.47 68.68 73.45 67.92 76.41
+%folds hpo/Health-Commits0006 balsa(30) 67.44 67.75 67.61 76.54 67.52 67.68 76.46 76.51 76.25 67.32
+%folds hpo/Health-Commits0006 random 66.55 19.59 65.97 66.99 62.05 66.22 66.38 67.79 65.58 77.02
+%folds hpo/Health-Commits0006 lgbm 78.30 78.92 78.30 72.41 76.46 69.16 78.92 77.64 76.46 79.17
+%folds hpo/Health-Commits0007 balsa(1) 94.66 97.96 90.61 89.21 89.90 92.75 92.62 97.60 30.69 96.15
+%folds hpo/Health-Commits0007 balsa(30) 88.53 89.90 30.69 97.33 31.49 89.67 30.98 31.38 89.90 30.46
+%folds hpo/Health-Commits0007 random 30.35 29.95 90.43 30.81 31.00 31.19 18.85 31.08 30.67 -10.20
+%folds hpo/Health-Commits0007 lgbm 95.80 95.43 88.54 89.90 30.93 89.90 87.13 94.57 87.13 91.42
+%folds hpo/Health-Commits0008 balsa(1) 63.65 -1.81 61.15 58.62 53.78 8.52 60.44 58.99 59.71 -3.33
+%folds hpo/Health-Commits0008 balsa(30) 90.00 53.41 55.33 77.84 48.36 89.22 73.89 70.28 52.61 5.69
+%folds hpo/Health-Commits0008 random 55.69 57.87 59.40 72.24 52.59 49.11 4.23 7.87 10.15 4.44
+%folds hpo/Health-Commits0008 lgbm 83.00 69.26 84.45 69.28 86.23 90.00 86.23 77.84 84.48 68.67
+%folds hpo/Health-Commits0009 balsa(1) 82.75 92.75 97.03 85.36 97.20 89.26 99.39 92.06 83.33 96.93
+%folds hpo/Health-Commits0009 balsa(30) 93.66 86.70 93.66 94.21 90.66 86.82 94.30 90.31 93.76 94.66
+%folds hpo/Health-Commits0009 random 85.75 91.89 88.62 87.15 88.45 81.85 88.11 92.11 9.50 82.23
+%folds hpo/Health-Commits0009 lgbm 96.15 81.85 89.68 96.93 99.80 98.74 98.65 96.83 85.62 92.84
+%folds hpo/Health-Commits0010 balsa(1) 97.29 89.19 82.45 93.05 89.50 96.50 86.71 93.54 91.64 98.52
+%folds hpo/Health-Commits0010 balsa(30) 67.33 99.60 94.01 97.19 95.59 83.58 99.86 70.81 90.23 93.54
+%folds hpo/Health-Commits0010 random 3.52 94.02 48.03 49.12 59.69 86.75 89.67 -16.12 56.41 89.16
+%folds hpo/Health-Commits0010 lgbm 91.14 93.75 92.69 94.01 84.83 87.29 94.96 92.69 94.01 88.59
+%folds hpo/Health-Commits0011 balsa(1) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-Commits0011 balsa(30) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds hpo/Health-Commits0011 random 100.00 100.00 100.00 100.00 100.00 100.00 -13.48 -27.89 100.00 100.00
+%folds hpo/Health-Commits0011 lgbm 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds process/xomo_flight balsa(1) 98.50 99.16 98.70 99.14 98.30 99.22 95.53 93.59 98.67 96.23
+%folds process/xomo_flight balsa(30) 99.91 99.53 99.16 98.54 99.90 97.76 99.72 97.28 99.08 99.84
+%folds process/xomo_flight random -9.65 87.27 80.66 -3.80 66.78 95.47 86.15 28.92 56.96 89.95
+%folds process/xomo_flight lgbm 99.91 99.71 99.71 99.53 99.23 99.81 99.71 99.84 99.23 99.71
+%folds process/xomo_ground balsa(1) 99.13 96.73 96.50 93.51 99.29 84.86 87.79 98.16 83.47 92.67
+%folds process/xomo_ground balsa(30) 96.25 97.60 98.27 99.20 95.96 99.57 98.73 97.90 98.73 98.86
+%folds process/xomo_ground random 99.11 56.09 51.96 83.17 3.16 63.78 -2.38 50.22 56.46 99.33
+%folds process/xomo_ground lgbm 99.20 99.72 99.11 99.72 99.11 99.72 99.72 99.34 99.29 99.72
+%folds process/xomo_osp balsa(1) 96.03 99.88 99.35 98.70 96.15 98.55 80.77 97.59 79.22 97.12
+%folds process/xomo_osp balsa(30) 97.01 99.14 94.68 99.39 99.41 100.00 99.14 96.84 98.38 99.86
+%folds process/xomo_osp random 80.90 94.50 68.94 42.29 85.73 41.01 22.93 72.43 87.96 26.02
+%folds process/xomo_osp lgbm 99.86 99.41 99.88 99.44 99.41 99.44 99.44 99.41 99.21 98.17
+%folds process/xomo_osp2 balsa(1) 91.91 57.64 95.37 96.78 85.74 68.74 94.12 35.06 86.54 85.53
+%folds process/xomo_osp2 balsa(30) 81.54 98.96 92.24 96.01 98.96 90.50 94.74 99.44 88.67 83.49
+%folds process/xomo_osp2 random 62.81 46.03 92.91 72.56 79.09 16.38 52.04 70.88 -0.70 15.84
+%folds process/xomo_osp2 lgbm 96.29 98.96 91.82 98.96 91.82 91.54 90.59 91.42 91.82 96.61
+%folds financial_data/BankChurners balsa(1) 46.55 79.47 55.42 59.55 68.26 86.05 44.50 74.85 70.31 55.01
+%folds financial_data/BankChurners balsa(30) 55.97 86.05 54.39 71.37 67.08 67.40 77.22 76.33 64.59 81.35
+%folds financial_data/BankChurners random 65.82 64.86 38.60 2.77 56.76 84.65 48.74 30.69 19.18 3.17
+%folds financial_data/BankChurners lgbm 92.39 87.77 73.86 87.77 89.57 87.61 92.39 78.03 60.92 97.89
+%folds behavior_data/all_players balsa(1) 86.12 87.55 93.78 95.76 81.20 95.18 95.56 80.51 70.60 92.67
+%folds behavior_data/all_players balsa(30) 99.06 94.61 98.14 94.61 91.74 94.25 99.68 95.46 91.22 99.68
+%folds behavior_data/all_players random 8.06 61.97 36.01 -30.20 66.49 15.95 -17.08 6.55 89.92 34.49
+%folds behavior_data/all_players lgbm 93.77 99.68 100.00 99.68 97.64 99.68 99.68 94.91 98.64 99.68
+%folds systems/PostgreSQL balsa(1) 96.22 87.26 95.35 89.80 86.98 96.13 95.26 88.41 91.41 90.52
+%folds systems/PostgreSQL balsa(30) 98.07 89.53 97.03 90.56 89.47 86.60 92.32 86.99 84.57 96.20
+%folds systems/PostgreSQL random 92.02 91.04 87.83 89.14 94.11 99.02 87.95 88.82 50.59 88.04
+%folds systems/PostgreSQL lgbm 90.20 96.88 89.56 97.98 88.74 98.28 90.34 90.67 95.34 95.61
+%folds financial_data/Loan balsa(1) 64.14 63.59 94.11 84.16 86.02 54.11 91.08 80.51 73.02 77.16
+%folds financial_data/Loan balsa(30) 87.95 96.83 87.46 96.83 78.93 81.86 73.96 92.31 93.23 95.16
+%folds financial_data/Loan random 10.52 19.42 53.71 16.02 -2.98 46.24 20.56 41.82 40.04 40.85
+%folds financial_data/Loan lgbm 94.27 96.83 100.00 98.65 98.65 96.83 97.57 100.00 96.83 100.00
+%folds process/pom3a balsa(1) 91.25 81.23 83.63 90.23 95.06 70.24 38.37 45.57 69.96 81.34
+%folds process/pom3a balsa(30) 74.75 80.96 90.87 96.53 90.40 47.91 97.66 67.57 91.20 98.55
+%folds process/pom3a random 69.64 57.38 27.39 30.00 41.79 38.42 38.02 37.05 98.38 38.98
+%folds process/pom3a lgbm 91.20 91.18 97.23 97.70 95.72 84.87 91.18 98.93 100.00 97.70
+%folds process/pom3b balsa(1) 93.42 62.22 81.12 94.49 41.46 83.28 89.57 92.25 49.95 43.33
+%folds process/pom3b balsa(30) 94.46 85.99 97.29 94.41 85.34 95.58 94.08 55.16 97.36 93.42
+%folds process/pom3b random 31.67 13.83 88.62 85.34 19.23 0.95 21.11 40.54 79.36 45.49
+%folds process/pom3b lgbm 93.42 88.65 91.01 88.65 88.65 93.07 90.64 93.09 49.45 94.51
+%folds process/pom3c balsa(1) 62.56 60.26 48.97 60.60 62.14 76.66 34.96 55.43 99.55 89.40
+%folds process/pom3c balsa(30) 99.55 85.74 78.64 99.65 64.43 26.66 89.64 74.15 96.53 68.91
+%folds process/pom3c random 40.35 36.07 5.86 23.16 13.37 28.07 -1.69 22.89 12.10 29.26
+%folds process/pom3c lgbm 89.64 84.01 89.64 83.52 93.58 89.64 89.64 76.82 84.01 89.64
+%folds health_data/Data_COVID19_Indonesia balsa(1) 100.00 100.00 98.46 100.00 85.27 100.00 67.17 98.77 100.00 99.53
+%folds health_data/Data_COVID19_Indonesia balsa(30) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 94.65 100.00 99.64
+%folds health_data/Data_COVID19_Indonesia random -3.41 -13.10 3.50 94.63 29.96 20.12 -15.43 79.57 4.76 68.80
+%folds health_data/Data_COVID19_Indonesia lgbm 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds health_data/Medical_Data_and_Hospital_Readmissions balsa(1) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds health_data/Medical_Data_and_Hospital_Readmissions balsa(30) 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds health_data/Medical_Data_and_Hospital_Readmissions random 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds health_data/Medical_Data_and_Hospital_Readmissions lgbm 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+%folds config/SS-N balsa(1) 88.56 92.79 92.46 86.79 93.44 86.43 88.00 85.79 83.93 74.73
+%folds config/SS-N balsa(30) 84.38 74.76 74.28 76.42 74.29 73.25 76.40 74.24 73.79 73.78
+%folds config/SS-N random 69.57 71.22 54.87 41.70 84.06 73.55 66.07 56.12 71.51 65.85
+%folds config/SS-N lgbm 93.74 97.49 97.51 97.49 97.49 96.09 90.37 93.60 96.00 93.54
+%folds systems/x264 balsa(1) 100.00 82.27 98.88 97.88 99.76 92.37 98.68 99.58 93.13 95.76
+%folds systems/x264 balsa(30) 97.45 94.71 98.87 99.69 99.36 97.45 97.64 99.69 99.99 100.00
+%folds systems/x264 random -16.16 75.01 55.63 70.89 96.84 90.32 54.71 -36.34 65.86 96.58
+%folds systems/x264 lgbm 99.76 98.92 99.69 98.92 98.31 99.66 99.13 98.56 99.66 99.53
+%folds config/SS-W balsa(1) 64.89 80.53 48.62 48.82 43.11 69.97 99.11 91.10 55.48 71.46
+%folds config/SS-W balsa(30) 87.98 72.92 85.33 81.50 53.20 80.52 39.14 82.02 95.32 95.65
+%folds config/SS-W random 46.94 62.76 65.98 27.54 30.08 98.30 62.36 22.58 52.54 54.43
+%folds config/SS-W lgbm 83.05 82.70 86.63 93.33 93.33 89.15 82.36 83.05 85.19 73.33
+%folds systems/7z balsa(1) 99.10 99.78 99.68 99.64 99.80 99.68 99.81 99.21 99.83 99.59
+%folds systems/7z balsa(30) 99.30 91.19 99.65 91.18 99.06 99.40 98.98 98.85 91.17 91.19
+%folds systems/7z random 85.92 91.10 87.96 91.08 91.09 86.02 84.27 98.85 91.16 91.18
+%folds systems/7z lgbm 99.20 99.19 99.80 99.20 99.18 99.79 99.20 99.80 99.82 99.20
+%folds config/SS-X balsa(1) 96.38 95.90 96.45 96.34 96.83 96.60 95.91 96.10 95.83 96.06
+%folds config/SS-X balsa(30) 97.44 96.24 96.49 96.36 96.53 95.67 95.76 96.36 95.31 96.18
+%folds config/SS-X random 92.99 68.16 42.80 41.57 58.19 73.82 53.56 74.72 65.84 60.74
+%folds config/SS-X lgbm 99.98 99.99 99.99 99.97 99.99 96.73 99.99 99.98 99.97 99.99
+%folds systems/exastencils balsa(1) 93.41 97.37 91.66 97.46 99.32 95.55 97.29 97.28 97.82 96.65
+%folds systems/exastencils balsa(30) 95.21 96.00 89.85 98.28 87.11 98.99 97.19 97.29 91.17 84.46
+%folds systems/exastencils random 56.50 62.91 54.88 92.23 73.51 80.89 23.95 66.08 74.18 73.37
+%folds systems/exastencils lgbm 99.13 98.56 98.91 99.00 97.06 99.30 99.16 96.52 98.58 98.28
+%folds binary_config/Scrum100k balsa(1) 42.59 67.37 70.39 50.06 69.85 34.29 65.03 69.85 44.35 68.65
+%folds binary_config/Scrum100k balsa(30) 99.24 92.62 98.19 87.19 89.72 85.31 72.30 96.79 91.83 99.24
+%folds binary_config/Scrum100k random 21.90 36.65 12.44 20.93 61.11 24.60 42.68 47.20 60.72 5.10
+%folds binary_config/Scrum100k lgbm 99.24 100.00 100.00 99.24 100.00 99.24 100.00 99.24 98.19 100.00
+%folds systems/javagc balsa(1) 97.08 83.85 96.91 96.07 96.99 96.69 96.47 96.86 96.69 96.42
+%folds systems/javagc balsa(30) 92.45 95.77 95.46 96.64 95.41 92.94 95.33 90.85 91.38 95.50
+%folds systems/javagc random 90.85 82.07 89.68 77.27 95.06 88.65 90.04 84.81 94.66 97.48
+%folds systems/javagc lgbm 99.04 97.96 97.74 94.18 98.87 99.04 98.87 99.04 99.04 97.96

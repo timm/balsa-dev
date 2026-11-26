@@ -4,9 +4,9 @@
 --   luajit balsa_eg.lua [data...]        5x2 xval, 30 trees, 16 bins
 --   luajit balsa_eg.lua --replay F.dat   rerun F's recorded folds
 -- (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
-local floor, sqrt, max = math.floor, math.sqrt, math.max
+local floor, sqrt, max, min = math.floor, math.sqrt, math.max, math.min
 local b = require("balsa")
-local the, srand, shuffle, bisect, csv, Tbl, Col, adds, div, forest, votes, predict, aucs = b.the, b.srand, b.shuffle, b.bisect, b.csv, b.Tbl, b.Col, b.adds, b.div, b.forest, b.votes, b.predict, b.aucs
+local the, srand, shuffle, bisect, csv, Tbl, Col, adds, div, disty, forest, votes, predict, aucs = b.the, b.srand, b.shuffle, b.bisect, b.csv, b.Tbl, b.Col, b.adds, b.div, b.disty, b.forest, b.votes, b.predict, b.aucs
 local fmt = string.format
 
 -------------------------------------------------------------- stats
@@ -345,6 +345,119 @@ reg = function(sets)
   end
 end
 
+local _anon_func_3 = function(tb)
+  local _accum_0 = { }
+  local _len_0 = 1
+  local _list_0 = tb.rows
+  for _index_0 = 1, #_list_0 do
+    local row = _list_0[_index_0]
+    _accum_0[_len_0] = row.d2h
+    _len_0 = _len_0 + 1
+  end
+  return _accum_0
+end
+local _anon_func_4 = function(guess)
+  local _accum_0 = { }
+  local _len_0 = 1
+  for _index_0 = 1, #guess do
+    local g = guess[_index_0]
+    _accum_0[_len_0] = g[1]
+    _len_0 = _len_0 + 1
+  end
+  return _accum_0
+end
+local _anon_func_5 = function(ids, test, tostring)
+  local _accum_0 = { }
+  local _len_0 = 1
+  for _index_0 = 1, #test do
+    local row = test[_index_0]
+    _accum_0[_len_0] = tostring(ids[row])
+    _len_0 = _len_0 + 1
+  end
+  return _accum_0
+end
+local opt
+opt = function(sets)
+  print("#1:opt n30:opt rand ")
+  for _index_0 = 1, #sets do
+    local f = sets[_index_0]
+    local tb = Tbl(csv(tostring(os.getenv("MOOTOPT") or "~/gits/moot/optimize") .. "/" .. tostring(f) .. ".csv"))
+    local _list_0 = tb.rows
+    for _index_1 = 1, #_list_0 do
+      local row = _list_0[_index_1]
+      row.d2h = disty(tb, row)
+    end
+    local y
+    y = function(row)
+      return row.d2h
+    end
+    local all = adds(_anon_func_3(tb))
+    local lo = math.huge
+    local _list_1 = tb.rows
+    for _index_1 = 1, #_list_1 do
+      local row = _list_1[_index_1]
+      lo = min(lo, row.d2h)
+    end
+    local score
+    score = function(got)
+      return 100 * (1 - (got - lo) / (all.mu - lo + 1e-32))
+    end
+    local best5
+    best5 = function(rows)
+      b = math.huge
+      for i = 1, min(5, #rows) do
+        b = min(b, rows[i].d2h)
+      end
+      return b
+    end
+    local ids = { }
+    for i, row in ipairs(tb.rows) do
+      ids[row] = #tb.rows - i
+    end
+    xval(tb.rows, function(train, test)
+      local scores, secs = { }, { }
+      local _list_2 = {
+        {
+          1,
+          false
+        },
+        {
+          30,
+          true
+        }
+      }
+      for _index_1 = 1, #_list_2 do
+        local arm = _list_2[_index_1]
+        the.trees, the.rf = arm[1], arm[2]
+        local t0 = os.clock()
+        local trees = forest(tb, train, y, Col)
+        local guess
+        do
+          local _accum_0 = { }
+          local _len_0 = 1
+          for _index_2 = 1, #test do
+            local row = test[_index_2]
+            _accum_0[_len_0] = {
+              row,
+              predict(trees, row)
+            }
+            _len_0 = _len_0 + 1
+          end
+          guess = _accum_0
+        end
+        table.sort(guess, function(a, b)
+          return a[2] < b[2]
+        end)
+        scores[#scores + 1] = score(best5(_anon_func_4(guess)))
+        secs[#secs + 1] = os.clock() - t0
+      end
+      scores[#scores + 1] = score(best5(shuffle(test)))
+      io.write(fmt("%s|%.2f %.2f %.2f |%.3f %.3f |%s \n", f, scores[1], scores[2], scores[3], secs[1], secs[2], table.concat(_anon_func_5(ids, test, tostring), " ")))
+      return io.flush()
+    end)
+  end
+end
+
 local REG = {
   "2dplanes",
   "abalone",
@@ -452,6 +565,9 @@ local ENS = {
 srand(the.seed)
 if arg[1] == "--replay" then
   return replay(arg[2])
+elseif arg[1] == "--opt" then
+  table.remove(arg, 1)
+  return opt(arg)
 elseif arg[1] == "--reg" then
   table.remove(arg, 1)
   return reg(#arg > 0 and arg or REG)

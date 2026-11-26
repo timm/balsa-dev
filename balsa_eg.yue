@@ -4,10 +4,10 @@
 --   luajit balsa_eg.lua [data...]        5x2 xval, 30 trees, 16 bins
 --   luajit balsa_eg.lua --replay F.dat   rerun F's recorded folds
 -- (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
-import floor, sqrt, max from math
+import floor, sqrt, max, min from math
 b = require "balsa"
 import the, srand, shuffle, bisect, csv, Tbl, Col, adds, div,
-       forest, votes, predict, aucs from b
+       disty, forest, votes, predict, aucs from b
 fmt = string.format
 
 
@@ -157,6 +157,42 @@ reg = (sets) ->                         -- 5x2 over the regression
         table.concat [tostring ids[row] for row in *test], " "
       io.flush!
 
+opt = (sets) ->                         -- optimize: fit on train,
+  print "#1:opt n30:opt rand "          -- sort test by predicted
+  for f in *sets                        -- d2h, label the best 5,
+    tb = Tbl csv "#{os.getenv("MOOTOPT") or "~/gits/moot/optimize"}/#{f}.csv"
+    for row in *tb.rows                 -- d2h: paid once, per row
+      row.d2h = disty tb, row
+    y = (row) -> row.d2h
+    all = adds [row.d2h for row in *tb.rows]      -- the WHOLE table
+    lo = math.huge                      -- scores are relative to it
+    for row in *tb.rows
+      lo = min lo, row.d2h
+    score = (got) -> 100 * (1 - (got - lo) / (all.mu - lo + 1e-32))
+    best5 = (rows) ->                   -- label 5, keep the winner
+      b = math.huge
+      for i = 1, min 5, #rows
+        b = min b, rows[i].d2h
+      b
+    ids = {}
+    for i, row in ipairs tb.rows
+      ids[row] = #tb.rows - i           -- 0-based csv row #
+    xval tb.rows, (train, test) ->
+      scores, secs = {}, {}
+      for arm in *{{1, false}, {30, true}}
+        the.trees, the.rf = arm[1], arm[2]
+        t0 = os.clock!
+        trees = forest tb, train, y, Col
+        guess = [{row, predict trees, row} for row in *test]
+        table.sort guess, (a, b) -> a[2] < b[2]
+        scores[] = score best5 [g[1] for g in *guess]
+        secs[] = os.clock! - t0
+      scores[] = score best5 shuffle test            -- label 5 at random
+      io.write fmt "%s|%.2f %.2f %.2f |%.3f %.3f |%s \n",
+        f, scores[1], scores[2], scores[3], secs[1], secs[2],
+        table.concat [tostring ids[row] for row in *test], " "
+      io.flush!
+
 REG = {"2dplanes", "abalone", "ailerons", "auto93", "autohorse",
   "autompg", "autoprice", "bank32nh", "bank8FM", "baskball",
   "bodyfat", "bolts", "breasttumor", "cal.housing", "cholesterol",
@@ -183,6 +219,9 @@ ENS = {"balance.scale", "blood-transfusion-service-center",
 srand the.seed
 if arg[1] == "--replay"
   replay arg[2]
+elseif arg[1] == "--opt"
+  table.remove arg, 1
+  opt arg
 elseif arg[1] == "--reg"
   table.remove arg, 1
   reg #arg > 0 and arg or REG

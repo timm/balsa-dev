@@ -8,16 +8,8 @@ local _ENV = setmetatable({}, {__index = globals})
 local floor, sqrt, max, min, log = math.floor, math.sqrt, math.max, math.min, math.log
 local LOG2 = log(2)
 
-the = {
-  seed = 1234567891,
-  prudence = 0.01,
-  bins = 16,
-  trees = 30,
-  cap = 200,
-  leaf = 2,
-  maxd = 30,
-  rf = true
-}
+the = {seed=1234567891, prudence=0.01, bins=16, trees=30,
+       cap=200, leaf=2, maxd=30, rf=true}
 
 -- Random -------------------------------------------------------------------
 local seed = the.seed
@@ -74,31 +66,35 @@ function csv(file)
 -- Header: Uppercase = Num, else Sym. Last char: ! class, X skip.
 -- "?" cells unknown. A row IS its csv cells (numeric indexes),
 -- plus one named field: labels, its label per x column.
+local Num, Sym, Counts = {}, {}, {}
+
+function new(mt,t)
+  mt.__index = mt
+  return setmetatable(t, mt) end
+
+-- Plain summaries from callers can use the same methods.
+local function kind(t)
+  return t.isnum and Num or Sym end
+
 function Col(txt, at)
-  local col
   txt = (txt == nil) and "N" or txt
   at = (at == nil) and 0 or at
-  col = {at = at, txt = txt, n = 0}
   if txt:match("^%u") then
-    col.isnum = true
-    col.mu, col.m2 = 0, 0
-    col.goal = txt:match("%-$") and 0 or 1
-  else
-    col.has = {} end
-  return col end
+    return new(Num, {at=at, txt=txt, n=0, isnum=true, mu=0, m2=0,
+                     goal=txt:match("%-$") and 0 or 1}) end
+  return new(Sym, {at=at, txt=txt, n=0, has={}}) end
 
 function add(col, v, inc)
-  local d
   inc = (inc == nil) and 1 or inc
-  if v == "?" then
-    return end
+  if v == "?" then return end
   col.n = col.n + inc
-  if col.isnum then
-    d = v - col.mu
-    col.mu = col.mu + (inc * d / col.n)
-    col.m2 = max(0, col.m2 + inc * d * (v - col.mu))
-  else
-    col.has[v] = (col.has[v] or 0) + inc end end
+  return (col.add_known or kind(col).add_known)(col, v, inc) end
+function Num:add_known(v, inc)
+  local d = v - self.mu
+  self.mu = self.mu + inc * d / self.n
+  self.m2 = max(0, self.m2 + inc * d * (v - self.mu)) end
+function Sym:add_known(v, inc)
+  self.has[v] = (self.has[v] or 0) + inc end
 
 function adds(vs, col)
   col = (col == nil) and Col() or col
@@ -107,15 +103,14 @@ function adds(vs, col)
   return col end
 
 function div(col)
+  return (col.div or kind(col).div)(col) end
+function Num:div()
+  return self.n < 2 and 0 or sqrt(self.m2 / (self.n - 1)) end
+function Sym:div()
   local e = 0
-  if col.isnum then
-    if col.n < 2 then
-      return 0
-    else
-      return sqrt(col.m2 / (col.n - 1)) end end
-  for _, m in pairs(col.has) do
+  for _, m in pairs(self.has) do
     if m > 0 then
-      e = e - (m / col.n * log(m / col.n)) end end
+      e = e - (m / self.n * log(m / self.n)) end end
   return e / LOG2 end
 
 -- class counts: an array indexed by label 1..nk
@@ -125,19 +120,14 @@ function zeros(nk)
     out[i] = 0 end
   return out end
 function Ys(nk)
-  return {
-    nk = nk,
-    n = 0,
-    has = zeros(nk)
-  } end
+  return new(Counts, {nk=nk, n=0, has=zeros(nk)}) end
 
 function yadd(ys, v)
-  if ys.nk then
-    if v > 0 then
-      ys.has[v] = ys.has[v] + 1
-      ys.n = ys.n + 1 end
-  else
-    return add(ys, v) end end
+  return (ys.yadd or (ys.nk and Counts.yadd or add))(ys, v) end
+function Counts:yadd(v)
+  if v > 0 then
+    self.has[v] = self.has[v] + 1
+    self.n = self.n + 1 end end
 
 function yadds(vs, ys)
   for i = 1, #vs do
@@ -145,36 +135,38 @@ function yadds(vs, ys)
   return ys end
 
 function yfold(a, b, inc, out)
-  local n,mu,gap,between
   inc = (inc == nil) and 1 or inc
   out = (out == nil) and a or out
-  n = a.n + inc * b.n
-  if a.nk then
-    for i = 1, a.nk do
-      out.has[i] = a.has[i] + inc * b.has[i] end
-    out.n = n
-    return out 
-  end
+  return (a.fold or (a.nk and Counts.fold or Num.fold))(a, b, inc, out) end
+function Counts:fold(b, inc, out)
+  for i = 1, self.nk do
+    out.has[i] = self.has[i] + inc * b.has[i] end
+  out.n = self.n + inc * b.n
+  return out end
+function Num:fold(b, inc, out)
+  local n,mu,gap,between = self.n + inc * b.n
   if n <= 0 then
     out.n, out.mu, out.m2 = 0, 0, 0
     return out end
-
-  mu = a.mu + inc * b.n * (b.mu - a.mu) / n
+  mu = self.mu + inc * b.n * (b.mu - self.mu) / n
   -- The gap uses the mean of the smaller summary.
-  gap = b.mu - (n < a.n and mu or a.mu)
-  between = min(n, a.n) * b.n * gap * gap / max(n, a.n)
-  out.m2 = max(0, a.m2 + inc * (b.m2 + between))
+  gap = b.mu - (n < self.n and mu or self.mu)
+  between = min(n, self.n) * b.n * gap * gap / max(n, self.n)
+  out.m2 = max(0, self.m2 + inc * (b.m2 + between))
   out.mu, out.n = mu, n
   return out end
 
 function ydiv(ys)
+  return Counts.spread(ys) end
+function spread(ys)
+  return (ys.spread or (ys.nk and Counts.spread or div))(ys) end
+function Counts:spread()
   local e = 0
-  if ys.n < 2 then
-    return 0 end
-  for _, c in ipairs(ys.has) do
+  if self.n < 2 then return 0 end
+  for _, c in ipairs(self.has) do
     if c > 0 then
       e = e - (c * log(c)) end end
-  return (e / ys.n + log(ys.n)) / LOG2 end
+  return (e / self.n + log(self.n)) / LOG2 end
 
 function norm(num, v)
   local z = (v - num.mu) / (div(num) + 1e-32)
@@ -191,19 +183,15 @@ function disty(tb, row)
   return (d / max(n, 1)) ^ 0.5 end
 
 function mid(ys)
+  return (ys.mid or (ys.nk and Counts.mid or Num.mid))(ys) end
+function Num:mid()
+  return self.mu end
+function Counts:mid()
   local best,most = nil, -1
-  if not ys.nk then
-    return ys.mu end
-  for i = 1, ys.nk do
-    if ys.has[i] > most then
-      best, most = i, ys.has[i] end end
+  for i = 1, self.nk do
+    if self.has[i] > most then
+      best, most = i, self.has[i] end end
   return best end
-
-function spread(ys)
-  if ys.nk then
-    return ydiv(ys)
-  else
-    return div(ys) end end
 
 function Cols(names)
   local all,x,y,klass,col,e = {}, {}, {}, nil
@@ -236,24 +224,23 @@ function bisect(vs, v, le)
   return lo - 1 end
 
 function mklabels(col, rows, n)
-  local labels,values,ranked,v,last = {}
-  if col.isnum then
-    values = {}
-    for _, row in ipairs(rows) do
-      v = row[col.at]
-      if v ~= "?" then
-        values[#values + 1] = v end end
-    if #values == 0 then
-      return labels end
-    table.sort(values)
-    for j = 0, n - 1 do
-      v = values[1 + floor(j * #values / n)]
-      if v ~= last then
-        labels[#labels + 1] = v
-        last = v end end
-    return labels 
-  end
-  for value, count in pairs(col.has) do
+  return (col.labels_for or kind(col).labels_for)(col, rows, n) end
+function Num:labels_for(rows, n)
+  local labels,values,v,last = {}, {}
+  for _, row in ipairs(rows) do
+    v = row[self.at]
+    if v ~= "?" then values[#values + 1] = v end end
+  if #values == 0 then return labels end
+  table.sort(values)
+  for j = 0, n - 1 do
+    v = values[1 + floor(j * #values / n)]
+    if v ~= last then
+      labels[#labels + 1] = v
+      last = v end end
+  return labels end
+function Sym:labels_for(_, n)
+  local labels,ranked = {}, {}
+  for value, count in pairs(self.has) do
     ranked[#ranked + 1] = {value, count} end
   table.sort(ranked, function(a, b)
     if a[2] == b[2] then
@@ -277,14 +264,14 @@ function labelall(tb)
   local klass,cols = tb.cols.klass, {}
   for i, col in ipairs(tb.cols.x) do
     col.labels = mklabels(col, tb.rows, the.bins)
-    cols[i] = col 
+    cols[i] = col
   end
   tb.nk = 0
   if klass and not klass.isnum then
     -- Keep every class label.
     klass.labels = mklabels(klass, tb.rows, math.huge)
     cols[#cols + 1] = klass
-    tb.nk = #klass.labels 
+    tb.nk = #klass.labels
   end
   for _, row in ipairs(tb.rows) do
     row.labels = {}
@@ -319,11 +306,11 @@ function cuts(col, rows, ys, mk, leaf, best)
   for i, row in ipairs(rows) do
     label = row.labels[col.at]
     if label > 0 then
-      yadd(bins[label], ys[i]) end 
+      yadd(bins[label], ys[i]) end
   end
   prefix, total, rest = mk(), mk(), mk()
   for _, bin in ipairs(bins) do
-    yfold(total, bin) 
+    yfold(total, bin)
   end
   for b = 1, nb do
     if col.isnum then
@@ -353,14 +340,13 @@ function tree(rows, y, xcols, mk, m, leaf, maxd, lvl)
     ys[i] = y(row) end
   cut = lvl < maxd and best_cut(xcols, rows, ys, mk, m, leaf)
   node = {ys = yadds(ys, mk()), n = #rows}
-  if not cut then
-    return node end
+  if not cut then return node end
   col = cut[1]
   node.ati, node.isnum, node.v = col.at, col.isnum, cut[2]
   yes, no = {}, {}
   for _, row in ipairs(rows) do
     branch = goes_left(row.labels[node.ati], node.v, node.isnum) and yes or no
-    branch[#branch + 1] = row 
+    branch[#branch + 1] = row
   end
   lvl = lvl + 1
   node.yes = tree(yes, y, xcols, mk, m, leaf, maxd, lvl)
@@ -399,13 +385,13 @@ function forest(tb, rows, y, mk)
   if the.rf then
     m = math.ceil(nk and sqrt(#xcols) or #xcols / 3) end
   if the.cap then
-    rows = capped(rows, y, the.cap, nk) 
+    rows = capped(rows, y, the.cap, nk)
   end
   half = function()
     local shuffled,out = shuffle(rows), {}
     for i = 1, floor(#rows / 2) do
       out[i] = shuffled[i] end
-    return out 
+    return out
   end
   out = {}
   for i = 1, the.trees do
@@ -437,8 +423,7 @@ function predict(trees, row)
 -- AUC ----------------------------------------------------------------------
 function auc(pos, neg)
   local s = 0
-  if #pos == 0 or #neg == 0 then
-    return nil end
+  if #pos == 0 or #neg == 0 then return nil end
   table.sort(neg)
   for _, p in ipairs(pos) do
     s = s + ((bisect(neg, p) + bisect(neg, p, true)) / 2) end
