@@ -13,7 +13,16 @@ LISP_KW = ("defun defmacro defmethod defm defstruct defvar defparameter "
 YUE_KW = ("and break continue do else elseif export false for from "
       "global if import in local nil not or return switch then true "
       "unless until when while with")
+PY_KW = ("def class return if elif else for while in not and or is "
+      "None True False import from global try except with as lambda "
+      "yield pass continue break")
 RULES = dict(
+  py  =[("str", r'"""(?:[^\\]|\\.)*?"""|"(?:\\.|[^"\\])*"'),
+        ("com", r"#.*"),
+        ("fun", r"(?<=^def )\w+|(?<=^class )\w+|(?<=^  def )\w+"),
+        ("kw",  r"(?<![\w.])(?:%s)(?![\w])" %
+                "|".join(PY_KW.split())),
+        ("num", r"(?<![\w.])\d+\.?\d*(?![\w])")],
   lisp=[("str", r'"(?:\\.|[^"\\])*"'),
         ("com", r";.*"),
         ("fun", r"(?<=\(defun )[^\s()]+|(?<=\(defm )[^\s()]+"
@@ -35,10 +44,13 @@ BG  = ["#fff4e0","#eaf8ec","#f1ecfd","#e2f6f6",
        "#fdfbd8","#fdecf3","#f1f1f1","#ffe9e2"]
 
 def banner(line, lang):
-  return line.startswith(";;;;" if lang == "lisp" else "----")
+  if lang == "lisp": return line.startswith(";;;;")
+  if lang == "yue":  return line.startswith("----")
+  return line.startswith("# ") and line[2:3].isupper()
 
 def paint(path):
-  lang = "yue" if path.endswith(".yue") else "lisp"
+  lang = ("yue" if path.endswith(".yue") else
+          "py" if path.endswith(".py") else "lisp")
   pat  = re.compile("|".join("(?P<%s>%s)" % kv for kv in RULES[lang]), re.M)
   src  = open(path).read()
   out, i = "", 0     # match raw text, escape after: "<=" must not hit "--.*"

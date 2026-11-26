@@ -15,7 +15,7 @@ the = SimpleNamespace(seed=1234567891, prudence=0.01, bins=16, trees=30,
 # CSV rows. Headers start uppercase for numbers. Suffixes !, +, -, and X
 # mark the class, goals to maximize or minimize, and columns to skip.
 class Row(list):
-  __slots__ = ("labels",)
+  __slots__ = ("labels", "d2h")
 
 def thing(s):
   for f in (int, float):

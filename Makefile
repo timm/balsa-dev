@@ -1,5 +1,6 @@
 # balsa-dev: the mess. Rigs, results, the lisp twin, charts.
-# The shippable rock lives next door in ../balsa; see: make package
+# The learner is balsa.py (run it with pypy3); the lua/yue line
+# is in attic/. The shippable repo is ../balsa; see: make package
 # Long payloads live at the end as comment blocks #<name> ... ;
 # make greps its own source to build them (see mark). Inside a
 # block, {Tmp} and {Here} are filled in by sed at extraction time.
@@ -17,20 +18,17 @@ msg ?= saving
 push: ## git add this dir, commit (msg="..."), push
 	git add . && { git commit -m "$(msg)" || true; } && git push
 
-run: ## run every eg (sbcl --script bald.lisp all)
-	sbcl --script bald.lisp all
+run: ## 5x2 classification over the 39 sets (pypy3)
+	pypy3 balsa_eg.py
 
-yue: ## rebuild balsa.lua + balsa_eg.lua (5.1-safe: no goto)
-	yue -c -s --target=5.1 balsa.yue && yue -c -s --target=5.1 balsa_eg.yue
-
-docs: ## render balsa.yue + balsa_eg.yue 3-col into ../balsa/docs
+docs: ## render balsa.py + balsa_eg.py 3-col into ../balsa/docs
 	mkdir -p $(HOME)/gh/balsa/docs
-	python3 hi.py 3 balsa.yue balsa_eg.yue > $(HOME)/gh/balsa/docs/index.html
+	python3 hi.py 3 balsa.py balsa_eg.py > $(HOME)/gh/balsa/docs/index.html
 
-package: yue docs ## copy learner into ../balsa, rebuild its .lua there
-	cp balsa.yue $(HOME)/gh/balsa/
-	cd $(HOME)/gh/balsa && yue -c -s --target=5.1 balsa.yue && \
-	  echo "balsa.lua  $$(shasum -a1 balsa.lua | cut -c1-12)  $$(wc -l < balsa.lua) lines" && \
+package: docs ## copy the learner into ../balsa
+	cp balsa.py $(HOME)/gh/balsa/
+	cd $(HOME)/gh/balsa && \
+	  echo "balsa.py  $$(shasum -a1 balsa.py | cut -c1-12)  $$(wc -l < balsa.py) lines" && \
 	  git status --short
 	echo "now: cd ~/gh/balsa && git commit -am ... && git push"
 
