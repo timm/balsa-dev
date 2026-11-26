@@ -60,8 +60,7 @@ def xval(rows, fn, m=5, n=2):
       fn(train, test)
 
 def rowids(tb):
-  n = len(tb.rows)
-  return {id(row): n - 1 - j for j, row in enumerate(tb.rows)}
+  return {id(row): j for j, row in enumerate(tb.rows)}
 
 def moot(sub, f):
   root = os.getenv("MOOT" + sub.upper(), "~/gits/moot/" + sub)
@@ -82,7 +81,7 @@ def ens(sets):
     xval(tb.rows, fold)
 
 def replay(dat):
-  print("#1:n1 n30 ")
+  print("#1:q16 n30 ")
   tb = v = name = None
   for line in open(dat):
     if line.startswith("#"): continue
@@ -90,8 +89,7 @@ def replay(dat):
     if f != name:
       name = f
       tb = Tbl(csv(moot("classify", f)))
-      n = len(tb.rows)
-      v = {n - 1 - j: row for j, row in enumerate(tb.rows)}
+      v = tb.rows
     at = kl_at(tb)
     y = lambda row: row.labels[at]
     test = [v[int(s)] for s in idstr.split()]
@@ -105,6 +103,74 @@ def replay(dat):
       secs.append(time.process_time() - t0)
     print("%s|%.3f %.3f |%.3f %.3f |%s " % (f, out[0], out[1],
           secs[0], secs[1], idstr), flush=True)
+
+def datroot(dat):
+  f = next(l for l in open(dat) if not l.startswith("#"))
+  sub = "optimize" if "/" in f.split("|")[0] else "regression"
+  return os.getenv("MOOT" + ("OPT" if sub == "optimize" else "REG"),
+                   "~/gits/moot/" + sub)
+
+def foldsof(dat, root):
+  "Yield (set, tb, test, train) off a dat's recorded row ids."
+  tb = v = name = None
+  for line in open(dat):
+    if line.startswith("#"): continue
+    f, _, _, idstr = line.strip().split("|")
+    if f != name:
+      name = f
+      tb = Tbl(csv("%s/%s.csv" % (root, f)))
+      v = tb.rows
+    test = [v[int(x)] for x in idstr.split()]
+    inh = set(map(id, test))
+    train = [row for row in tb.rows if id(row) not in inh]
+    yield f, tb, test, train, idstr
+
+def regreplay(dat):
+  print("#1:reg n30:reg mean ")
+  root = datroot(dat)
+  for f, tb, test, train, idstr in foldsof(dat, root):
+    at = goalcol(tb).at
+    y = lambda row: row[at]
+    keep = [r for r in test if y(r) != "?"]
+    want = [y(r) for r in keep]
+    ok = [y(r) for r in train if y(r) != "?"]
+    mu = sum(ok) / max(1, len(ok))
+    maes, secs = [], []
+    for trees, rf in ((1, False), (30, True)):
+      the.trees, the.rf = trees, rf
+      t0 = time.process_time()
+      trees_ = Forest(tb, train, y, Col)
+      maes.append(mae(want, [trees_.predict(r) for r in keep]))
+      secs.append(time.process_time() - t0)
+    maes.append(mae(want, [mu] * len(keep)))
+    print("%s|%.4g %.4g %.4g |%.3f %.3f |%s " % (f, maes[0], maes[1],
+          maes[2], secs[0], secs[1], idstr), flush=True)
+
+def optreplay(dat):
+  print("#1:opt n30:opt rand ")
+  root = os.getenv("MOOTOPT", "~/gits/moot/optimize")
+  seen = {}
+  for f, tb, test, train, idstr in foldsof(dat, root):
+    if f not in seen:
+      for row in tb.rows: row.d2h = tb.disty(row)
+      lo = min(r.d2h for r in tb.rows)
+      mu = sum(r.d2h for r in tb.rows) / len(tb.rows)
+      seen[f] = (lo, mu)
+    lo, mu = seen[f]
+    score = lambda got: 100 * (1 - (got - lo) / (mu - lo + 1e-32))
+    best5 = lambda rows: min(r.d2h for r in rows[:5])
+    y = lambda row: row.d2h
+    out, secs = [], []
+    for trees, rf in ((1, False), (30, True)):
+      the.trees, the.rf = trees, rf
+      t0 = time.process_time()
+      trees_ = Forest(tb, train, y, Col)
+      guess = sorted(test, key=lambda r: trees_.predict(r))
+      out.append(score(best5(guess)))
+      secs.append(time.process_time() - t0)
+    out.append(score(best5(shuffle(test))))
+    print("%s|%.2f %.2f %.2f |%.3f %.3f |%s " % (f, out[0], out[1],
+          out[2], secs[0], secs[1], idstr), flush=True)
 
 def mae(want, got):
   return sum(abs(w - g) for w, g in zip(want, got)) / max(1, len(want))
@@ -192,6 +258,8 @@ if __name__ == "__main__":
   srand(the.seed)
   a = sys.argv[1:]
   if a and a[0] == "--replay": replay(a[1])
+  elif a and a[0] == "--regreplay": regreplay(a[1])
+  elif a and a[0] == "--optreplay": optreplay(a[1])
   elif a and a[0] == "--reg":  reg(a[1:] or REG)
   elif a and a[0] == "--opt":  opt(a[1:])
   else:                        ens(a or ENS)
