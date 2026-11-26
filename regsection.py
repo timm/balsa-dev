@@ -55,23 +55,18 @@ def main():
 
     # ---- the variance table -----------------------------------------
     # The decomposition needs a complete data-set x learner x fold grid,
-    # so each group is split twice: over the three treatments that ran
-    # every set, and -- where TabICL has a full group -- over all four.
-    def vrow(lab, g, arms, n=None):
-        d, m, f, o = regvar.split(D, sorted(g), arms)
-        return (f"{tex(lab)} & {n if n is not None else len(g)} & {d:.0f}"
+    # so every row covers only the sets TabICL finished.
+    def vrow(lab, g):
+        d, m, f, o = regvar.split(D, sorted(g), regvar.FOUR)
+        return (f"{tex(lab)} & {len(g)} & {d:.0f}"
                 f" & {m:.0f} & {f:.0f} & {o:.0f} & {d / m:.0f} \\\\")
     var = []
     for name, g in G:
         g4 = sorted(s for s in g if s in ran)
-        var.append(vrow(name, g, regvar.THREE))
-        if len(g4) >= 2:
-            var.append(vrow(r"\quad + TabICL", g4, regvar.FOUR))
+        if len(g4) >= 2: var.append(vrow(name, g4))
     var.append(r"\cmidrule{1-7}")
-    var.append(vrow("all sets", sorted(D), regvar.THREE))
-    if len(ran) >= 2:
-        var.append(vrow(r"\quad + TabICL", sorted(ran), regvar.FOUR))
-    dA, mA, fA, oA = regvar.split(D, sorted(D), regvar.THREE)
+    var.append(vrow("all sets", sorted(ran)))
+    dA, mA, fA, oA = regvar.split(D, sorted(ran), regvar.FOUR)
 
     # ---- numbers the prose quotes ------------------------------------
     big = sorted(s for s in D if N[s] >= 1000)

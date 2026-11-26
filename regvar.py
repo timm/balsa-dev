@@ -14,21 +14,25 @@ rel is used, not raw MAE: regression targets carry their own units, so a
 split on raw MAE only reports that cal.housing has bigger numbers than
 bolts -- it gives the data set 90% and the learner 0.0%.
 
-The learners are balsa(1), balsa(30), LightGBM and TabICL.  The
-mean-predictor is the divisor, not a learner: its rel is 1.0 everywhere, a
-constant column that would distort both the learner and the interaction
-terms.
+The learners are balsa(30), LightGBM and TabICL.  balsa(1) is left out,
+as in the paper's classification split: a deliberately crippled single
+tree would inflate the learner share with a gap no reader is choosing
+between.  The mean-predictor is left out too -- it is the divisor, not a
+learner, and its rel is 1.0 on every fold, a constant column that would
+distort both the learner and the interaction terms.
 
 The decomposition needs a full data-set x learner x fold grid, and TabICL
-is capped by rows (see tabicl_reg.py), so every table is printed twice:
-once over the four treatments on the sets TabICL finished, and once over
-the other three on every set.
+is capped by rows (see tabicl_reg.py), so every row covers only the sets
+TabICL finished.
 
 usage: python3 regvar.py runs/reg56.csv runs/sereg.csv
 """
 import csv, os, sys, collections, statistics as st
 
-THREE = ("balsa1", "balsa30", "lgbm")
+# balsa(1) is left out, as in the paper's classification split: it is a
+# deliberately crippled single tree, and the question the decomposition
+# asks is what separates the learners a reader would actually consider.
+THREE = ("balsa30", "lgbm")
 FOUR  = THREE + ("tabicl",)
 ARMS  = THREE
 
@@ -99,12 +103,9 @@ def main():
         print()
         row("ALL non-SE", A); row("ALL SE", B); row("EVERYTHING", both)
 
-    print(f"=== 4 treatments ({', '.join(FOUR)}), "
-          f"the {len(ran)} sets TabICL finished\n")
+    print(f"=== {', '.join(FOUR)} -- the {len(ran)} sets "
+          f"TabICL finished\n")
     table(FOUR, ran)
-    print(f"\n=== 3 treatments ({', '.join(THREE)}), "
-          f"all {len(both)} sets\n")
-    table(THREE, set(both))
 
 
 if __name__ == "__main__": main()

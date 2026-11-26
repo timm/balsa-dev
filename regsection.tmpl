@@ -180,14 +180,23 @@ most likely culprit.
 
 \paragraph{The data set still dominates the learner.} Table~\ref{tab:regvar}
 applies the decomposition of Table~\ref{box:variance} to $\mathit{rel}$.
-Over all @@nAll@@ sets the data set owns @@dA@@\% of the variance against
-the learner's @@mA@@\%, a ratio of @@ratioA@@ to 1, with @@fA@@\% to the
-luck of the fold and @@oA@@\% to interaction. The classification study
-found 83 against 3. Two corpora, two losses, two sets of learners, and
-the same answer: {\em which data set you are on matters far more than
-which of these learners you run.} That is the finding this paper keeps
-returning to, and it is the reason a cheap, legible baseline is worth
-building before an expensive one.
+Over the @@nRan@@ sets it covers, the data set owns @@dA@@\% of the
+variance against the learner's @@mA@@\%, a ratio of @@ratioA@@ to 1, with
+@@fA@@\% to the luck of the fold and @@oA@@\% to interaction.
+Table~\ref{tab:clsvar}, the same split on AUC over the same three
+learners, reads @@dA@@ against @@mA@@ as well. Two corpora and two
+losses, and the answer does not move: {\em which data set you are on
+matters far more than which of these learners you run.}
+
+Group by group the two tables also fail in the same place. Each has one
+group where the learner catches up --- {\em static} in
+Table~\ref{tab:clsvar} at 40 against 36, {\em large, mixed} and {\tt
+config} here at about two to one --- and in both corpora those are the
+groups where one learner is simply built for the job (TabICL on the
+small static-analysis sets, LightGBM on the big configuration ones).
+Everywhere else the data set wins by an order of magnitude or more. That
+is the finding this paper keeps returning to, and it is the reason a
+cheap, legible baseline is worth building before an expensive one.
 
 \begin{table}[t]
 \caption{All @@nAll@@ regression data sets, by group. {\em Mean rel} is
@@ -220,15 +229,17 @@ group & sets & {\tt b1} & {\tt lgbm} & {\tt b30} & TabICL
 \end{table}
 
 \begin{table}[t]
-\caption{Table~\ref{box:variance}'s four-way split of the variance, run on
-$\mathit{rel}$ instead of AUC. {\em data}, {\em learner} and {\em fold}
-are $\eta^2$ percentages; {\em other} is what those three leave, the
-interaction between learner and data set. The last column is {\em
-data}/{\em learner}. Each group appears twice where it can: once over
-the three treatments that ran all its sets, and once ({\em + TabICL})
-over the four, restricted to the sets TabICL could run. Raw MAE is not usable here: on units rather than ratios the
-split reads {\em data} 90, {\em learner} 0, which only says that {\tt
-cal.housing} has bigger numbers than {\tt bolts}.}
+\caption{Table~\ref{box:variance}'s four-way split, run on $\mathit{rel}$
+instead of AUC. This is Table~\ref{tab:clsvar} for regression, with the
+same three learners --- LightGBM, {\tt balsa(30)} and TabICL --- so the
+two can be read against each other. {\tt balsa(1)} is left out for the
+reason given there. A decomposition needs a complete data set $\times$
+learner $\times$ fold grid, so every row covers only the @@nRan@@ sets
+TabICL finished; that is why the group counts here are at or below those
+of Table~\ref{tab:regfolds}. Raw MAE is not usable for any of this: on
+units rather than ratios the split reads {\em data} 90, {\em learner} 0,
+which only says that {\tt cal.housing} has bigger numbers than {\tt
+bolts}.}
 \label{tab:regvar}
 \centering
 {\scriptsize

@@ -54,7 +54,12 @@ regtex: ## regenerate the paper's regression section from runs/
 	  > $(Paper)/regression.tex
 	echo "wrote $(Paper)/regression.tex"
 
-reg: regfigs regtex ## both: every regression number in the paper, recomputed
+clstex: ## regenerate the paper's classification variance table
+	python3 -B clsvar.py runs/nose39-yue.txt runs/se61-yue.txt \
+	  > $(Paper)/clsvar.tex
+	echo "wrote $(Paper)/clsvar.tex"
+
+reg: regfigs regtex clstex ## every generated number in the paper, recomputed
 
 sh: $(Tmp)/bashrc $(Tmp)/nvim.lua ## bash with our prompt; vi = clean nvim
 	bash --rcfile $(Tmp)/bashrc -i
