@@ -119,7 +119,7 @@ mae = (want, got) ->                    -- mean |want - got|
 reg = (sets) ->                         -- 5x2 over the regression
   print "#1:reg n30:reg mean "          -- corpus: MAE of 1 tree, 30
   for f in *sets                        -- trees, and guess-the-mean
-    tb = Tbl csv "~/gits/moot/regression/#{f}.csv"
+    tb = Tbl csv "#{os.getenv("MOOTREG") or "~/gits/moot/regression"}/#{f}.csv"
     g = tb.cols.klass
     if not g                            -- else the first goal in
       for col in *tb.cols.y             -- file order

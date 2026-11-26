@@ -21,7 +21,7 @@ import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-MOOT = os.path.expanduser("~/gits/moot/regression")
+MOOT = os.path.expanduser(os.getenv("MOOTREG", "~/gits/moot/regression"))
 # name in the csv, label, colour, marker -- the same ink as the AUC figures
 ARMS = [("balsa1",  "balsa(1)",  "#2ca02c", "^"),
         ("lgbm",    "lgbm(100)", "#2a6fdb", "o"),
@@ -50,9 +50,13 @@ def main():
         x = [h for h in head
              if not h.rstrip("+-!").endswith("X") and h[-1] not in "+-!"]
         numeric[s] = all(h[0].isupper() for h in x)
-    G = [("numeric\nattributes", [s for s in sets if n[s] < 1000 and numeric[s]]),
-         ("mixed\nattributes",   [s for s in sets if n[s] < 1000 and not numeric[s]]),
-         ("large, mixed",        [s for s in sets if n[s] >= 1000])]
+    if any("/" in s for s in sets):          # moot/optimize: group by folder
+        G = [(d, [s for s in sets if s.split("/")[0] == d])
+             for d in sorted({s.split("/")[0] for s in sets})]
+    else:
+        G = [("numeric\nattributes", [s for s in sets if n[s] < 1000 and numeric[s]]),
+             ("mixed\nattributes",   [s for s in sets if n[s] < 1000 and not numeric[s]]),
+             ("large, mixed",        [s for s in sets if n[s] >= 1000])]
 
     mu = {(s, a): st.fmean([float(r[f"rel_{a}"]) for r in D[s]])
           for s in sets for a, *_ in ARMS}
@@ -87,7 +91,8 @@ def main():
                           st.fmean([mu[(s, a)] for s in sets]),
                           st.fmean([sd[(s, a)] for s in sets])))
         ax.text(xs.mean(), 1.83, g, ha="center", va="bottom", fontsize=FS["head"])
-        ticks += list(xs); labs += fs; x0 += len(fs) + 3
+        ticks += list(xs); labs += [f.split("/")[-1] for f in fs]
+        x0 += len(fs) + 3
         if gi < len(G) - 1: ax.axvline(x0 - 2, color="#555", lw=1)
 
     ax.axhline(1.0, color="#999", lw=1.4, ls=(0, (6, 4)))

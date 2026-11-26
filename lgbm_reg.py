@@ -12,13 +12,21 @@ warnings.filterwarnings("ignore")
 
 def load(f):
   "x matrix (nums float, syms category codes), target list, cats"
+  root = os.getenv("MOOTREG", "~/gits/moot/regression")
   rows = [l.strip().split(",") for l in open(
-          os.path.expanduser("~/gits/moot/regression/%s.csv" % f))
+          os.path.expanduser("%s/%s.csv" % (root, f)))
           if l.strip()]
   head, rows = rows[0], rows[1:]
-  k  = next(i for i, h in enumerate(head) if h.endswith("!"))
+  # the goal: a ! column if there is one, else the first + or - goal.
+  # moot/regression marks it !, moot/optimize marks it + or -.  This is
+  # balsa_eg.yue's own rule, so both rigs score the same column.
+  k = next((i for i, h in enumerate(head) if h.endswith("!")), None)
+  if k is None:
+    k = next(i for i, h in enumerate(head)
+             if h[-1] in "+-" and not h.rstrip("+-").endswith("X"))
   xs = [i for i, h in enumerate(head)
-        if i != k and not h.rstrip("+-!").endswith("X")]
+        if i != k and not h.rstrip("+-!").endswith("X")
+        and h[-1] not in "+-!"]
   def col(i):
     vs = [r[i] for r in rows]
     if head[i][0].isupper():

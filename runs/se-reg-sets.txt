@@ -1,0 +1,28 @@
+# SE data sets in moot with a single numeric goal: optimize/config and
+# optimize/systems, which are software configuration tuning.  A goal is
+# a column ending + or -; numeric if its name starts uppercase.
+# Excluded, single numeric goal but not SE: behavior_data/player_statistics_cleaned_final, behavior_data/student_dropout, health_data/Medical_Data_and_Hospital_Readmissions, sales_data/socks, test/dataset120, test/dataset600
+# path<TAB>rows<TAB>goal
+config/Apache_AllMeasurements	192	Performance-
+config/HSMGP_num	3456	AverageTimePerIteration-
+config/SQL_AllMeasurements	4653	Performance-
+config/X264_AllMeasurements	1152	Performance-
+config/rs-6d-c3_obj1	3840	Throughput-
+config/rs-6d-c3_obj2	3840	Latency-
+config/sol-6d-c2-obj1	2866	Throughput-
+config/wc+rs-3d-c4-obj1	196	Throughput-
+config/wc+sol-3d-c4-obj1	196	Throughput-
+config/wc+wc-3d-c4-obj1	196	Throughput-
+config/wc-6d-c1-obj1	2880	Throughput-
+systems/7z	68640	Performance-
+systems/BDBC	2560	PERF-
+systems/HSQLDB	864	Performance-
+systems/LLVM	1024	PERF-
+systems/PostgreSQL	19008	Performance-
+systems/dconvert	6764	Time-
+systems/deeparch	4096	Aws-theano-
+systems/exastencils	86058	Performance-
+systems/javagc	166975	Performance-
+systems/redis	4400	PERF-
+systems/storm	1557	Throughput-
+systems/x264	53662	PSNR-
