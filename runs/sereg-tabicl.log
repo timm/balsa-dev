@@ -1,0 +1,57 @@
+#done process/nasa93dem                    93 rows     3.2s
+#done config/Apache_AllMeasurements       192 rows     3.0s
+#done config/SS-D                         196 rows     2.4s
+#done config/SS-F                         196 rows     2.4s
+#done config/SS-G                         196 rows     2.4s
+#done config/wc+rs-3d-c4-obj1             196 rows     2.5s
+#done config/wc+sol-3d-c4-obj1            196 rows     2.5s
+#done config/wc+wc-3d-c4-obj1             196 rows     2.5s
+#done config/SS-B                         206 rows     2.5s
+#done config/SS-H                         259 rows     3.2s
+#done process/pom3d                       500 rows     5.5s
+#done config/SS-E                         756 rows     4.9s
+#done config/SS-M                         864 rows     9.9s
+#done systems/HSQLDB                      864 rows    10.1s
+#done config/SS-O                         972 rows     9.6s
+#done process/coc1000                    1000 rows    13.1s
+#done config/SS-L                        1023 rows    10.0s
+#done config/SS-P                        1023 rows    10.0s
+#done systems/LLVM                       1024 rows     9.8s
+#done config/SS-I                        1080 rows     8.9s
+#done config/X264_AllMeasurements        1152 rows    12.5s
+#done config/SS-A                        1343 rows     8.0s
+#done config/SS-C                        1512 rows     8.9s
+#done systems/storm                      1557 rows    16.6s
+#done systems/BDBC                       2560 rows    30.5s
+#done config/SS-Q                        2736 rows    29.4s
+#done config/sol-6d-c2-obj1              2866 rows    26.0s
+#done config/SS-K                        2880 rows    26.0s
+#done config/wc-6d-c1-obj1               2880 rows    26.1s
+#done config/SS-R                        3008 rows    54.6s
+#done config/HSMGP_num                   3456 rows    63.1s
+#done config/SS-J                        3840 rows    59.0s
+#done config/SS-S                        3840 rows    58.7s
+#done config/rs-6d-c3_obj1               3840 rows    59.1s
+#done config/rs-6d-c3_obj2               3840 rows    62.8s
+#done systems/deeparch                   4096 rows    75.4s
+#done systems/redis                      4400 rows    76.7s
+#done config/SS-U                        4608 rows    99.9s
+#done config/SQL_AllMeasurements         4653 rows   156.2s
+#done config/SS-T                        5184 rows   106.9s
+#done systems/dconvert                   6764 rows   176.1s
+#done config/SS-V                        6840 rows   172.1s
+#done process/xomo_flight               10000 rows   336.1s
+#done process/xomo_ground               10000 rows   336.3s
+#done process/xomo_osp                  10000 rows   337.4s
+#done process/xomo_osp2                 10000 rows   328.2s
+#done systems/PostgreSQL                19008 rows   768.9s
+#done process/pom3a                     20000 rows   840.6s
+#done process/pom3b                     20000 rows   838.2s
+#done process/pom3c                     20000 rows   840.0s
+#skip config/SS-N (53662 rows > ROWCAP 20000)
+#skip systems/x264 (53662 rows > ROWCAP 20000)
+#skip config/SS-W (65536 rows > ROWCAP 20000)
+#skip systems/7z (68640 rows > ROWCAP 20000)
+#skip config/SS-X (86058 rows > ROWCAP 20000)
+#skip systems/exastencils (86058 rows > ROWCAP 20000)
+#skip systems/javagc (166975 rows > ROWCAP 20000)

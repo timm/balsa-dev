@@ -1,0 +1,56 @@
+#done detroit                              13 rows     2.3s
+#done longley                              16 rows     2.1s
+#done gascons                              27 rows     2.1s
+#done schlvote                             38 rows     2.2s
+#done bolts                                40 rows     2.2s
+#done diabetes.numeric                     43 rows     1.8s
+#done vineyard                             52 rows     2.0s
+#done elusage                              55 rows     1.9s
+#done pollution                            60 rows     2.8s
+#done mbagrade                             61 rows     1.9s
+#done sleep                                62 rows     2.3s
+#done pyrim                                74 rows     3.2s
+#done auto93                               93 rows     3.3s
+#done baskball                             96 rows     2.4s
+#done cloud                               108 rows     2.6s
+#done fruitfly                            125 rows     2.3s
+#done echomonths                          130 rows     2.9s
+#done veteran                             137 rows     2.9s
+#done fishcatch                           158 rows     2.9s
+#done autoprice                           159 rows     3.4s
+#done servo                               167 rows     2.7s
+#done triazines                           186 rows     6.7s
+#done lowbwt                              189 rows     3.2s
+#done wisconsin                           194 rows     5.2s
+#done pharynx                             195 rows     3.4s
+#done pwlinear                            200 rows     3.4s
+#done autohorse                           205 rows     4.6s
+#done cpu                                 209 rows     3.0s
+#done machine.cpu                         209 rows     2.9s
+#done bodyfat                             252 rows     4.1s
+#done breasttumor                         286 rows     3.9s
+#done cholesterol                         303 rows     4.5s
+#done autompg                             398 rows     4.4s
+#done pbc                                 418 rows     6.3s
+#done housing                             506 rows     6.0s
+#done meta                                528 rows     7.6s
+#done sensory                             576 rows     6.5s
+#done strike                              625 rows     5.9s
+#done stock                               950 rows     9.1s
+#done abalone                            4177 rows    69.8s
+#done bank32nh                           8192 rows   256.9s
+#done bank8FM                            8192 rows   183.6s
+#done cpu.act                            8192 rows   248.2s
+#done cpu.small                          8192 rows   202.7s
+#done kin8nm                             8192 rows   192.9s
+#done puma32H                            8192 rows   293.5s
+#done puma8NH                            8192 rows   190.9s
+#done ailerons                          13750 rows   803.9s
+#done pol                               15000 rows   693.2s
+#done elevators                         16599 rows   689.2s
+#skip cal.housing (20640 rows > ROWCAP 20000)
+#skip house16H (22784 rows > ROWCAP 20000)
+#skip house8L (22784 rows > ROWCAP 20000)
+#skip 2dplanes (40768 rows > ROWCAP 20000)
+#skip fried (40768 rows > ROWCAP 20000)
+#skip mv (40768 rows > ROWCAP 20000)

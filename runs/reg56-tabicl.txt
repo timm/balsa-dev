@@ -1,0 +1,105 @@
+#data             tabicl
+abalone            0.61
+ailerons           0.35
+auto93             0.52
+autohorse          0.16
+autompg            0.28
+autoprice          0.29
+bank32nh           0.57
+bank8FM            0.19
+baskball           0.88
+bodyfat            0.03
+bolts              0.19
+breasttumor        0.98
+cholesterol        1.00
+cloud              0.38
+cpu                0.38
+cpu.act            0.13
+cpu.small          0.16
+detroit            0.72
+diabetes.numeric   0.85
+echomonths         0.71
+elevators          0.29
+elusage            0.42
+fishcatch          0.11
+fruitfly           1.08
+gascons            0.16
+housing            0.31
+kin8nm             0.25
+longley            0.22
+lowbwt             0.62
+machine.cpu        0.42
+mbagrade           0.99
+meta               0.79
+pbc                0.75
+pharynx            0.70
+pol                0.03
+pollution          0.70
+puma32H            0.25
+puma8NH            0.50
+pwlinear           0.38
+pyrim              0.68
+schlvote           0.90
+sensory            0.87
+servo              0.22
+sleep              0.89
+stock              0.09
+strike             0.64
+triazines          0.84
+veteran            0.97
+vineyard           0.57
+wisconsin          0.94
+
+#mean rel-mae      0.52  (50 sets)
+#secs (all data)  8018.8
+#skipped 6 sets over ROWCAP=20000: cal.housing house16H house8L 2dplanes fried mv
+%folds abalone tabicl 0.611 0.604 0.627 0.599 0.590 0.628 0.614 0.603 0.611 0.602
+%folds ailerons tabicl 0.345 0.347 0.344 0.346 0.345 0.346 0.344 0.348 0.344 0.347
+%folds auto93 tabicl 0.508 0.518 0.561 0.438 0.559 0.478 0.442 0.429 0.396 0.869
+%folds autohorse tabicl 0.150 0.134 0.223 0.151 0.147 0.160 0.208 0.161 0.103 0.155
+%folds autompg tabicl 0.259 0.274 0.283 0.262 0.268 0.278 0.285 0.283 0.291 0.284
+%folds autoprice tabicl 0.305 0.285 0.291 0.280 0.282 0.313 0.266 0.230 0.253 0.353
+%folds bank32nh tabicl 0.581 0.570 0.560 0.584 0.567 0.579 0.578 0.566 0.578 0.570
+%folds bank8FM tabicl 0.187 0.185 0.187 0.184 0.189 0.185 0.185 0.186 0.188 0.184
+%folds baskball tabicl 1.082 0.731 0.790 0.888 0.832 0.913 0.767 1.001 0.863 0.906
+%folds bodyfat tabicl 0.023 0.040 0.041 0.028 0.025 0.040 0.053 0.022 0.033 0.028
+%folds bolts tabicl 0.360 0.109 0.180 0.296 0.159 0.100 0.193 0.220 0.116 0.156
+%folds breasttumor tabicl 0.996 0.941 1.004 0.947 0.986 0.960 0.959 1.008 0.986 0.971
+%folds cholesterol tabicl 0.984 0.956 1.002 1.006 0.995 0.998 1.072 0.981 0.988 1.060
+%folds cloud tabicl 0.333 0.444 0.393 0.398 0.328 0.355 0.367 0.374 0.321 0.451
+%folds cpu tabicl 0.315 0.385 0.402 0.371 0.420 0.372 0.379 0.461 0.453 0.275
+%folds cpu.act tabicl 0.135 0.133 0.134 0.134 0.134 0.135 0.135 0.133 0.132 0.135
+%folds cpu.small tabicl 0.158 0.161 0.162 0.162 0.163 0.161 0.164 0.161 0.161 0.163
+%folds detroit tabicl 1.316 0.247 1.493 0.396 0.634 0.254 0.721 0.616 0.957 0.602
+%folds diabetes.numeric tabicl 0.809 0.884 0.815 0.992 0.864 0.683 0.828 0.974 0.875 0.817
+%folds echomonths tabicl 0.691 0.779 0.639 0.709 0.659 0.774 0.792 0.653 0.702 0.664
+%folds elevators tabicl 0.287 0.292 0.291 0.289 0.287 0.293 0.290 0.289 0.294 0.288
+%folds elusage tabicl 0.343 0.503 0.275 0.515 0.386 0.543 0.367 0.515 0.347 0.452
+%folds fishcatch tabicl 0.106 0.119 0.131 0.107 0.113 0.113 0.101 0.108 0.089 0.133
+%folds fruitfly tabicl 1.060 1.044 1.123 1.227 1.203 1.033 1.027 1.059 0.979 1.014
+%folds gascons tabicl 0.118 0.144 0.085 0.484 0.102 0.116 0.149 0.102 0.177 0.082
+%folds housing tabicl 0.302 0.296 0.296 0.315 0.289 0.323 0.337 0.306 0.323 0.299
+%folds kin8nm tabicl 0.255 0.247 0.252 0.256 0.253 0.253 0.248 0.251 0.243 0.256
+%folds longley tabicl 0.330 0.171 0.268 0.179 0.130 0.203 0.258 0.298 0.139 0.253
+%folds lowbwt tabicl 0.603 0.666 0.638 0.623 0.593 0.595 0.615 0.651 0.606 0.626
+%folds machine.cpu tabicl 0.428 0.315 0.398 0.449 0.359 0.490 0.358 0.566 0.420 0.389
+%folds mbagrade tabicl 0.992 1.248 0.965 0.990 0.877 0.863 1.148 0.999 0.920 0.929
+%folds meta tabicl 1.032 0.513 0.894 0.752 0.937 0.603 0.743 0.949 0.961 0.505
+%folds pbc tabicl 0.737 0.746 0.810 0.682 0.789 0.737 0.736 0.734 0.771 0.721
+%folds pharynx tabicl 0.643 0.764 0.660 0.669 0.714 0.745 0.760 0.682 0.688 0.692
+%folds pol tabicl 0.033 0.034 0.035 0.032 0.036 0.033 0.033 0.035 0.034 0.034
+%folds pollution tabicl 0.864 0.714 0.578 0.825 0.559 0.801 0.545 0.797 0.642 0.688
+%folds puma32H tabicl 0.248 0.261 0.252 0.256 0.259 0.251 0.257 0.252 0.259 0.248
+%folds puma8NH tabicl 0.499 0.493 0.497 0.496 0.501 0.491 0.500 0.492 0.503 0.487
+%folds pwlinear tabicl 0.371 0.333 0.338 0.357 0.387 0.390 0.471 0.393 0.367 0.411
+%folds pyrim tabicl 0.657 0.595 0.685 0.590 0.804 0.665 0.612 0.953 0.691 0.592
+%folds schlvote tabicl 0.868 1.593 0.862 1.066 1.015 0.588 0.830 0.785 0.688 0.746
+%folds sensory tabicl 0.898 0.870 0.837 0.864 0.948 0.825 0.858 0.875 0.852 0.893
+%folds servo tabicl 0.232 0.217 0.227 0.198 0.218 0.340 0.219 0.143 0.224 0.173
+%folds sleep tabicl 0.939 0.800 0.774 0.906 0.744 0.762 1.043 0.774 0.937 1.213
+%folds stock tabicl 0.090 0.086 0.086 0.089 0.098 0.087 0.100 0.085 0.095 0.087
+%folds strike tabicl 0.657 0.666 0.624 0.614 0.660 0.629 0.548 0.713 0.721 0.617
+%folds triazines tabicl 0.852 0.820 0.762 0.759 0.967 0.727 0.875 0.891 0.911 0.864
+%folds veteran tabicl 0.896 0.927 0.870 1.090 1.113 1.074 0.907 0.808 1.181 0.829
+%folds vineyard tabicl 0.639 0.537 0.527 0.571 0.748 0.495 0.489 0.636 0.643 0.430
+%folds wisconsin tabicl 0.977 0.998 0.960 0.936 0.924 0.917 0.873 0.934 0.921 0.938

@@ -14,15 +14,23 @@ rel is used, not raw MAE: regression targets carry their own units, so a
 split on raw MAE only reports that cal.housing has bigger numbers than
 bolts -- it gives the data set 90% and the learner 0.0%.
 
-The learners are balsa(1), balsa(30) and LightGBM.  The mean-predictor is
-the divisor, not a learner: its rel is 1.0 everywhere, a constant column
-that would distort both the learner and the interaction terms.
+The learners are balsa(1), balsa(30), LightGBM and TabICL.  The
+mean-predictor is the divisor, not a learner: its rel is 1.0 everywhere, a
+constant column that would distort both the learner and the interaction
+terms.
+
+The decomposition needs a full data-set x learner x fold grid, and TabICL
+is capped by rows (see tabicl_reg.py), so every table is printed twice:
+once over the four treatments on the sets TabICL finished, and once over
+the other three on every set.
 
 usage: python3 regvar.py runs/reg56.csv runs/sereg.csv
 """
 import csv, os, sys, collections, statistics as st
 
-ARMS = ("balsa1", "balsa30", "lgbm")
+THREE = ("balsa1", "balsa30", "lgbm")
+FOUR  = THREE + ("tabicl",)
+ARMS  = THREE
 
 
 def folds(path):
@@ -32,8 +40,9 @@ def folds(path):
     return D
 
 
-def split(D, sets):
+def split(D, sets, ARMS=None):
     "eta-squared for data set, learner, fold, interaction.  Sums to 100."
+    ARMS = ARMS or THREE
     I, J = len(sets), len(ARMS)
     R = len(D[sets[0]])
     val = lambda s, r, a: float(r[f"rel_{a}"])
@@ -74,18 +83,28 @@ def main():
     A, B = folds(sys.argv[1]), folds(sys.argv[2])
     both = {**A, **B}
     G = groups(sorted(A), sorted(B))
-    print(f"{'group':16s}{'sets':>5}{'data':>7}{'learner':>9}{'fold':>7}"
-          f"{'other':>7}{'data/learner':>14}")
-    for name, g in G:
-        d, m, f, o = split(both, sorted(g))
-        print(f"{name:16s}{len(g):5d}{d:7.0f}{m:9.0f}{f:7.0f}{o:7.0f}"
-              f"{d / m:13.0f}x")
-    print()
-    for name, g in (("ALL non-SE", sorted(A)), ("ALL SE", sorted(B)),
-                    ("EVERYTHING", sorted(both))):
-        d, m, f, o = split(both, g)
-        print(f"{name:16s}{len(g):5d}{d:7.0f}{m:9.0f}{f:7.0f}{o:7.0f}"
-              f"{d / m:13.0f}x")
+    ran = {s for s in both
+           if all(r.get("rel_tabicl", "") != "" for r in both[s])}
+
+    def table(arms, keep):
+        print(f"{'group':16s}{'sets':>5}{'data':>7}{'learner':>9}{'fold':>7}"
+              f"{'other':>7}{'data/learner':>14}")
+        def row(name, g):
+            g = sorted(s for s in g if s in keep)
+            if not g: return
+            d, m, f, o = split(both, g, arms)
+            print(f"{name:16s}{len(g):5d}{d:7.0f}{m:9.0f}{f:7.0f}{o:7.0f}"
+                  f"{d / m:13.0f}x")
+        for name, g in G: row(name, g)
+        print()
+        row("ALL non-SE", A); row("ALL SE", B); row("EVERYTHING", both)
+
+    print(f"=== 4 treatments ({', '.join(FOUR)}), "
+          f"the {len(ran)} sets TabICL finished\n")
+    table(FOUR, ran)
+    print(f"\n=== 3 treatments ({', '.join(THREE)}), "
+          f"all {len(both)} sets\n")
+    table(THREE, set(both))
 
 
 if __name__ == "__main__": main()

@@ -25,7 +25,8 @@ MOOT = os.path.expanduser(os.getenv("MOOTREG", "~/gits/moot/regression"))
 # name in the csv, label, colour, marker -- the same ink as the AUC figures
 ARMS = [("balsa1",  "balsa(1)",  "#2ca02c", "^"),
         ("lgbm",    "lgbm(100)", "#2a6fdb", "o"),
-        ("balsa30", "balsa(30)", "#e8613c", "s")]
+        ("balsa30", "balsa(30)", "#e8613c", "s"),
+        ("tabicl",  "TabICL",    "#000000", "D")]
 FS = dict(tick=14, lab=14, head=17, mono=14, bar=15)
 
 
@@ -34,6 +35,12 @@ def spread(v):
     v = sorted(v); n = len(v)
     q = lambda p: v[min(n - 1, int(p * n))]
     return (q(.9) - q(.1)) / 2.56
+
+
+def vals(D, s, a):
+    "The folds of one treatment on one set, or [] if it did not run it."
+    k = f"rel_{a}"
+    return [float(r[k]) for r in D[s] if r.get(k, "") != ""]
 
 
 def main():
@@ -60,9 +67,12 @@ def main():
              ("mixed\nattributes",   [s for s in sets if n[s] < 1000 and not numeric[s]]),
              ("large, mixed",        [s for s in sets if n[s] >= 1000])]
 
-    mu = {(s, a): st.fmean([float(r[f"rel_{a}"]) for r in D[s]])
+    # nan where a treatment did not run a set, so its line simply breaks
+    # there instead of dropping to zero or dragging the mean around
+    nan = float("nan")
+    mu = {(s, a): (st.fmean(v) if (v := vals(D, s, a)) else nan)
           for s in sets for a, *_ in ARMS}
-    sd = {(s, a): spread([float(r[f"rel_{a}"]) for r in D[s]])
+    sd = {(s, a): (spread(v) if (v := vals(D, s, a)) else nan)
           for s in sets for a, *_ in ARMS}
     # timings live in the sibling .txt, on its "#secs (all data)" line
     secs = {}
@@ -75,9 +85,13 @@ def main():
                 secs = {("balsa1" if "(1)" in h else
                          "balsa30" if "(30)" in h else h): float(x)
                         for h, x in zip(head, v)}
+    tt = sys.argv[1].rsplit(".", 1)[0] + "-tabicl.txt"
+    if os.path.exists(tt):
+        for line in open(tt):
+            if line.startswith("#secs"): secs["tabicl"] = float(line.split()[-1])
 
     fig = plt.figure(figsize=(14.3, 6.6))
-    gs = fig.add_gridspec(1, 3, width_ratios=[3.4, 1.6, 20], wspace=0)
+    gs = fig.add_gridspec(1, 3, width_ratios=[3.4, 3.6, 20], wspace=0)
     bx, ax = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
 
     x0, ticks, labs, H = 0, [], [], []
@@ -88,10 +102,12 @@ def main():
             ax.plot(xs, [mu[(s, a)] for s in fs], color=c, marker=m, lw=2, ms=6)
             ax.plot(xs, [sd[(s, a)] for s in fs], color=c, ls="--", lw=1.8,
                     marker=m, ms=3.5)
-            if gi == 0:
-                H.append((lab, c, m,
-                          st.fmean([mu[(s, a)] for s in sets]),
-                          st.fmean([sd[(s, a)] for s in sets])))
+            # a treatment with no score anywhere (TabICL on a csv built
+            # before it ran) earns no legend row rather than a crash
+            if gi == 0 and (ok := [s for s in sets
+                                   if mu[(s, a)] == mu[(s, a)]]):
+                H.append((lab, c, m, st.fmean([mu[(s, a)] for s in ok]),
+                          st.fmean([sd[(s, a)] for s in ok]), len(ok)))
         ax.text(xs.mean(), 1.83, g, ha="center", va="bottom", fontsize=FS["head"])
         ticks += list(xs); labs += [f.split("/")[-1] for f in fs]
         x0 += len(fs) + 3
@@ -110,7 +126,7 @@ def main():
     ax.grid(axis="y", which="major", color="#ddd")
     ax.grid(axis="y", which="minor", color="#b0b0b0", ls=(0, (4, 4)), lw=1)
     ax.set_ylabel("MAE / MAE(predict the mean)\nlower is better, 5x2 folds",
-                  fontsize=FS["lab"], labelpad=6)
+                  fontsize=FS["lab"])
     ax.tick_params(axis="y", labelsize=FS["tick"])
     ax.spines["top"].set_visible(False)
 
@@ -123,17 +139,17 @@ def main():
     for g, fs in G[:gbig]: x0s += len(fs) + 1
     left = (x0s + .9) / (x0 - 1.2)
     wide = len(G[gbig][1]) / (x0 - 1.2)
-    tx = ax.inset_axes((left + .012, .74, wide - .025, .22))
-    tx.set_xlim(0, 24); tx.set_ylim(0, 4.6)
+    tx = ax.inset_axes((left + .012, .66, wide - .025, .30))
+    tx.set_xlim(0, 24); tx.set_ylim(0, 5.7)
     tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
     for s_ in tx.spines.values(): s_.set_visible(False)
     mono = dict(family="monospace", fontsize=FS["mono"] - 2,
                 bbox=dict(fc="#fcfcfa", ec="none", pad=1))
-    tx.text(17.2, 4.1, "mean", ha="right", va="center", **mono)
-    tx.text(23.8, 4.1, "sd", ha="right", va="center", **mono)
-    tx.plot([21.4, 23.8], [3.5, 3.5], color="#555", lw=1.4, ls=(0, (3, 2)))
-    for k, (lab, c, m, a, b) in enumerate(H):
-        y = 2.9 - 1.1 * k
+    tx.text(17.2, 5.2, "mean", ha="right", va="center", **mono)
+    tx.text(23.8, 5.2, "sd", ha="right", va="center", **mono)
+    tx.plot([21.4, 23.8], [4.6, 4.6], color="#555", lw=1.4, ls=(0, (3, 2)))
+    for k, (lab, c, m, a, b, _n) in enumerate(H):
+        y = 4.0 - 1.1 * k
         tx.text(0, y, lab, ha="left", va="center", **mono)
         tx.plot([9.4, 11.4], [y, y], color=c, lw=2.2)
         tx.plot(10.4, y, m, color=c, ms=6)
@@ -163,9 +179,25 @@ def main():
 
     fig.set_facecolor("#fcfcfa"); ax.set_facecolor("#fcfcfa")
     plt.tight_layout()
+    # Matplotlib parks the y label just left of the tick labels, which on
+    # this layout lands its first line on top of the runtime bars.  No
+    # fixed padding is right for every corpus -- the bar panel's width
+    # follows the set count -- so measure once the layout has settled and
+    # butt the label's LEFT EDGE up against the bars.  Centring it in the
+    # gap is not enough: the label is two lines wide, so its own left half
+    # still reaches back over the bars.
+    fig.canvas.draw()
+    rend = fig.canvas.get_renderer()
+    w    = ax.yaxis.label.get_window_extent(rend).width
+    bars = bx.get_tightbbox(rend).x1
+    tick = min(t.get_window_extent(rend).x0 for t in ax.get_yticklabels())
+    x = min(bars + 40 + w / 2, tick - 12 - w / 2)      # ticks win a tie
+    ax.yaxis.set_label_coords(
+        ax.transAxes.inverted().transform((x, 0))[0], .5)
     plt.savefig(sys.argv[2], dpi=200)
     plt.savefig(sys.argv[2].rsplit(".", 1)[0] + ".pdf")
-    for lab, c, m, a, b in H: print(f"{lab:10s} mean {a:.2f}  sd {b:.2f}")
+    for lab, c, m, a, b, n in H:
+        print(f"{lab:10s} mean {a:.2f}  sd {b:.2f}  ({n} sets)")
     for g, fs in G: print(f"{g.replace(chr(10),' '):22s} {len(fs)} sets")
 
 
