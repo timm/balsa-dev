@@ -5,7 +5,7 @@ Balsa for Python 3.11+. Column positions are zero-based.
 """
 # (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 from bisect import bisect_left, bisect_right
-from math import ceil, copysign, exp, floor, inf, log, nan, sqrt
+from math import ceil, exp, floor, inf, log, nan, sqrt
 from os.path import expanduser
 from types import SimpleNamespace
 
@@ -28,7 +28,8 @@ def csv(file):
     return [Row(thing(v) for v in line.split(","))
             for s in f if (line := s.replace("\r", "").strip())]
 
-# Column and target summaries. Known labels start at 1, and "?" gets -1.
+# Column and target summaries. Known labels are 0..n-1; "?" is -1,
+# so "unknown" is always label < 0.
 class Column:
   def __init__(i, txt, at): i.txt, i.at, i.n = txt, at, 0
 
@@ -41,10 +42,10 @@ class Column:
     bins = [mk() for _ in range(len(i.labels) + 1)]
     for row, y in zip(rows, targets):
       b = row.labels[i.at]
-      if b > 0: bins[b - 1].add(y)
+      if b >= 0: bins[b].add(y)
     prefix, total, rest = mk(), mk(), mk()
     for bin in bins: yfold(total, bin)
-    for b, bin in enumerate(bins[:-1], 1):
+    for b, bin in enumerate(bins[:-1]):
       left, right = i.split_bin(bin, prefix, total, rest)
       if min(left.n, right.n) >= leaf:
         yield (i, b), xpect(left, right)
@@ -56,12 +57,10 @@ class Num(Column):
 
   def add_known(i, v, inc):
     d = v - i.mu
-    change = inc * d
-    if i.n: i.mu += change / i.n
-    else: i.mu += copysign(inf, change) if change else nan
+    i.mu += inc * d / i.n
     i.m2 = max(0, i.m2 + inc * d * (v - i.mu))
 
-  def div(i): return sqrt(i.m2 / (i.n - 1)) if i.n >= 2 else 0
+  def div(i): return 0 if i.n < 2 else sqrt(i.m2 / (i.n - 1))
 
   def mid(i): return i.mu
 
@@ -87,7 +86,7 @@ class Num(Column):
     m = len(values)
     return list(dict.fromkeys(values[j * m // n] for j in range(n)))
 
-  def label(i, v): return max(1, bisect_right(i.labels, v))
+  def label(i, v): return max(0, bisect_right(i.labels, v) - 1)
 
   def split_bin(i, bin, prefix, total, rest):
     return yfold(prefix, bin), yfold(total, bin, -1)
@@ -114,8 +113,8 @@ class Sym(Column):
     return ranked[:max(0, min(len(ranked), n - 1))]
 
   def label(i, v):
-    try: return i.labels.index(v) + 1
-    except ValueError: return len(i.labels) + 1
+    try: return i.labels.index(v)
+    except ValueError: return len(i.labels)   # the rare pool
 
   def class_labels(i): return i.labels_for(inf)
 
@@ -131,8 +130,8 @@ class Ys:
   def __init__(i, nk): i.nk, i.n, i.has = nk, 0, [0] * nk
 
   def add(i, v):
-    if v > 0:
-      i.has[v - 1] += 1
+    if v >= 0:
+      i.has[v] += 1
       i.n += 1
 
   def div(i):
@@ -140,7 +139,7 @@ class Ys:
     e = sum(-c * log(c) for c in i.has if c > 0)
     return (e / i.n + log(i.n)) / log(2)
 
-  def mid(i): return i.has.index(max(i.has)) + 1 if i.has else None
+  def mid(i): return i.has.index(max(i.has)) if i.has else None
 
   def fold(i, b, inc, u):
     for j, c in enumerate(b.has):
@@ -210,18 +209,19 @@ def best_cut(xcols, rows, targets, mk, m, leaf):
 
 class Tree:
   def __init__(i, rows, y, xcols, mk, m, leaf, maxd, lvl=0):
-    targets = list(map(y, rows))
-    cut = None
-    if lvl < maxd: cut = best_cut(xcols, rows, targets, mk, m, leaf)
-    i.ys, i.n, i.ati = adds(targets, mk()), len(rows), None
+    targets = [y(row) for row in rows]
+    i.ys  = adds(targets, mk())              # every node: a summary,
+    i.n   = len(rows)                        # a size, and maybe a cut
+    i.ati = None
+    if lvl >= maxd: return
+    cut = best_cut(xcols, rows, targets, mk, m, leaf)
     if cut is None: return
     i.col, i.v = cut
     i.ati = i.col.at
-    yes, no = [], []
-    for row in rows:
-      (yes if i.goes_left(row) else no).append(row)
+    yes   = [row for row in rows if i.goes_left(row)]
+    no    = [row for row in rows if not i.goes_left(row)]
     i.yes = Tree(yes, y, xcols, mk, m, leaf, maxd, lvl + 1)
-    i.no = Tree(no, y, xcols, mk, m, leaf, maxd, lvl + 1)
+    i.no  = Tree(no,  y, xcols, mk, m, leaf, maxd, lvl + 1)
 
   def goes_left(i, row):
     label = row.labels[i.ati]
@@ -309,7 +309,7 @@ def aucs(wps):
   for j in range(len(wps[0][1])):
     pos, neg = [], []
     for y, scores in wps:
-      (pos if y == j + 1 else neg).append(scores[j])
+      (pos if y == j else neg).append(scores[j])
     a = auc(pos, neg)
     if a is not None: n, weighted = n + len(pos), weighted + len(pos) * a
   return 100 * weighted / max(n, 1)
