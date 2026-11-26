@@ -1,67 +1,23 @@
-# SE data sets: moot/optimize config, process, systems.  We predict the
-# FIRST y column in file order; a set's other goals stay out of x and
-# are simply not scored.
-# Not used: hpo/ (35 sets, all Health-*, all three-goal), and
-# binary_config/ (12), whose FFM and FM sets are synthetic SAT instances
-# and whose columns are nearly all constant -- 1030 of 1044 x columns in
-# FFM-1000-200-0.50-SAT-1 hold a single value, 106 of 124 in Scrum10k.
-# With rf sampling sqrt(|x|) columns per node, most nodes there draw
-# nothing usable, so the group measured our sampler, not the learners.
-# path<TAB>rows<TAB>n_goals<TAB>first_goal
-config/Apache_AllMeasurements	192	1	Performance-
-config/HSMGP_num	3456	1	AverageTimePerIteration-
-config/SQL_AllMeasurements	4653	1	Performance-
-config/SS-A	1343	2	Throughput+
-config/SS-B	206	2	A-
-config/SS-C	1512	2	Throughput+
-config/SS-D	196	2	Throughput+
-config/SS-E	756	2	Throughput+
-config/SS-F	196	2	Throughput+
-config/SS-G	196	2	Throughput+
-config/SS-H	259	2	Energy-
-config/SS-I	1080	2	Throughput+
-config/SS-J	3840	2	Throughput+
-config/SS-K	2880	2	Throughput+
-config/SS-L	1023	2	A-
-config/SS-M	864	3	Benchmark-energy-
-config/SS-N	53662	2	PSNR-
-config/SS-O	972	2	Performance-
-config/SS-P	1023	2	A-
-config/SS-Q	2736	3	Performance-
-config/SS-R	3008	2	Performance-
-config/SS-S	3840	2	Throughput-
-config/SS-T	5184	2	Performance-
-config/SS-U	4608	2	Benchmark-iperf-
-config/SS-V	6840	2	Performance-
-config/SS-W	65536	2	Performance-
-config/SS-X	86058	2	Compile-performance-
-config/X264_AllMeasurements	1152	1	Performance-
-config/rs-6d-c3_obj1	3840	1	Throughput-
-config/rs-6d-c3_obj2	3840	1	Latency-
-config/sol-6d-c2-obj1	2866	1	Throughput-
-config/wc+rs-3d-c4-obj1	196	1	Throughput-
-config/wc+sol-3d-c4-obj1	196	1	Throughput-
-config/wc+wc-3d-c4-obj1	196	1	Throughput-
-config/wc-6d-c1-obj1	2880	1	Throughput-
-process/coc1000	1000	5	LOC+
-process/nasa93dem	93	3	Kloc+
-process/pom3a	20000	3	Cost-
-process/pom3b	20000	3	Cost-
-process/pom3c	20000	3	Cost-
-process/pom3d	500	3	Cost-
-process/xomo_flight	10000	4	EFFORT-
-process/xomo_ground	10000	4	EFFORT-
-process/xomo_osp	10000	4	EFFORT-
-process/xomo_osp2	10000	4	EFFORT-
-systems/7z	68640	1	Performance-
-systems/BDBC	2560	1	PERF-
-systems/HSQLDB	864	1	Performance-
-systems/LLVM	1024	1	PERF-
-systems/PostgreSQL	19008	1	Performance-
-systems/dconvert	6764	1	Time-
-systems/deeparch	4096	1	Aws-theano-
-systems/exastencils	86058	1	Performance-
-systems/javagc	166975	1	Performance-
-systems/redis	4400	1	PERF-
-systems/storm	1557	1	Throughput-
-systems/x264	53662	1	PSNR-
+config/Apache_AllMeasurements
+config/HSMGP_num
+config/rs-6d-c3_obj1
+config/rs-6d-c3_obj2
+config/sol-6d-c2-obj1
+config/SQL_AllMeasurements
+config/wc-6d-c1-obj1
+config/wc+rs-3d-c4-obj1
+config/wc+sol-3d-c4-obj1
+config/wc+wc-3d-c4-obj1
+config/X264_AllMeasurements
+systems/7z
+systems/BDBC
+systems/dconvert
+systems/deeparch
+systems/exastencils
+systems/HSQLDB
+systems/javagc
+systems/LLVM
+systems/PostgreSQL
+systems/redis
+systems/storm
+systems/x264
