@@ -1,21 +1,13 @@
-# Every SE data set in moot/optimize: binary_config, config, process,
-# systems.  We predict the FIRST y column in file order; sets with more
-# than one goal keep the rest out of x, they are simply not scored.
-# hpo/ is excluded: all 35 are Health-*, and all have three goals.
-# Skipped 0: 
+# SE data sets: moot/optimize config, process, systems.  We predict the
+# FIRST y column in file order; a set's other goals stay out of x and
+# are simply not scored.
+# Not used: hpo/ (35 sets, all Health-*, all three-goal), and
+# binary_config/ (12), whose FFM and FM sets are synthetic SAT instances
+# and whose columns are nearly all constant -- 1030 of 1044 x columns in
+# FFM-1000-200-0.50-SAT-1 hold a single value, 106 of 124 in Scrum10k.
+# With rf sampling sqrt(|x|) columns per node, most nodes there draw
+# nothing usable, so the group measured our sampler, not the learners.
 # path<TAB>rows<TAB>n_goals<TAB>first_goal
-binary_config/FFM-1000-200-0.50-SAT-1	10000	3	Cost-
-binary_config/FFM-125-25-0.50-SAT-1	10000	3	Cost-
-binary_config/FFM-250-50-0.50-SAT-1	10000	3	Cost-
-binary_config/FFM-500-100-0.50-SAT-1	10000	3	Cost-
-binary_config/FM-500-100-0.25-SAT-1	10000	3	Cost-
-binary_config/FM-500-100-0.50-SAT-1	10000	3	Cost-
-binary_config/FM-500-100-0.75-SAT-1	10000	3	Cost-
-binary_config/FM-500-100-1.00-SAT-1	10000	3	Cost-
-binary_config/Scrum100k	100000	3	Cost-
-binary_config/Scrum10k	10000	3	Cost-
-binary_config/Scrum1k	1000	3	Cost-
-binary_config/billing10k	10000	3	Cost-
 config/Apache_AllMeasurements	192	1	Performance-
 config/HSMGP_num	3456	1	AverageTimePerIteration-
 config/SQL_AllMeasurements	4653	1	Performance-
