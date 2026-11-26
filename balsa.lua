@@ -699,11 +699,19 @@ end
 local forest
 forest = function(tb, rows, y, mk)
   local xcols = tb.cols.x
-  local m = the.rf and math.ceil(sqrt(#xcols))
   mk = mk or function()
     return Ys(tb.nk)
   end
   local nk = mk().nk
+  local m = nil
+  if the.rf then
+    if nk then
+      m = math.ceil(sqrt(#xcols))
+    else
+      m = math.ceil(#xcols / 3)
+    end
+  end
+  --                                       but p/3 for regression
   if the.cap then
     rows = capped(rows, y, the.cap, nk)
   end

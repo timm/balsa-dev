@@ -288,9 +288,12 @@ capped = (rows, y, n, nk) ->            -- <= n random rows per class
 
 forest = (tb, rows, y, mk) ->           -- mk: the y summary; default
   xcols = tb.cols.x                     -- klass counts (nil mk + a
-  m = the.rf and math.ceil sqrt #xcols  -- custom y = regression:
-  mk = mk or -> Ys tb.nk                -- pass mk = Col)
-  nk = mk!.nk
+  mk = mk or -> Ys tb.nk                -- custom y = regression:
+  nk = mk!.nk                           -- pass mk = Col)
+  m = nil                               -- cols per cut: Breiman says
+  if the.rf                             -- sqrt(p) for classification
+    m = if nk then math.ceil sqrt #xcols else math.ceil #xcols / 3
+  --                                       but p/3 for regression
   if the.cap
     rows = capped rows, y, the.cap, nk
   half = ->
