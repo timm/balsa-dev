@@ -70,7 +70,7 @@ def main():
                          "balsa30" if "(30)" in h else h): float(x)
                         for h, x in zip(head, v)}
 
-    fig = plt.figure(figsize=(14.3, 5.2))
+    fig = plt.figure(figsize=(14.3, 6.6))
     gs = fig.add_gridspec(1, 3, width_ratios=[3.4, 1.6, 20], wspace=0)
     bx, ax = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
 
@@ -86,7 +86,7 @@ def main():
                 H.append((lab, c, m,
                           st.fmean([mu[(s, a)] for s in sets]),
                           st.fmean([sd[(s, a)] for s in sets])))
-        ax.text(xs.mean(), 1.53, g, ha="center", va="bottom", fontsize=FS["head"])
+        ax.text(xs.mean(), 1.83, g, ha="center", va="bottom", fontsize=FS["head"])
         ticks += list(xs); labs += fs; x0 += len(fs) + 3
         if gi < len(G) - 1: ax.axvline(x0 - 2, color="#555", lw=1)
 
@@ -96,7 +96,7 @@ def main():
     ax.set_xticks(ticks)
     ax.set_xticklabels(labs, rotation=60, ha="right", rotation_mode="anchor",
                        fontsize=10)
-    ax.set_ylim(0, 1.5); ax.set_xlim(-.9, x0 - 2.1)
+    ax.set_ylim(0, 1.8); ax.set_xlim(-.9, x0 - 2.1)
     ax.set_yticks([0, .25, .5, .75, 1, 1.25, 1.5])
     ax.set_yticks([.125, .375, .625, .875, 1.125, 1.375], minor=True)
     ax.tick_params(axis="y", which="minor", length=0)
@@ -107,11 +107,14 @@ def main():
     ax.tick_params(axis="y", labelsize=FS["tick"])
     ax.spines["top"].set_visible(False)
 
-    tx = ax.inset_axes((.035, .615, .36, .31))
+    # top left.  It runs a little past the first panel, because the text is
+    # fixed in points and the panel is not wide enough for it; nothing is up
+    # there to collide with, since every panel is sorted best LightGBM first
+    tx = ax.inset_axes((.015, .74, .40, .22))
     tx.set_xlim(0, 30); tx.set_ylim(0, 4.6)
     tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
     for s_ in tx.spines.values(): s_.set_visible(False)
-    mono = dict(family="monospace", fontsize=FS["mono"],
+    mono = dict(family="monospace", fontsize=FS["mono"] - 2,
                 bbox=dict(fc="#fcfcfa", ec="none", pad=1))
     tx.text(17.5, 4.1, "mean", ha="right", va="center", **mono)
     tx.text(29.5, 4.1, "sd", ha="right", va="center", **mono)
