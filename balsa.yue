@@ -64,7 +64,8 @@ csv = (file) ->
 -- plus one named field: labels, its label per x column.
 Col = (txt="N", at=0) ->                -- no args: an anonymous Num
   if txt\match "^%u"
-    {:at, :txt, isnum: true, n: 0, mu: 0, m2: 0}  -- a Num
+    {:at, :txt, isnum: true, n: 0, mu: 0, m2: 0,  -- a Num; goal:
+     goal: txt\match("%-$") and 0 or 1}          -- 0=min, 1=max
   else
     {:at, :txt, n: 0, has: {}}                 -- a Sym
 
@@ -129,6 +130,20 @@ ydiv = (ys) ->                          -- entropy of the counts
   e = 0
   e -= c * log(c) for c in *ys.has when c > 0
   (e / ys.n + log ys.n) / LOG2
+
+norm = (num, v) ->                      -- v -> 0..1, logistic z-score
+  z = (v - num.mu) / (div(num) + 1e-32)
+  z = max -3, min 3, z
+  1 / (1 + math.exp -1.7 * z)
+
+disty = (tb, row) ->                    -- distance to heaven, 0=best:
+  d, n = 0, 0                           -- euclidean over the goals
+  for col in *tb.cols.y
+    v = row[col.at]
+    if v != "?"
+      d += (norm(col, v) - col.goal) ^ 2
+      n += 1
+  (d / max n, 1) ^ 0.5
 
 mid = (ys) ->                           -- center: majority label | mu
   if not ys.nk
@@ -346,5 +361,5 @@ aucs = (wps) ->                         -- expected 1-vs-rest, 0..100
 
 -- the module: what balsa_eg.yue (and any other rig) may touch
 {:the, :srand, :rand, :shuffle, :bisect, :csv, :Tbl, :Col, :adds,
- :div, :mid, :tree, :leaf_of, :forest, :votes, :predict, :auc,
- :aucs}
+ :div, :mid, :disty, :tree, :leaf_of, :forest, :votes, :predict,
+ :auc, :aucs}

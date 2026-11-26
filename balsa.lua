@@ -129,7 +129,8 @@ Col = function(txt, at)
       isnum = true,
       n = 0,
       mu = 0,
-      m2 = 0
+      m2 = 0,
+      goal = txt:match("%-$") and 0 or 1
     }
   else
     return {
@@ -279,6 +280,28 @@ ydiv = function(ys)
     end
   end
   return (e / ys.n + log(ys.n)) / LOG2
+end
+
+local norm
+norm = function(num, v)
+  local z = (v - num.mu) / (div(num) + 1e-32)
+  z = max(-3, min(3, z))
+  return 1 / (1 + math.exp(-1.7 * z))
+end
+
+local disty
+disty = function(tb, row)
+  local d, n = 0, 0
+  local _list_0 = tb.cols.y
+  for _index_0 = 1, #_list_0 do
+    local col = _list_0[_index_0]
+    local v = row[col.at]
+    if v ~= "?" then
+      d = d + ((norm(col, v) - col.goal) ^ 2)
+      n = n + 1
+    end
+  end
+  return (d / max(n, 1)) ^ 0.5
 end
 
 local mid
@@ -848,6 +871,7 @@ return {
   adds = adds,
   div = div,
   mid = mid,
+  disty = disty,
   tree = tree,
   leaf_of = leaf_of,
   forest = forest,
