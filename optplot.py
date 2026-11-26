@@ -61,6 +61,10 @@ def main():
         numeric[s] = all(h[0].isupper() for h in x)
     minrows = int(os.getenv("MINROWS", "0"))   # drop the tiny sets
     sets = [s for s in sets if n[s] >= minrows]
+    keep = os.getenv("FOLDERS")              # SE vs the rest: name the
+    if keep:                                 # folders this figure wants
+        want = set(keep.split(","))
+        sets = [s for s in sets if s.split("/")[0] in want]
     if any("/" in s for s in sets):          # moot/optimize: group by
         dirs = {}                            # folder, but a panel needs
         for s in sets:                       # width to carry a header,
@@ -68,7 +72,7 @@ def main():
         thin = [s for d, v in dirs.items() if len(v) < MIN_PANEL          
                 for s in v]                  # thin ones pool as "other"
         G = [(d, v) for d, v in sorted(dirs.items()) if len(v) >= MIN_PANEL]
-        if thin: G.append(("other", sorted(thin)))
+        if thin: G.append((os.getenv("TITLE", "other"), sorted(thin)))
     else:
         G = [("numeric\nattributes", [s for s in sets if n[s] < 1000 and numeric[s]]),
              ("mixed\nattributes",   [s for s in sets if n[s] < 1000 and not numeric[s]]),
@@ -117,7 +121,7 @@ def main():
                                    if mu[(s, a)] == mu[(s, a)]]):
                 H.append((lab, c, m, st.fmean([mu[(s, a)] for s in ok]),
                           st.fmean([sd[(s, a)] for s in ok]), len(ok)))
-        ax.text(xs.mean(), 147, g, ha="center", va="bottom",
+        ax.text(xs.mean(), 170, g, ha="center", va="bottom",
                 fontsize=FS["head"] - 3)
         ticks += list(xs); labs += [f.split("/")[-1] for f in fs]
         x0 += len(fs) + 3
@@ -129,7 +133,7 @@ def main():
     ax.set_xticks(ticks)
     ax.set_xticklabels(labs, rotation=90, ha="center", va="top",
                        fontsize=XT)
-    ax.set_ylim(0, 145); ax.set_xlim(-.9, x0 - 2.1)
+    ax.set_ylim(0, 168); ax.set_xlim(-.9, x0 - 2.1)
     ax.set_yticks([0, 20, 40, 60, 80, 100])
     ax.set_yticks([10, 30, 50, 70, 90, 110], minor=True)
     ax.tick_params(axis="y", which="minor", length=0)
@@ -149,7 +153,7 @@ def main():
     for g, fs in G[:gbig]: x0s += len(fs) + 1
     left = (x0s + .9) / (x0 - 1.2)
     wide = len(G[gbig][1]) / (x0 - 1.2)
-    tx = ax.inset_axes((left + .012, .66, wide - .025, .30))
+    tx = ax.inset_axes((left + .012, .70, wide - .025, .28))
     tx.set_xlim(0, 24); tx.set_ylim(0, 5.7)
     tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
     for s_ in tx.spines.values(): s_.set_visible(False)
@@ -166,7 +170,8 @@ def main():
         tx.text(17.2, y, f"{a:.1f}", ha="right", va="center", **mono)
         tx.text(23.8, y, f"{b:.1f}", ha="right", va="center", **mono)
 
-    if sum(secs.get(a, 0) for a, *_ in ARMS) > 0:
+    if keep: secs = {}                   # the .txt totals are corpus-
+    if sum(secs.get(a, 0) for a, *_ in ARMS) > 0:   # wide, not this cut
         bt = sorted((secs[a], lab, c) for a, lab, c, _ in ARMS if a in secs)
         bx.bar(range(len(bt)), [b[0] for b in bt],
                color=[b[2] for b in bt], width=.84)
@@ -181,7 +186,8 @@ def main():
         bx.set_title("total secs, log scale\n(summed over folds,\n1 thread each)",
                      fontsize=FS["head"] - 5)
     else:
-        bx.text(.5, .5, "no timings\nin this csv", ha="center", va="center",
+        bx.text(.5, .5, "timings:\nsee the\nwhole-corpus\nfigure",
+                ha="center", va="center",
                 fontsize=FS["head"] - 3, color="#888", transform=bx.transAxes)
         bx.set_xticks([])
     bx.set_yticks([]); bx.set_facecolor("#fcfcfa")

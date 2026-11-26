@@ -1,0 +1,361 @@
+# vim: set ts=2 sw=2 sts=2 et cc=75:
+"""Balsa learner for Python 3.11+. Column positions are zero-based."""
+# (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
+from bisect import bisect_left, bisect_right
+from math import ceil, copysign, exp, floor, inf, log, nan, sqrt
+from os.path import expanduser
+from types import SimpleNamespace
+
+the = SimpleNamespace(seed=1234567891, prudence=0.01, bins=16, trees=30,
+                      cap=200, leaf=2, maxd=30, rf=True)
+_seed = the.seed
+
+
+def srand(n):
+  global _seed
+  _seed = n
+
+
+def rand(n=1):
+  global _seed
+  _seed = 16807 * _seed % 2147483647
+  return 1 + floor(n * _seed / 2147483647)
+
+
+def shuffle(t):
+  u = t[:1]
+  for j in range(1, len(t)):
+    k = rand(j + 1) - 1
+    u.append(u[k] if k < j else t[j])
+    u[k] = t[j]
+  return u
+
+
+def pick(t, n=None):
+  if n is None or n is False or not n < len(t): return t[:]
+  return shuffle(t)[:ceil(n)] if n > 0 else []
+
+
+class Row(list):
+  __slots__ = ("labels",)
+
+
+def thing(v):
+  v = v.strip()
+  if "_" in v or v.lower().lstrip("+-") in ("nan", "inf", "infinity"):
+    return v
+  try:
+    return int(v)
+  except ValueError:
+    try:
+      if v.lower().lstrip("+-").startswith("0x"): return float.fromhex(v)
+      return float(v)
+    except ValueError:
+      return v
+
+
+def csv(file):
+  with open(expanduser(file), encoding="utf-8") as f:
+    return [Row(thing(v) for v in line.split(","))
+            for s in f if (line := s.replace("\r", "").strip())]
+
+
+def bisect(t, v, le=False):
+  return (bisect_right if le else bisect_left)(t, v)
+
+
+def adds(vs, col=None):
+  col = Num() if col is None else col
+  for v in vs: col.add(v)
+  return col
+
+
+def yfold(ys, other, inc=1, u=None):
+  return ys.fold(other, inc, ys if u is None else u)
+
+
+def tolabel(col, v):
+  return -1 if v == "?" else col.label(v)
+
+
+def xpect(left, right):
+  return ((left.n * left.div() + right.n * right.div())
+          / (left.n + right.n + 1e-32))
+
+
+class Column:
+  def __init__(i, txt, at):
+    i.txt, i.at, i.n = txt, at, 0
+
+  def add(i, v, inc=1):
+    if v != "?":
+      i.n += inc
+      i.add_known(v, inc)
+
+  def cuts(i, rows, targets, mk, leaf, best):
+    bins = [mk() for _ in range(len(i.labels) + 1)]
+    for row, y in zip(rows, targets):
+      b = row.labels[i.at]
+      if b > 0: bins[b - 1].add(y)
+    prefix, total, rest = mk(), mk(), mk()
+    for bin in bins: yfold(total, bin)
+    for b, bin in enumerate(bins[:-1], 1):
+      left, right = i.split_bin(bin, prefix, total, rest)
+      if min(left.n, right.n) >= leaf: best((i, b), xpect(left, right))
+
+
+class Num(Column):
+  def __init__(i, txt="N", at=0):
+    super().__init__(txt, at)
+    i.mu, i.m2, i.goal = 0, 0, int(not txt.endswith("-"))
+
+  def add_known(i, v, inc):
+    d = v - i.mu
+    change = inc * d
+    if i.n: i.mu += change / i.n
+    else: i.mu += copysign(inf, change) if change else nan
+    i.m2 = max(0, i.m2 + inc * d * (v - i.mu))
+
+  def div(i):
+    return sqrt(i.m2 / (i.n - 1)) if i.n >= 2 else 0
+
+  def mid(i):
+    return i.mu
+
+  def fold(i, b, inc, u):
+    n = i.n + inc * b.n
+    if n <= 0:
+      u.n, u.mu, u.m2 = 0, 0, 0
+      return u
+    mu = i.mu + inc * b.n * (b.mu - i.mu) / n
+    gap = b.mu - (mu if n < i.n else i.mu)
+    between = min(n, i.n) * b.n * gap * gap / max(n, i.n)
+    u.m2 = max(0, i.m2 + inc * (b.m2 + between))
+    u.mu, u.n = mu, n
+    return u
+
+  def norm(i, v):
+    z = (v - i.mu) / (i.div() + 1e-32)
+    return 1 / (1 + exp(-1.7 * max(-3, min(3, z))))
+
+  def labels_for(i, n, rows):
+    values = sorted(row[i.at] for row in rows if row[i.at] != "?")
+    if not values: return []
+    m = len(values)
+    return list(dict.fromkeys(values[j * m // n] for j in range(n)))
+
+  def label(i, v):
+    return max(1, bisect_right(i.labels, v))
+
+  def split_bin(i, bin, prefix, total, rest):
+    return yfold(prefix, bin), yfold(total, bin, -1)
+
+  def matches(i, label, cut):
+    return label <= cut
+
+
+class Sym(Column):
+  def __init__(i, txt, at):
+    super().__init__(txt, at)
+    i.has = {}
+
+  def add_known(i, v, inc):
+    i.has[v] = i.has.get(v, 0) + inc
+
+  def div(i):
+    e = 0
+    for c in i.has.values():
+      if c > 0:
+        p = c / i.n
+        e -= p * log(p)
+    return e / log(2)
+
+  def mid(i):
+    return None
+
+  def labels_for(i, n, rows=None):
+    def key(v):
+      txt = format(v, ".14g") if isinstance(v, float) else str(v)
+      return -i.has[v], txt
+    ranked = sorted(i.has, key=key)
+    return ranked[:max(0, min(len(ranked), n - 1))]
+
+  def label(i, v):
+    try:
+      return i.labels.index(v) + 1
+    except ValueError:
+      return len(i.labels) + 1
+
+  def class_labels(i):
+    return i.labels_for(inf)
+
+  def split_bin(i, bin, prefix, total, rest):
+    return bin, yfold(total, bin, -1, rest)
+
+  def matches(i, label, cut):
+    return label == cut
+
+
+def Col(txt="N", at=0):
+  return (Num if txt[:1].isascii() and txt[:1].isupper() else Sym)(txt, at)
+
+
+class Ys:
+  def __init__(i, nk):
+    i.nk, i.n, i.has = nk, 0, [0] * nk
+
+  def add(i, v):
+    if v > 0:
+      i.has[v - 1] += 1
+      i.n += 1
+
+  def div(i):
+    if i.n < 2: return 0
+    e = 0
+    for c in i.has:
+      if c > 0: e -= c * log(c)
+    return (e / i.n + log(i.n)) / log(2)
+
+  def mid(i):
+    return max(range(i.nk), key=i.has.__getitem__) + 1 if i.nk else None
+
+  def fold(i, b, inc, u):
+    for j, c in enumerate(b.has):
+      u.has[j] = i.has[j] + inc * c
+    u.n = i.n + inc * b.n
+    return u
+
+
+class Cols:
+  def __init__(i, names):
+    i.names, i.x, i.y, i.klass = names, [], [], None
+    i.all = [Col(txt, j) for j, txt in enumerate(names)]
+    for col in reversed(i.all):
+      suffix = col.txt[-1:]
+      if suffix == "X": continue
+      (i.y if suffix in ("+", "-", "!") else i.x).append(col)
+      if suffix == "!": i.klass = col
+
+
+class Tbl:
+  def __init__(i, rows):
+    i.cols = Cols(rows[0])
+    i.rows = [r if isinstance(r, Row) else Row(r) for r in rows[:0:-1]]
+    for row in i.rows:
+      for col in i.cols.all: col.add(row[col.at])
+    i.labelall()
+
+  def labelall(i):
+    cols, klass, i.nk = i.cols.x[:], i.cols.klass, 0
+    for col in cols: col.labels = col.labels_for(the.bins, i.rows)
+    if isinstance(klass, Sym):
+      klass.labels = klass.class_labels()
+      cols.append(klass)
+      i.nk = len(klass.labels)
+    for row in i.rows:
+      row.labels = [None] * len(row)
+      for col in cols: row.labels[col.at] = tolabel(col, row[col.at])
+
+  def disty(i, row):
+    d, n = 0, 0
+    for col in i.cols.y:
+      v = row[col.at]
+      if v != "?":
+        d += (col.norm(v) - col.goal) ** 2
+        n += 1
+    return sqrt(d / max(n, 1))
+
+
+def best_cut(xcols, rows, targets, mk, m, leaf):
+  cut, score = None, None
+
+  def best(candidate, s):
+    nonlocal cut, score
+    if score is None or s < score: cut, score = candidate, s
+
+  for col in pick(xcols, m): col.cuts(rows, targets, mk, leaf, best)
+  return cut
+
+
+class Tree:
+  def __init__(i, rows, y, xcols, mk, m, leaf, maxd, lvl=0):
+    targets = list(map(y, rows))
+    cut = None
+    if lvl < maxd: cut = best_cut(xcols, rows, targets, mk, m, leaf)
+    i.ys, i.n, i.ati = adds(targets, mk()), len(rows), None
+    if cut is None: return
+    i.col, i.v = cut
+    i.ati = i.col.at
+    yes, no = [], []
+    for row in rows:
+      (yes if i.goes_left(row) else no).append(row)
+    i.yes = Tree(yes, y, xcols, mk, m, leaf, maxd, lvl + 1)
+    i.no = Tree(no, y, xcols, mk, m, leaf, maxd, lvl + 1)
+
+  def goes_left(i, row):
+    label = row.labels[i.ati]
+    return label < 0 or i.col.matches(label, i.v)
+
+  def leaf_of(i, row):
+    while i.ati is not None:
+      i = i.yes if i.goes_left(row) else i.no
+    return i
+
+
+def capped(rows, y, n, nk=None):
+  shuffled = shuffle(rows)
+  if nk is None or nk is False: return shuffled[:max(0, floor(n))]
+  counts, kept = {}, []
+  for row in shuffled:
+    label = y(row)
+    counts[label] = counts.get(label, 0) + 1
+    if counts[label] <= n: kept.append(row)
+  return kept
+
+
+class Forest(list):
+  def __init__(i, tb, rows, y, mk=None):
+    if mk is None: mk = lambda: Ys(tb.nk)
+    nk = getattr(mk(), "nk", None)
+    xcols, m = tb.cols.x, None
+    if the.rf:
+      m = ceil(sqrt(len(xcols)) if nk is not None else len(xcols) / 3)
+    if the.cap is not False and the.cap is not None:
+      rows = capped(rows, y, the.cap, nk)
+    for _ in range(the.trees):
+      sample = rows if the.trees == 1 else pick(rows, len(rows) // 2)
+      i.append(Tree(sample, y, xcols, mk, m, the.leaf, the.maxd))
+
+  def vote(i, row):
+    nk, w = i[0].ys.nk, len(i)
+    h = [0] * nk
+    for node in i:
+      ys = node.leaf_of(row).ys
+      for j, c in enumerate(ys.has):
+        h[j] += c / ys.n / w if ys.n else nan
+    return h
+
+  def votes(i, rows, y):
+    return [(y(row), i.vote(row)) for row in rows]
+
+  def predict(i, row):
+    if not i: return nan
+    return sum(node.leaf_of(row).ys.mid() for node in i) / len(i)
+
+
+def auc(pos, neg):
+  if not pos or not neg: return None
+  neg.sort()
+  s = sum((bisect_left(neg, p) + bisect_right(neg, p)) / 2 for p in pos)
+  return s / (len(pos) * len(neg))
+
+
+def aucs(wps):
+  n, weighted = 0, 0
+  for j in range(len(wps[0][1])):
+    pos, neg = [], []
+    for y, scores in wps:
+      (pos if y == j + 1 else neg).append(scores[j])
+    a = auc(pos, neg)
+    if a is not None: n, weighted = n + len(pos), weighted + len(pos) * a
+  return 100 * weighted / max(n, 1)

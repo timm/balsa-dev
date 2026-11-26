@@ -127,3 +127,16 @@ $(Tmp)/bashrc:   $(Here)/Makefile | $(Tmp) ; $(call mark,bashrc)   > $@
 # }
 # PROMPT_COMMAND=_p
 # cd {Here}
+
+SE   = binary_config,config,hpo,process,systems
+NOSE = behavior_data,financial_data,health_data,misc,rl,sales_data,test
+PY   = $(HOME)/.venvs/tabicl/bin/python
+
+optfigs: ## redraw the three optimization figures from runs/opt.csv
+	MOOTOPT=$(HOME)/gits/moot/optimize $(PY) -B optplot.py \
+	  runs/opt.csv ens-balsa-opt.png
+	MOOTOPT=$(HOME)/gits/moot/optimize FOLDERS=$(SE) $(PY) -B optplot.py \
+	  runs/opt.csv ens-balsa-opt-se.png
+	MOOTOPT=$(HOME)/gits/moot/optimize FOLDERS=$(NOSE) \
+	  TITLE="24 non-SE sets" $(PY) -B optplot.py \
+	  runs/opt.csv ens-balsa-opt-noxse.png
