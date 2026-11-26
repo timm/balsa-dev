@@ -252,8 +252,8 @@ def shuffle(t):
   return u
 
 def pick(t, n=None):
-  if n is None or n is False or not n < len(t): return t[:]
-  return shuffle(t)[:ceil(n)] if n > 0 else []
+  n = n or len(t)
+  return shuffle(t)[:ceil(n)] if n < len(t) else t[:]
 
 def capped(rows, y, n, nk=None):
   shuffled = shuffle(rows)
