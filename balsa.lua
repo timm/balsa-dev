@@ -231,6 +231,19 @@ yadds = function(vs, ys)
   return ys
 end
 
+local yclear
+yclear = function(ys)
+  if ys.nk then
+    for i = 1, ys.nk do
+      ys.has[i] = 0
+    end
+    ys.n = 0
+  else
+    ys.n, ys.mu, ys.m2 = 0, 0, 0
+  end
+  return ys
+end
+
 local _anon_func_1 = function(mu, n, ys1)
   if n < ys1.n then
     return mu
@@ -549,14 +562,14 @@ xpect = function(a, b)
 end
 
 local cuts
-cuts = function(col, rows, ys, mk, leaf, best)
+cuts = function(col, rows, ys, mk, leaf, best, pool)
   local nb = #col.labels
   local bins
   do
     local _accum_0 = { }
     local _len_0 = 1
-    for _ = 1, nb + 1 do
-      _accum_0[_len_0] = mk()
+    for b = 1, nb + 1 do
+      _accum_0[_len_0] = yclear(pool[b])
       _len_0 = _len_0 + 1
     end
     bins = _accum_0
@@ -567,9 +580,9 @@ cuts = function(col, rows, ys, mk, leaf, best)
       yadd(bins[b], ys[i])
     end
   end
-  local yes = mk()
-  local no = mk()
-  local rest = mk()
+  local yes = yclear(pool[nb + 2])
+  local no = yclear(pool[nb + 3])
+  local rest = yclear(pool[nb + 4])
   for _index_0 = 1, #bins do
     local bin = bins[_index_0]
     yfold(no, bin)
@@ -594,14 +607,14 @@ cuts = function(col, rows, ys, mk, leaf, best)
 end
 
 local best_cut
-best_cut = function(xcols, rows, ys, mk, m, leaf)
+best_cut = function(xcols, rows, ys, mk, m, leaf, pool)
   local best = argmost(function(a, b)
     return a < b
   end)
   local _list_0 = pick(#xcols, m)
   for _index_0 = 1, #_list_0 do
     local i = _list_0[_index_0]
-    cuts(xcols[i + 1], rows, ys, mk, leaf, best)
+    cuts(xcols[i + 1], rows, ys, mk, leaf, best, pool)
   end
   return best()
 end
@@ -619,11 +632,21 @@ yes_ = function(col, b, row)
   return w < 0 or (_anon_func_2(b, col, w))
 end
 
+local _anon_func_3 = function(mk, the)
+  local _accum_0 = { }
+  local _len_0 = 1
+  for _ = 1, the.bins + 4 do
+    _accum_0[_len_0] = mk()
+    _len_0 = _len_0 + 1
+  end
+  return _accum_0
+end
 local tree
-tree = function(rows, y, xcols, mk, m, leaf, maxd, lvl)
+tree = function(rows, y, xcols, mk, m, leaf, maxd, lvl, pool)
   if lvl == nil then
     lvl = 0
   end
+  pool = pool or _anon_func_3(mk, the)
   local ys
   do
     local _accum_0 = { }
@@ -635,7 +658,7 @@ tree = function(rows, y, xcols, mk, m, leaf, maxd, lvl)
     end
     ys = _accum_0
   end
-  local cut = lvl < maxd and best_cut(xcols, rows, ys, mk, m, leaf)
+  local cut = lvl < maxd and best_cut(xcols, rows, ys, mk, m, leaf, pool)
   local node = {
     ys = yadds(ys, mk()),
     n = #rows
@@ -670,13 +693,13 @@ tree = function(rows, y, xcols, mk, m, leaf, maxd, lvl)
       end
       no = _accum_0
     end
-    node.yes = tree(yes, y, xcols, mk, m, leaf, maxd, lvl + 1)
-    node.no = tree(no, y, xcols, mk, m, leaf, maxd, lvl + 1)
+    node.yes = tree(yes, y, xcols, mk, m, leaf, maxd, lvl + 1, pool)
+    node.no = tree(no, y, xcols, mk, m, leaf, maxd, lvl + 1, pool)
   end
   return node
 end
 
-local _anon_func_3 = function(node, w)
+local _anon_func_4 = function(node, w)
   if node.isnum then
     return w <= node.v
   else
@@ -687,7 +710,7 @@ local leaf_of
 leaf_of = function(node, row)
   while node.ati do
     local w = row.labels[node.ati]
-    local ok = w < 0 or (_anon_func_3(node, w))
+    local ok = w < 0 or (_anon_func_4(node, w))
     node = ok and node.yes or node.no
   end
   return node
@@ -756,7 +779,7 @@ forest = function(tb, rows, y, mk)
   return out
 end
 
-local _anon_func_4 = function(nk)
+local _anon_func_5 = function(nk)
   local _accum_0 = { }
   local _len_0 = 1
   for _ = 1, nk do
@@ -768,7 +791,7 @@ end
 local vote
 vote = function(trees, row)
   local nk = trees[1].ys.nk
-  local h, w = _anon_func_4(nk), #trees
+  local h, w = _anon_func_5(nk), #trees
   for _index_0 = 1, #trees do
     local node = trees[_index_0]
     local ys = leaf_of(node, row).ys

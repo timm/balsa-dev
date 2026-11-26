@@ -106,6 +106,15 @@ yadds = (vs, ys) ->
   yadd ys, v for v in *vs
   ys
 
+yclear = (ys) ->                        -- a pooled scratch, as new
+  if ys.nk
+    for i = 1, ys.nk
+      ys.has[i] = 0
+    ys.n = 0
+  else
+    ys.n, ys.mu, ys.m2 = 0, 0, 0
+  ys
+
 yfold = (ys1, ys2, inc=1, out=ys1) ->   -- out = 1 + inc*2; out
   if ys1.nk                             -- defaults to 1: fold in place
     for i = 1, ys1.nk
@@ -236,15 +245,15 @@ argmost = (better) ->                   -- visitor; f! = best so far
 xpect = (a, b) ->                       -- size-weighted spread
   (a.n * spread(a) + b.n * spread(b)) / (a.n + b.n + 1e-32)
 
-cuts = (col, rows, ys, mk, leaf, best) ->
+cuts = (col, rows, ys, mk, leaf, best, pool) ->
   nb = #col.labels
-  bins = [mk! for _ = 1, nb + 1]        -- sym "rare" pool at nb+1
-  for i, row in ipairs rows
-    b = row.labels[col.at]
-    if b > 0 then yadd bins[b], ys[i]
-  yes = mk!
-  no = mk!                              -- nums: the sliding right side
-  rest = mk!                            -- syms: scratch, remade per value
+  bins = [yclear pool[b] for b = 1, nb + 1]  -- sym "rare" at nb+1;
+  for i, row in ipairs rows             -- all scratch is pooled: the
+    b = row.labels[col.at]              -- constructor was 1/5th of
+    if b > 0 then yadd bins[b], ys[i]   -- this file's runtime, as gc
+  yes  = yclear pool[nb + 2]
+  no   = yclear pool[nb + 3]            -- nums: the sliding right side
+  rest = yclear pool[nb + 4]            -- syms: scratch per value
   yfold no, bin for bin in *bins
   for b = 1, nb
     bin = bins[b]
@@ -258,19 +267,20 @@ cuts = (col, rows, ys, mk, leaf, best) ->
     if leaf <= min lhs.n, rhs.n
       best {col, b}, xpect lhs, rhs
 
-best_cut = (xcols, rows, ys, mk, m, leaf) ->
+best_cut = (xcols, rows, ys, mk, m, leaf, pool) ->
   best = argmost (a, b) -> a < b
   for i in *pick #xcols, m
-    cuts xcols[i + 1], rows, ys, mk, leaf, best
+    cuts xcols[i + 1], rows, ys, mk, leaf, best, pool
   best!
 
 yes_ = (col, b, row) ->                 -- row on the yes side of cut?
   w = row.labels[col.at]
   w < 0 or (if col.isnum then w <= b else w == b)
 
-tree = (rows, y, xcols, mk, m, leaf, maxd, lvl=0) ->
+tree = (rows, y, xcols, mk, m, leaf, maxd, lvl=0, pool) ->
+  pool = pool or [mk! for _ = 1, the.bins + 4]
   ys = [y row for row in *rows]
-  cut = lvl < maxd and best_cut xcols, rows, ys, mk, m, leaf
+  cut = lvl < maxd and best_cut xcols, rows, ys, mk, m, leaf, pool
   node = {ys: yadds(ys, mk!), n: #rows}
   if cut
     col, b = cut[1], cut[2]
@@ -278,8 +288,8 @@ tree = (rows, y, xcols, mk, m, leaf, maxd, lvl=0) ->
     node.ati, node.isnum = col.at, col.isnum
     yes = [row for row in *rows when yes_ col, b, row]
     no  = [row for row in *rows when not yes_ col, b, row]
-    node.yes = tree yes, y, xcols, mk, m, leaf, maxd, lvl + 1
-    node.no  = tree no,  y, xcols, mk, m, leaf, maxd, lvl + 1
+    node.yes = tree yes, y, xcols, mk, m, leaf, maxd, lvl + 1, pool
+    node.no  = tree no,  y, xcols, mk, m, leaf, maxd, lvl + 1, pool
   node
 
 leaf_of = (node, row) ->                -- flat fields: no col deref
