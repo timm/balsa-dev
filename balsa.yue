@@ -94,18 +94,33 @@ div = (col) ->                          -- sd for Nums, entropy for Syms
 Ys = (nk) -> {:nk, n: 0, has: [0 for _ = 1, nk]}
 
 yadd = (ys, v) ->
-  if v > 0                              -- v = -1: class unknown
-    ys.has[v] += 1
-    ys.n += 1
+  if ys.nk                              -- labels: count into the array
+    if v > 0                            -- v = -1: class unknown
+      ys.has[v] += 1
+      ys.n += 1
+  else
+    add ys, v                           -- a Num: Welford; skips ?
 
 yadds = (vs, ys) ->
   yadd ys, v for v in *vs
   ys
 
 yfold = (ys1, ys2, inc=1, out=ys1) ->   -- out = 1 + inc*2; out
-  for i = 1, ys1.nk                     -- defaults to 1: fold in place
-    out.has[i] = ys1.has[i] + inc * ys2.has[i]
-  out.n = ys1.n + inc * ys2.n
+  if ys1.nk                             -- defaults to 1: fold in place
+    for i = 1, ys1.nk
+      out.has[i] = ys1.has[i] + inc * ys2.has[i]
+    out.n = ys1.n + inc * ys2.n
+  else                                  -- Nums: Chan et al.'s closed
+    m = ys2.n                           -- form adds or (inc=-1)
+    n = ys1.n + inc * m                 -- subtracts two (n, mu, m2)
+    if n <= 0
+      out.n, out.mu, out.m2 = 0, 0, 0
+    else
+      mu = ys1.mu + inc * m * (ys2.mu - ys1.mu) / n
+      d  = ys2.mu - (if n < ys1.n then mu else ys1.mu)
+      out.m2 = max 0, ys1.m2 + inc * (ys2.m2 +
+                 min(n, ys1.n) * m * d * d / max(n, ys1.n))
+      out.mu, out.n = mu, n
   out
 
 ydiv = (ys) ->                          -- entropy of the counts
@@ -114,6 +129,18 @@ ydiv = (ys) ->                          -- entropy of the counts
   e = 0
   e -= c * log(c) for c in *ys.has when c > 0
   (e / ys.n + log ys.n) / LOG2
+
+mid = (ys) ->                           -- center: majority label | mu
+  if not ys.nk
+    return ys.mu
+  best, most = nil, -1
+  for i = 1, ys.nk
+    if ys.has[i] > most
+      best, most = i, ys.has[i]
+  best
+
+spread = (ys) ->                        -- entropy | sd, for xpect
+  if ys.nk then ydiv ys else div ys
 
 Cols = (names) ->
   all = [Col txt, at for at, txt in ipairs names]
@@ -133,9 +160,9 @@ Cols = (names) ->
 bisect = (vs, v, le) ->                 -- #items in sorted vs below v
   lo, hi = 1, #vs + 1
   while lo < hi
-    mid = floor (lo + hi) / 2
-    below = if le then vs[mid] <= v else vs[mid] < v
-    if below then lo = mid + 1 else hi = mid
+    mp = floor (lo + hi) / 2
+    below = if le then vs[mp] <= v else vs[mp] < v
+    if below then lo = mp + 1 else hi = mp
   lo - 1
 
 mklabels = (col, rows, n) ->
@@ -163,10 +190,11 @@ tolabel = (col, v) ->                   -- v -> its label 1..; ? = -1
   #col.labels + 1                       -- rare sym values pool here
 
 labelall = (tb) ->                      -- once per tbl: a legend per
-  kl = tb.cols.klass                    -- col (klass keeps EVERY
-  cols = [col for col in *tb.cols.x]    -- value), then every cell's
-  if kl then cols[] = kl                -- label, onto the row
-  for col in *cols
+  kl = tb.cols.klass                    -- col; a Sym klass keeps
+  if kl and kl.isnum then kl = nil      -- EVERY value (a Num klass
+  cols = [col for col in *tb.cols.x]    -- is a regression goal: no
+  if kl then cols[] = kl                -- labels), then every cell's
+  for col in *cols                      -- label, onto the row
     n = if col == kl then 1/0 else the.bins
     col.labels = mklabels col, tb.rows, n
   for row in *tb.rows
@@ -191,7 +219,7 @@ argmost = (better) ->                   -- visitor; f! = best so far
     out, b4
 
 xpect = (a, b) ->                       -- size-weighted spread
-  (a.n * ydiv(a) + b.n * ydiv(b)) / (a.n + b.n + 1e-32)
+  (a.n * spread(a) + b.n * spread(b)) / (a.n + b.n + 1e-32)
 
 cuts = (col, rows, ys, mk, leaf, best) ->
   nb = #col.labels
@@ -247,7 +275,10 @@ leaf_of = (node, row) ->                -- flat fields: no col deref
   node
 
 ------------------------------------------------------------- forest
-capped = (rows, y, n) ->                -- <= n random rows per class
+capped = (rows, y, n, nk) ->            -- <= n random rows per class
+  if not nk                             -- (regression: n rows, any)
+    u = shuffle rows
+    return [u[i] for i = 1, min n, #u]
   h, out = {}, {}
   for row in *shuffle rows
     v = y row
@@ -255,12 +286,13 @@ capped = (rows, y, n) ->                -- <= n random rows per class
     if h[v] <= n then out[] = row
   out
 
-forest = (tb, rows, y) ->
-  xcols = tb.cols.x
-  m = the.rf and math.ceil sqrt #xcols
-  mk = -> Ys tb.nk
+forest = (tb, rows, y, mk) ->           -- mk: the y summary; default
+  xcols = tb.cols.x                     -- klass counts (nil mk + a
+  m = the.rf and math.ceil sqrt #xcols  -- custom y = regression:
+  mk = mk or -> Ys tb.nk                -- pass mk = Col)
+  nk = mk!.nk
   if the.cap
-    rows = capped rows, y, the.cap
+    rows = capped rows, y, the.cap, nk
   half = ->
     u = shuffle rows
     [u[i] for i = 1, floor #rows / 2]
@@ -281,6 +313,12 @@ vote = (trees, row) ->                  -- label -> mean leaf share
 
 votes = (trees, rows, y) ->
   [{y(row), vote trees, row} for row in *rows]
+
+predict = (trees, row) ->               -- regression: mean leaf mid
+  s = 0
+  for node in *trees
+    s += mid leaf_of(node, row).ys
+  s / #trees
 
 ---------------------------------------------------------------- auc
 auc = (pos, neg) ->                     -- Mann-Whitney, ties halved:
@@ -304,5 +342,6 @@ aucs = (wps) ->                         -- expected 1-vs-rest, 0..100
   100 * sum / max n, 1
 
 -- the module: what balsa_eg.yue (and any other rig) may touch
-{:the, :srand, :rand, :shuffle, :bisect, :csv, :Tbl, :adds, :div,
- :tree, :leaf_of, :forest, :votes, :auc, :aucs}
+{:the, :srand, :rand, :shuffle, :bisect, :csv, :Tbl, :Col, :adds,
+ :div, :mid, :tree, :leaf_of, :forest, :votes, :predict, :auc,
+ :aucs}

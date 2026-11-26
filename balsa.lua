@@ -210,10 +210,14 @@ end
 
 local yadd
 yadd = function(ys, v)
-  if v > 0 then
-    local _obj_0 = ys.has
-    _obj_0[v] = _obj_0[v] + 1
-    ys.n = ys.n + 1
+  if ys.nk then
+    if v > 0 then
+      local _obj_0 = ys.has
+      _obj_0[v] = _obj_0[v] + 1
+      ys.n = ys.n + 1
+    end
+  else
+    return add(ys, v)
   end
 end
 
@@ -226,6 +230,13 @@ yadds = function(vs, ys)
   return ys
 end
 
+local _anon_func_1 = function(mu, n, ys1)
+  if n < ys1.n then
+    return mu
+  else
+    return ys1.mu
+  end
+end
 local yfold
 yfold = function(ys1, ys2, inc, out)
   if inc == nil then
@@ -234,10 +245,23 @@ yfold = function(ys1, ys2, inc, out)
   if out == nil then
     out = ys1
   end
-  for i = 1, ys1.nk do
-    out.has[i] = ys1.has[i] + inc * ys2.has[i]
+  if ys1.nk then
+    for i = 1, ys1.nk do
+      out.has[i] = ys1.has[i] + inc * ys2.has[i]
+    end
+    out.n = ys1.n + inc * ys2.n
+  else
+    local m = ys2.n
+    local n = ys1.n + inc * m
+    if n <= 0 then
+      out.n, out.mu, out.m2 = 0, 0, 0
+    else
+      local mu = ys1.mu + inc * m * (ys2.mu - ys1.mu) / n
+      local d = ys2.mu - (_anon_func_1(mu, n, ys1))
+      out.m2 = max(0, ys1.m2 + inc * (ys2.m2 + min(n, ys1.n) * m * d * d / max(n, ys1.n)))
+      out.mu, out.n = mu, n
+    end
   end
-  out.n = ys1.n + inc * ys2.n
   return out
 end
 
@@ -255,6 +279,29 @@ ydiv = function(ys)
     end
   end
   return (e / ys.n + log(ys.n)) / LOG2
+end
+
+local mid
+mid = function(ys)
+  if not ys.nk then
+    return ys.mu
+  end
+  local best, most = nil, -1
+  for i = 1, ys.nk do
+    if ys.has[i] > most then
+      best, most = i, ys.has[i]
+    end
+  end
+  return best
+end
+
+local spread
+spread = function(ys)
+  if ys.nk then
+    return ydiv(ys)
+  else
+    return div(ys)
+  end
 end
 
 local Cols
@@ -307,17 +354,17 @@ local bisect
 bisect = function(vs, v, le)
   local lo, hi = 1, #vs + 1
   while lo < hi do
-    local mid = floor((lo + hi) / 2)
+    local mp = floor((lo + hi) / 2)
     local below
     if le then
-      below = vs[mid] <= v
+      below = vs[mp] <= v
     else
-      below = vs[mid] < v
+      below = vs[mp] < v
     end
     if below then
-      lo = mid + 1
+      lo = mp + 1
     else
-      hi = mid
+      hi = mp
     end
   end
   return lo - 1
@@ -395,6 +442,9 @@ end
 local labelall
 labelall = function(tb)
   local kl = tb.cols.klass
+  if kl and kl.isnum then
+    kl = nil
+  end
   local cols
   do
     local _accum_0 = { }
@@ -472,7 +522,7 @@ end
 
 local xpect
 xpect = function(a, b)
-  return (a.n * ydiv(a) + b.n * ydiv(b)) / (a.n + b.n + 1e-32)
+  return (a.n * spread(a) + b.n * spread(b)) / (a.n + b.n + 1e-32)
 end
 
 local cuts
@@ -533,7 +583,7 @@ best_cut = function(xcols, rows, ys, mk, m, leaf)
   return best()
 end
 
-local _anon_func_1 = function(b, col, w)
+local _anon_func_2 = function(b, col, w)
   if col.isnum then
     return w <= b
   else
@@ -543,7 +593,7 @@ end
 local yes_
 yes_ = function(col, b, row)
   local w = row.labels[col.at]
-  return w < 0 or (_anon_func_1(b, col, w))
+  return w < 0 or (_anon_func_2(b, col, w))
 end
 
 local tree
@@ -603,7 +653,7 @@ tree = function(rows, y, xcols, mk, m, leaf, maxd, lvl)
   return node
 end
 
-local _anon_func_2 = function(node, w)
+local _anon_func_3 = function(node, w)
   if node.isnum then
     return w <= node.v
   else
@@ -614,7 +664,7 @@ local leaf_of
 leaf_of = function(node, row)
   while node.ati do
     local w = row.labels[node.ati]
-    local ok = w < 0 or (_anon_func_2(node, w))
+    local ok = w < 0 or (_anon_func_3(node, w))
     node = ok and node.yes or node.no
   end
   return node
@@ -622,7 +672,17 @@ end
 
 ------------------------------------------------------------- forest
 local capped
-capped = function(rows, y, n)
+capped = function(rows, y, n, nk)
+  if not nk then
+    local u = shuffle(rows)
+    local _accum_0 = { }
+    local _len_0 = 1
+    for i = 1, min(n, #u) do
+      _accum_0[_len_0] = u[i]
+      _len_0 = _len_0 + 1
+    end
+    return _accum_0
+  end
   local h, out = { }, { }
   local _list_0 = shuffle(rows)
   for _index_0 = 1, #_list_0 do
@@ -637,15 +697,15 @@ capped = function(rows, y, n)
 end
 
 local forest
-forest = function(tb, rows, y)
+forest = function(tb, rows, y, mk)
   local xcols = tb.cols.x
   local m = the.rf and math.ceil(sqrt(#xcols))
-  local mk
-  mk = function()
+  mk = mk or function()
     return Ys(tb.nk)
   end
+  local nk = mk().nk
   if the.cap then
-    rows = capped(rows, y, the.cap)
+    rows = capped(rows, y, the.cap, nk)
   end
   local half
   half = function()
@@ -665,7 +725,7 @@ forest = function(tb, rows, y)
   return out
 end
 
-local _anon_func_3 = function(nk)
+local _anon_func_4 = function(nk)
   local _accum_0 = { }
   local _len_0 = 1
   for _ = 1, nk do
@@ -677,7 +737,7 @@ end
 local vote
 vote = function(trees, row)
   local nk = trees[1].ys.nk
-  local h, w = _anon_func_3(nk), #trees
+  local h, w = _anon_func_4(nk), #trees
   for _index_0 = 1, #trees do
     local node = trees[_index_0]
     local ys = leaf_of(node, row).ys
@@ -701,6 +761,16 @@ votes = function(trees, rows, y)
     _len_0 = _len_0 + 1
   end
   return _accum_0
+end
+
+local predict
+predict = function(trees, row)
+  local s = 0
+  for _index_0 = 1, #trees do
+    local node = trees[_index_0]
+    s = s + mid(leaf_of(node, row).ys)
+  end
+  return s / #trees
 end
 
 ---------------------------------------------------------------- auc
@@ -766,12 +836,15 @@ return {
   bisect = bisect,
   csv = csv,
   Tbl = Tbl,
+  Col = Col,
   adds = adds,
   div = div,
+  mid = mid,
   tree = tree,
   leaf_of = leaf_of,
   forest = forest,
   votes = votes,
+  predict = predict,
   auc = auc,
   aucs = aucs
 }

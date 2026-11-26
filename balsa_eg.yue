@@ -6,8 +6,8 @@
 -- (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 import floor, sqrt, max from math
 b = require "balsa"
-import the, srand, shuffle, bisect, csv, Tbl, adds, div,
-       forest, votes, aucs from b
+import the, srand, shuffle, bisect, csv, Tbl, Col, adds, div,
+       forest, votes, predict, aucs from b
 fmt = string.format
 
 
@@ -109,6 +109,67 @@ replay = (dat) ->                       -- rerun DAT's recorded folds:
                  f, aucs_[1], aucs_[2], secs[1], secs[2], ids
     io.flush!
 
+mae = (want, got) ->                    -- mean |want - got|
+  s, n = 0, 0
+  for i, w in ipairs want
+    s += math.abs w - got[i]
+    n += 1
+  s / max n, 1
+
+reg = (sets) ->                         -- 5x2 over the regression
+  print "#1:reg n30:reg mean "          -- corpus: MAE of 1 tree, 30
+  for f in *sets                        -- trees, and guess-the-mean
+    tb = Tbl csv "~/gits/moot/regression/#{f}.csv"
+    g = tb.cols.klass
+    if not g                            -- else the first goal in
+      for col in *tb.cols.y             -- file order
+        if not g or col.at < g.at then g = col
+    y = (row) -> row[g.at]
+    ids = {}
+    for i, row in ipairs tb.rows
+      ids[row] = #tb.rows - i           -- 0-based csv row #
+    xval tb.rows, (train, test) ->
+      want, keep = {}, {}
+      for row in *test
+        w = y row
+        if w != "?"
+          want[] = w
+          keep[] = row
+      mu = 0
+      m = 0
+      for row in *train
+        w = y row
+        if w != "?"
+          mu += w
+          m += 1
+      mu /= max m, 1
+      maes, secs = {}, {}
+      for arm in *{{1, false}, {30, true}}
+        the.trees, the.rf = arm[1], arm[2]
+        t0 = os.clock!
+        trees = forest tb, train, y, Col
+        maes[] = mae want, [predict trees, row for row in *keep]
+        secs[] = os.clock! - t0
+      maes[] = mae want, [mu for _ in *keep]
+      io.write fmt "%s|%.4g %.4g %.4g |%.3f %.3f |%s 
+",
+        f, maes[1], maes[2], maes[3], secs[1], secs[2],
+        table.concat [tostring ids[row] for row in *test], " "
+      io.flush!
+
+REG = {"2dplanes", "abalone", "ailerons", "auto93", "autohorse",
+  "autompg", "autoprice", "bank32nh", "bank8FM", "baskball",
+  "bodyfat", "bolts", "breasttumor", "cal.housing", "cholesterol",
+  "cleveland", "cloud", "cpu.act", "cpu", "cpu.small",
+  "detroit", "diabetes.numeric", "echomonths",
+  "elevators", "elusage", "fishcatch", "fried", "fruitfly",
+  "gascons", "house16H", "house8L", "housing", "hungarian",
+  "kin8nm", "longley", "lowbwt", "machine.cpu", "mbagrade", "meta",
+  "mv", "pbc", "pharynx", "pol", "pollution", "puma32H", "puma8NH",
+  "pwlinear", "pyrim", "quake", "schlvote", "sensory", "servo",
+  "sleep", "stock", "strike", "triazines", "veteran", "vineyard",
+  "wisconsin"}
+
 ENS = {"balance.scale", "blood-transfusion-service-center",
   "breast.w", "diabetes", "ecoli", "glass", "ionosphere", "sonar",
   "vehicle", "wdbc", "vote", "soybean", "tic-tac-toe", "german",
@@ -122,5 +183,8 @@ ENS = {"balance.scale", "blood-transfusion-service-center",
 srand the.seed
 if arg[1] == "--replay"
   replay arg[2]
+elseif arg[1] == "--reg"
+  table.remove arg, 1
+  reg #arg > 0 and arg or REG
 else
   ens #arg > 0 and arg or ENS

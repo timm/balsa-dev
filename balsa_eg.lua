@@ -6,7 +6,7 @@
 -- (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 local floor, sqrt, max = math.floor, math.sqrt, math.max
 local b = require("balsa")
-local the, srand, shuffle, bisect, csv, Tbl, adds, div, forest, votes, aucs = b.the, b.srand, b.shuffle, b.bisect, b.csv, b.Tbl, b.adds, b.div, b.forest, b.votes, b.aucs
+local the, srand, shuffle, bisect, csv, Tbl, Col, adds, div, forest, votes, predict, aucs = b.the, b.srand, b.shuffle, b.bisect, b.csv, b.Tbl, b.Col, b.adds, b.div, b.forest, b.votes, b.predict, b.aucs
 local fmt = string.format
 
 -------------------------------------------------------------- stats
@@ -165,67 +165,247 @@ replay = function(dat)
   print("#1:q16 n30 ")
   local tb, v, name = nil, nil, nil
   for line in io.lines(dat) do
-    if line:match("^#") then
-      goto _continue_0
-    end
-    local f = line:match("^([^|]*)|")
-    local ids = line:match("|([^|]*)$")
-    if f ~= name then
-      name = f
-      tb = Tbl(csv("~/gits/moot/classify/" .. tostring(f) .. ".csv"))
-      v = { }
-      for i, row in ipairs(tb.rows) do
-        v[#tb.rows - i] = row
+    local _continue_0 = false
+    repeat
+      if line:match("^#") then
+        _continue_0 = true
+        break
       end
-    end
-    local at = tb.cols.klass.at
-    local kl
-    kl = function(row)
-      return row.labels[at]
-    end
-    local test, inh = { }, { }
-    for s in ids:gmatch("%d+") do
-      local row = v[tonumber(s)]
-      test[#test + 1] = row
-      inh[row] = true
-    end
-    local train
-    do
-      local _accum_0 = { }
-      local _len_0 = 1
-      local _list_0 = tb.rows
-      for _index_0 = 1, #_list_0 do
-        local row = _list_0[_index_0]
-        if not inh[row] then
-          _accum_0[_len_0] = row
-          _len_0 = _len_0 + 1
+      local f = line:match("^([^|]*)|")
+      local ids = line:match("|([^|]*)$")
+      if f ~= name then
+        name = f
+        tb = Tbl(csv("~/gits/moot/classify/" .. tostring(f) .. ".csv"))
+        v = { }
+        for i, row in ipairs(tb.rows) do
+          v[#tb.rows - i] = row
         end
       end
-      train = _accum_0
-    end
-    local aucs_, secs = { }, { }
-    local _list_0 = {
-      {
-        1,
-        false
-      },
-      {
-        30,
-        true
+      local at = tb.cols.klass.at
+      local kl
+      kl = function(row)
+        return row.labels[at]
+      end
+      local test, inh = { }, { }
+      for s in ids:gmatch("%d+") do
+        local row = v[tonumber(s)]
+        test[#test + 1] = row
+        inh[row] = true
+      end
+      local train
+      do
+        local _accum_0 = { }
+        local _len_0 = 1
+        local _list_0 = tb.rows
+        for _index_0 = 1, #_list_0 do
+          local row = _list_0[_index_0]
+          if not inh[row] then
+            _accum_0[_len_0] = row
+            _len_0 = _len_0 + 1
+          end
+        end
+        train = _accum_0
+      end
+      local aucs_, secs = { }, { }
+      local _list_0 = {
+        {
+          1,
+          false
+        },
+        {
+          30,
+          true
+        }
       }
-    }
-    for _index_0 = 1, #_list_0 do
-      local treat = _list_0[_index_0]
-      the.trees, the.rf = treat[1], treat[2]
-      local t0 = os.clock()
-      aucs_[#aucs_ + 1] = aucs(votes(forest(tb, train, kl), test, kl))
-      secs[#secs + 1] = os.clock() - t0
+      for _index_0 = 1, #_list_0 do
+        local treat = _list_0[_index_0]
+        the.trees, the.rf = treat[1], treat[2]
+        local t0 = os.clock()
+        aucs_[#aucs_ + 1] = aucs(votes(forest(tb, train, kl), test, kl))
+        secs[#secs + 1] = os.clock() - t0
+      end
+      io.write(fmt("%s|%.3f %.3f |%.3f %.3f |%s\n", f, aucs_[1], aucs_[2], secs[1], secs[2], ids))
+      io.flush()
+      _continue_0 = true
+    until true
+    if not _continue_0 then
+      break
     end
-    io.write(fmt("%s|%.3f %.3f |%.3f %.3f |%s\n", f, aucs_[1], aucs_[2], secs[1], secs[2], ids))
-    io.flush()
-    ::_continue_0::
   end
 end
+
+local mae
+mae = function(want, got)
+  local s, n = 0, 0
+  for i, w in ipairs(want) do
+    s = s + math.abs(w - got[i])
+    n = n + 1
+  end
+  return s / max(n, 1)
+end
+
+local _anon_func_0 = function(keep, predict, trees)
+  local _accum_0 = { }
+  local _len_0 = 1
+  for _index_0 = 1, #keep do
+    local row = keep[_index_0]
+    _accum_0[_len_0] = predict(trees, row)
+    _len_0 = _len_0 + 1
+  end
+  return _accum_0
+end
+local _anon_func_1 = function(keep, mu)
+  local _accum_0 = { }
+  local _len_0 = 1
+  for _index_0 = 1, #keep do
+    local _ = keep[_index_0]
+    _accum_0[_len_0] = mu
+    _len_0 = _len_0 + 1
+  end
+  return _accum_0
+end
+local _anon_func_2 = function(ids, test, tostring)
+  local _accum_0 = { }
+  local _len_0 = 1
+  for _index_0 = 1, #test do
+    local row = test[_index_0]
+    _accum_0[_len_0] = tostring(ids[row])
+    _len_0 = _len_0 + 1
+  end
+  return _accum_0
+end
+local reg
+reg = function(sets)
+  print("#1:reg n30:reg mean ")
+  for _index_0 = 1, #sets do
+    local f = sets[_index_0]
+    local tb = Tbl(csv("~/gits/moot/regression/" .. tostring(f) .. ".csv"))
+    local g = tb.cols.klass
+    if not g then
+      local _list_0 = tb.cols.y
+      for _index_1 = 1, #_list_0 do
+        local col = _list_0[_index_1]
+        if not g or col.at < g.at then
+          g = col
+        end
+      end
+    end
+    local y
+    y = function(row)
+      return row[g.at]
+    end
+    local ids = { }
+    for i, row in ipairs(tb.rows) do
+      ids[row] = #tb.rows - i
+    end
+    xval(tb.rows, function(train, test)
+      local want, keep = { }, { }
+      for _index_1 = 1, #test do
+        local row = test[_index_1]
+        local w = y(row)
+        if w ~= "?" then
+          want[#want + 1] = w
+          keep[#keep + 1] = row
+        end
+      end
+      local mu = 0
+      local m = 0
+      for _index_1 = 1, #train do
+        local row = train[_index_1]
+        local w = y(row)
+        if w ~= "?" then
+          mu = mu + w
+          m = m + 1
+        end
+      end
+      mu = mu / max(m, 1)
+      local maes, secs = { }, { }
+      local _list_0 = {
+        {
+          1,
+          false
+        },
+        {
+          30,
+          true
+        }
+      }
+      for _index_1 = 1, #_list_0 do
+        local arm = _list_0[_index_1]
+        the.trees, the.rf = arm[1], arm[2]
+        local t0 = os.clock()
+        local trees = forest(tb, train, y, Col)
+        maes[#maes + 1] = mae(want, _anon_func_0(keep, predict, trees))
+        secs[#secs + 1] = os.clock() - t0
+      end
+      maes[#maes + 1] = mae(want, _anon_func_1(keep, mu))
+      io.write(fmt("%s|%.4g %.4g %.4g |%.3f %.3f |%s \n", f, maes[1], maes[2], maes[3], secs[1], secs[2], table.concat(_anon_func_2(ids, test, tostring), " ")))
+      return io.flush()
+    end)
+  end
+end
+
+local REG = {
+  "2dplanes",
+  "abalone",
+  "ailerons",
+  "auto93",
+  "autohorse",
+  "autompg",
+  "autoprice",
+  "bank32nh",
+  "bank8FM",
+  "baskball",
+  "bodyfat",
+  "bolts",
+  "breasttumor",
+  "cal.housing",
+  "cholesterol",
+  "cleveland",
+  "cloud",
+  "cpu.act",
+  "cpu",
+  "cpu.small",
+  "detroit",
+  "diabetes.numeric",
+  "echomonths",
+  "elevators",
+  "elusage",
+  "fishcatch",
+  "fried",
+  "fruitfly",
+  "gascons",
+  "house16H",
+  "house8L",
+  "housing",
+  "hungarian",
+  "kin8nm",
+  "longley",
+  "lowbwt",
+  "machine.cpu",
+  "mbagrade",
+  "meta",
+  "mv",
+  "pbc",
+  "pharynx",
+  "pol",
+  "pollution",
+  "puma32H",
+  "puma8NH",
+  "pwlinear",
+  "pyrim",
+  "quake",
+  "schlvote",
+  "sensory",
+  "servo",
+  "sleep",
+  "stock",
+  "strike",
+  "triazines",
+  "veteran",
+  "vineyard",
+  "wisconsin"
+}
 
 local ENS = {
   "balance.scale",
@@ -272,6 +452,9 @@ local ENS = {
 srand(the.seed)
 if arg[1] == "--replay" then
   return replay(arg[2])
+elseif arg[1] == "--reg" then
+  table.remove(arg, 1)
+  return reg(#arg > 0 and arg or REG)
 else
   return ens(#arg > 0 and arg or ENS)
 end
