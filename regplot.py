@@ -14,8 +14,9 @@ for l in L:
   if l.startswith("%folds"):
     _, f, t, *v = l.split(); F[(f, t)] = [float(x) for x in v]
 TK = ["balsa(1)", "balsa(30)", "lgbm"]
-sets = sorted({f for f, _ in F},
-              key=lambda f: np.mean(F[(f, "lgbm")]))
+sets = sorted({f for f, _ in F},        # the gap: where balsa wins
+              key=lambda f: np.mean(F[(f, "balsa(30)")]) -
+                            np.mean(F[(f, "lgbm")]))
 d = {f: [float(np.mean(F[(f, t)])) for t in TK] for f in sets}
 T = [("balsa(1)", 0, "#2ca02c", "^"), ("balsa(30)", 1, "#e8613c", "s"),
      ("lgbm(100)", 2, "#2a6fdb", "o")]
