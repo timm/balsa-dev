@@ -210,25 +210,22 @@ def best_cut(xcols, rows, targets, mk, m, leaf):
 class Tree:
   def __init__(i, rows, y, xcols, mk, m, leaf, maxd, lvl=0):
     targets = [y(row) for row in rows]
-    i.ys  = adds(targets, mk())              # every node: a summary,
-    i.n   = len(rows)                        # a size, and maybe a cut
-    i.ati = None
-    if lvl >= maxd: return
-    cut = best_cut(xcols, rows, targets, mk, m, leaf)
-    if cut is None: return
-    i.col, i.v = cut
-    i.ati = i.col.at
-    yes   = [row for row in rows if i.goes_left(row)]
-    no    = [row for row in rows if not i.goes_left(row)]
-    i.yes = Tree(yes, y, xcols, mk, m, leaf, maxd, lvl + 1)
-    i.no  = Tree(no,  y, xcols, mk, m, leaf, maxd, lvl + 1)
+    i.ys, i.n, i.yes = adds(targets, mk()), len(rows), None
+    if lvl < maxd:
+      if cut := best_cut(xcols, rows, targets, mk, m, leaf):
+        i.col, i.v = cut
+        yes, no = [], []
+        for row in rows:
+          (yes if i.goes_left(row) else no).append(row)
+        i.yes = Tree(yes, y, xcols, mk, m, leaf, maxd, lvl + 1)
+        i.no  = Tree(no,  y, xcols, mk, m, leaf, maxd, lvl + 1)
 
   def goes_left(i, row):
-    label = row.labels[i.ati]
+    label = row.labels[i.col.at]
     return label < 0 or i.col.matches(label, i.v)
 
   def leaf_of(i, row):
-    while i.ati is not None: i = i.yes if i.goes_left(row) else i.no
+    while i.yes: i = i.yes if i.goes_left(row) else i.no
     return i
 
 # Sampling. The Park–Miller generator makes the samples repeatable.
