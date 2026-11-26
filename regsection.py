@@ -108,8 +108,8 @@ def main():
 
     # the learner's own line count, counted from the source, never typed
     import re
-    cap = int(re.search(r"cap:\s*(\d+)", open("balsa.yue").read()).group(1))
-    loc = sum(1 for l in open("balsa.yue") if not re.match(r"^\s*(--.*)?$", l))
+    cap = int(re.search(r"cap=(\d+)", open("balsa.py").read()).group(1))
+    loc = sum(1 for l in open("balsa.py") if not re.match(r"^\s*(#.*)?$", l))
 
     out = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                             "regsection.tmpl")).read()

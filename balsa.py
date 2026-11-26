@@ -169,14 +169,14 @@ class Cols:
       if suffix == "!": i.klass = col
 
   def add(i, row):
+    row = row if isinstance(row, Row) else Row(row)
     for col in i.all: col.add(row[col.at])
     return row
 
 class Tbl:
   def __init__(i, rows):
-    i.rows, i.cols = [], Cols(rows[0])
-    for row in rows[1:]:
-      i.rows += [i.cols.add(row if isinstance(row, Row) else Row(row))]
+    i.cols = Cols(rows[0])
+    i.rows = [i.cols.add(row) for row in rows[1:]]
     i.labelall()
 
   def labelall(i):
@@ -231,7 +231,7 @@ class Tree:
     while i.yes: i = i.yes if i.goes_left(row) else i.no
     return i
 
-# Sampling. The Park–Miller generator makes the samples repeatable.
+# Sampling. The Park-Miller generator makes the samples repeatable.
 _seed = the.seed
 
 def srand(n):
