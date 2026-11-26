@@ -1,12 +1,9 @@
 #!/usr/bin/env python3 -B
 """regplot2: the ens-balsa-nose figure, for regression.
 
-y is 1 - MAE/MAE(predict the mean): the share of the baseline's error that
-a learner removes.  1.0 is perfect, 0.0 is no better than the mean, and
-negative is worse than it.  Plotted this way round so HIGHER IS BETTER, as
-in the AUC figures, and -- the reason for it -- so the solid means sit at
-the top while the dashed spreads sit near zero.  On MAE/MAE the two ran
-together along the bottom and could not be told apart.
+y is rel = MAE / MAE of a learner that always predicts the mean.  So 1.0 is
+the baseline, and LOWER IS BETTER -- the opposite of the AUC figures, hence
+the dashed line at 1.0 and the inverted reading of "best".
 
 Three groups, as far as this corpus allows the classification split:
 numeric (all x columns numeric, < 1000 rows), mixed (at least one symbolic
@@ -63,9 +60,9 @@ def main():
              ("mixed\nattributes",   [s for s in sets if n[s] < 1000 and not numeric[s]]),
              ("large, mixed",        [s for s in sets if n[s] >= 1000])]
 
-    mu = {(s, a): st.fmean([1 - float(r[f"rel_{a}"]) for r in D[s]])
+    mu = {(s, a): st.fmean([float(r[f"rel_{a}"]) for r in D[s]])
           for s in sets for a, *_ in ARMS}
-    sd = {(s, a): spread([1 - float(r[f"rel_{a}"]) for r in D[s]])
+    sd = {(s, a): spread([float(r[f"rel_{a}"]) for r in D[s]])
           for s in sets for a, *_ in ARMS}
     # timings live in the sibling .txt, on its "#secs (all data)" line
     secs = {}
@@ -85,7 +82,7 @@ def main():
 
     x0, ticks, labs, H = 0, [], [], []
     for gi, (g, fs) in enumerate(G):
-        fs = sorted(fs, key=lambda s: -mu[(s, "lgbm")])  # best lgbm first
+        fs = sorted(fs, key=lambda s: mu[(s, "lgbm")])   # worst lgbm last
         xs = np.arange(x0, x0 + len(fs))
         for a, lab, c, m in ARMS:
             ax.plot(xs, [mu[(s, a)] for s in fs], color=c, marker=m, lw=2, ms=6)
@@ -95,24 +92,24 @@ def main():
                 H.append((lab, c, m,
                           st.fmean([mu[(s, a)] for s in sets]),
                           st.fmean([sd[(s, a)] for s in sets])))
-        ax.text(xs.mean(), 1.44, g, ha="center", va="bottom", fontsize=FS["head"])
+        ax.text(xs.mean(), 1.83, g, ha="center", va="bottom", fontsize=FS["head"])
         ticks += list(xs); labs += [f.split("/")[-1] for f in fs]
         x0 += len(fs) + 3
         if gi < len(G) - 1: ax.axvline(x0 - 2, color="#555", lw=1)
 
-    ax.axhline(0.0, color="#999", lw=1.4, ls=(0, (6, 4)))
-    ax.text(-.5, .03, "no better than predicting the mean", ha="left",
-            va="bottom", fontsize=FS["tick"] - 1, color="#666")
+    ax.axhline(1.0, color="#999", lw=1.4, ls=(0, (6, 4)))
+    ax.text(x0 - 1.6, 1.02, "predict the mean", ha="right", va="bottom",
+            fontsize=FS["tick"] - 1, color="#666")
     ax.set_xticks(ticks)
     ax.set_xticklabels(labs, rotation=60, ha="right", rotation_mode="anchor",
                        fontsize=10)
-    ax.set_ylim(-.5, 1.42); ax.set_xlim(-.9, x0 - 2.1)
-    ax.set_yticks([-.5, -.25, 0, .25, .5, .75, 1])
-    ax.set_yticks([-.375, -.125, .125, .375, .625, .875], minor=True)
+    ax.set_ylim(0, 1.8); ax.set_xlim(-.9, x0 - 2.1)
+    ax.set_yticks([0, .25, .5, .75, 1, 1.25, 1.5])
+    ax.set_yticks([.125, .375, .625, .875, 1.125, 1.375], minor=True)
     ax.tick_params(axis="y", which="minor", length=0)
     ax.grid(axis="y", which="major", color="#ddd")
     ax.grid(axis="y", which="minor", color="#b0b0b0", ls=(0, (4, 4)), lw=1)
-    ax.set_ylabel("1 - MAE/MAE(predict the mean)\nhigher is better, 5x2 folds",
+    ax.set_ylabel("MAE / MAE(predict the mean)\nlower is better, 5x2 folds",
                   fontsize=FS["lab"], labelpad=6)
     ax.tick_params(axis="y", labelsize=FS["tick"])
     ax.spines["top"].set_visible(False)
