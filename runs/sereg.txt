@@ -22,9 +22,54 @@ systems/javagc     0.49        0.53        1.00        0.08
 systems/redis      1.36        1.03        1.00        0.89       
 systems/storm      0.07        0.28        1.00        0.06       
 systems/x264       0.32        0.35        1.00        0.07       
+hpo/Health-ClosedIssues0000 0.17        0.21        1.00        0.08       
+hpo/Health-ClosedIssues0001 0.15        0.19        1.00        0.11       
+hpo/Health-ClosedIssues0002 0.03        0.11        1.00        0.02       
+hpo/Health-ClosedIssues0003 0.62        0.60        1.00        0.42       
+hpo/Health-ClosedIssues0004 0.48        0.46        1.00        0.31       
+hpo/Health-ClosedIssues0005 0.16        0.23        1.00        0.11       
+hpo/Health-ClosedIssues0006 0.75        0.64        1.00        0.52       
+hpo/Health-ClosedIssues0007 0.36        0.34        1.00        0.24       
+hpo/Health-ClosedIssues0008 0.71        0.63        1.00        0.48       
+hpo/Health-ClosedIssues0009 0.65        0.59        1.00        0.44       
+hpo/Health-ClosedIssues0010 0.84        0.71        1.00        0.62       
+hpo/Health-ClosedIssues0011 0.38        0.43        1.00        0.37       
+hpo/Health-ClosedPRs0000 0.00        0.08        1.00        0.00       
+hpo/Health-ClosedPRs0002 0.02        0.10        1.00        0.01       
+hpo/Health-ClosedPRs0003 0.02        0.11        1.00        0.02       
+hpo/Health-ClosedPRs0004 0.29        0.30        1.00        0.27       
+hpo/Health-ClosedPRs0005 0.10        0.18        1.00        0.10       
+hpo/Health-ClosedPRs0006 0.21        0.22        1.00        0.16       
+hpo/Health-ClosedPRs0007 0.41        0.42        1.00        0.37       
+hpo/Health-ClosedPRs0008 0.30        0.31        1.00        0.29       
+hpo/Health-ClosedPRs0009 0.57        0.48        1.00        0.41       
+hpo/Health-ClosedPRs0010 0.46        0.47        1.00        0.28       
+hpo/Health-ClosedPRs0011 0.02        0.11        1.00        0.02       
+hpo/Health-Commits0000 0.15        0.20        1.00        0.08       
+hpo/Health-Commits0001 0.06        0.14        1.00        0.05       
+hpo/Health-Commits0002 0.04        0.12        1.00        0.03       
+hpo/Health-Commits0003 0.50        0.45        1.00        0.34       
+hpo/Health-Commits0004 0.31        0.37        1.00        0.17       
+hpo/Health-Commits0005 0.19        0.23        1.00        0.12       
+hpo/Health-Commits0006 0.19        0.22        1.00        0.13       
+hpo/Health-Commits0007 0.25        0.29        1.00        0.15       
+hpo/Health-Commits0008 0.49        0.50        1.00        0.28       
+hpo/Health-Commits0009 0.44        0.41        1.00        0.30       
+hpo/Health-Commits0010 0.35        0.34        1.00        0.24       
+hpo/Health-Commits0011 0.35        0.38        1.00        0.33       
+process/coc1000    1.32        1.04        1.00        1.03       
+process/nasa93dem  1.06        0.88        1.00        0.97       
+process/pom3a      0.51        0.46        1.00        0.20       
+process/pom3b      0.43        0.41        1.00        0.27       
+process/pom3c      0.44        0.42        1.00        0.19       
+process/pom3d      0.57        0.50        1.00        0.41       
+process/xomo_flight 0.79        0.62        1.00        1.01       
+process/xomo_ground 0.81        0.63        1.00        1.02       
+process/xomo_osp   0.80        0.63        1.00        1.01       
+process/xomo_osp2  1.12        0.81        1.00        0.97       
 
-#mean rel-mae      0.32        0.43        1.00        0.26       
-#secs (all data)    1.5         9.1         0.0        11.2       
+#mean rel-mae      0.38        0.41        1.00        0.31       
+#secs (all data)    3.3        23.9         0.0        24.5       
 %folds config/Apache_AllMeasurements balsa(1) 0.212 0.175 0.207 0.196 0.196 0.185 0.244 0.259 0.177 0.198
 %folds config/Apache_AllMeasurements balsa(30) 0.278 0.342 0.369 0.307 0.372 0.372 0.284 0.381 0.353 0.294
 %folds config/Apache_AllMeasurements mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
@@ -117,3 +162,183 @@ systems/x264       0.32        0.35        1.00        0.07
 %folds systems/x264 balsa(30) 0.340 0.390 0.321 0.345 0.347 0.340 0.350 0.344 0.373 0.378
 %folds systems/x264 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
 %folds systems/x264 lgbm 0.069 0.070 0.069 0.072 0.069 0.071 0.069 0.069 0.069 0.069
+%folds hpo/Health-ClosedIssues0000 balsa(1) 0.163 0.186 0.181 0.171 0.166 0.160 0.158 0.157 0.170 0.195
+%folds hpo/Health-ClosedIssues0000 balsa(30) 0.193 0.190 0.238 0.216 0.209 0.199 0.185 0.224 0.251 0.202
+%folds hpo/Health-ClosedIssues0000 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedIssues0000 lgbm 0.081 0.086 0.082 0.084 0.083 0.084 0.082 0.084 0.083 0.083
+%folds hpo/Health-ClosedIssues0001 balsa(1) 0.148 0.142 0.138 0.137 0.154 0.139 0.147 0.147 0.159 0.157
+%folds hpo/Health-ClosedIssues0001 balsa(30) 0.226 0.201 0.202 0.163 0.165 0.153 0.185 0.199 0.206 0.193
+%folds hpo/Health-ClosedIssues0001 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedIssues0001 lgbm 0.112 0.114 0.111 0.115 0.115 0.111 0.112 0.114 0.112 0.113
+%folds hpo/Health-ClosedIssues0002 balsa(1) 0.030 0.029 0.026 0.038 0.039 0.027 0.033 0.031 0.036 0.037
+%folds hpo/Health-ClosedIssues0002 balsa(30) 0.089 0.106 0.109 0.111 0.117 0.111 0.141 0.104 0.105 0.071
+%folds hpo/Health-ClosedIssues0002 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedIssues0002 lgbm 0.023 0.020 0.019 0.021 0.021 0.020 0.021 0.019 0.021 0.020
+%folds hpo/Health-ClosedIssues0003 balsa(1) 0.620 0.600 0.655 0.558 0.613 0.602 0.603 0.647 0.597 0.709
+%folds hpo/Health-ClosedIssues0003 balsa(30) 0.597 0.586 0.581 0.690 0.583 0.612 0.583 0.585 0.601 0.593
+%folds hpo/Health-ClosedIssues0003 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedIssues0003 lgbm 0.424 0.420 0.420 0.420 0.420 0.414 0.411 0.427 0.418 0.415
+%folds hpo/Health-ClosedIssues0004 balsa(1) 0.456 0.453 0.498 0.500 0.514 0.447 0.474 0.513 0.458 0.441
+%folds hpo/Health-ClosedIssues0004 balsa(30) 0.466 0.433 0.512 0.446 0.495 0.465 0.436 0.463 0.458 0.467
+%folds hpo/Health-ClosedIssues0004 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedIssues0004 lgbm 0.311 0.306 0.316 0.300 0.305 0.313 0.314 0.313 0.319 0.304
+%folds hpo/Health-ClosedIssues0005 balsa(1) 0.149 0.157 0.155 0.156 0.153 0.152 0.153 0.160 0.160 0.156
+%folds hpo/Health-ClosedIssues0005 balsa(30) 0.237 0.218 0.222 0.244 0.215 0.224 0.230 0.196 0.210 0.266
+%folds hpo/Health-ClosedIssues0005 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedIssues0005 lgbm 0.108 0.114 0.111 0.111 0.112 0.111 0.111 0.110 0.112 0.110
+%folds hpo/Health-ClosedIssues0006 balsa(1) 0.739 0.766 0.746 0.845 0.715 0.717 0.758 0.730 0.745 0.773
+%folds hpo/Health-ClosedIssues0006 balsa(30) 0.661 0.647 0.618 0.665 0.631 0.638 0.618 0.624 0.601 0.656
+%folds hpo/Health-ClosedIssues0006 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedIssues0006 lgbm 0.508 0.527 0.516 0.516 0.521 0.508 0.511 0.516 0.516 0.528
+%folds hpo/Health-ClosedIssues0007 balsa(1) 0.329 0.330 0.369 0.363 0.378 0.349 0.354 0.394 0.372 0.332
+%folds hpo/Health-ClosedIssues0007 balsa(30) 0.345 0.351 0.347 0.359 0.331 0.347 0.324 0.308 0.352 0.324
+%folds hpo/Health-ClosedIssues0007 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedIssues0007 lgbm 0.236 0.245 0.241 0.238 0.243 0.241 0.239 0.241 0.237 0.246
+%folds hpo/Health-ClosedIssues0008 balsa(1) 0.766 0.703 0.666 0.681 0.650 0.723 0.693 0.754 0.682 0.754
+%folds hpo/Health-ClosedIssues0008 balsa(30) 0.649 0.622 0.612 0.608 0.624 0.625 0.646 0.646 0.600 0.647
+%folds hpo/Health-ClosedIssues0008 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedIssues0008 lgbm 0.480 0.480 0.481 0.486 0.486 0.472 0.475 0.483 0.477 0.483
+%folds hpo/Health-ClosedIssues0009 balsa(1) 0.618 0.663 0.652 0.727 0.602 0.588 0.670 0.652 0.749 0.626
+%folds hpo/Health-ClosedIssues0009 balsa(30) 0.579 0.584 0.600 0.621 0.597 0.602 0.566 0.569 0.582 0.640
+%folds hpo/Health-ClosedIssues0009 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedIssues0009 lgbm 0.448 0.436 0.439 0.452 0.453 0.437 0.430 0.446 0.449 0.443
+%folds hpo/Health-ClosedIssues0010 balsa(1) 0.808 0.902 0.839 0.834 0.839 0.905 0.808 0.830 0.840 0.815
+%folds hpo/Health-ClosedIssues0010 balsa(30) 0.742 0.717 0.704 0.737 0.700 0.697 0.749 0.706 0.687 0.656
+%folds hpo/Health-ClosedIssues0010 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedIssues0010 lgbm 0.615 0.612 0.617 0.621 0.616 0.616 0.611 0.621 0.619 0.616
+%folds hpo/Health-ClosedIssues0011 balsa(1) 0.350 0.383 0.371 0.373 0.401 0.377 0.350 0.425 0.374 0.372
+%folds hpo/Health-ClosedIssues0011 balsa(30) 0.450 0.449 0.425 0.381 0.461 0.439 0.370 0.419 0.435 0.432
+%folds hpo/Health-ClosedIssues0011 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedIssues0011 lgbm 0.373 0.374 0.370 0.379 0.368 0.377 0.366 0.375 0.380 0.367
+%folds hpo/Health-ClosedPRs0000 balsa(1) 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000
+%folds hpo/Health-ClosedPRs0000 balsa(30) 0.089 0.068 0.074 0.106 0.052 0.117 0.092 0.072 0.080 0.095
+%folds hpo/Health-ClosedPRs0000 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedPRs0000 lgbm 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000
+%folds hpo/Health-ClosedPRs0002 balsa(1) 0.015 0.027 0.013 0.015 0.018 0.015 0.014 0.014 0.028 0.013
+%folds hpo/Health-ClosedPRs0002 balsa(30) 0.119 0.053 0.122 0.064 0.146 0.088 0.083 0.128 0.072 0.141
+%folds hpo/Health-ClosedPRs0002 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedPRs0002 lgbm 0.014 0.012 0.014 0.013 0.012 0.014 0.013 0.013 0.014 0.012
+%folds hpo/Health-ClosedPRs0003 balsa(1) 0.023 0.022 0.023 0.022 0.021 0.036 0.024 0.023 0.021 0.025
+%folds hpo/Health-ClosedPRs0003 balsa(30) 0.109 0.123 0.117 0.093 0.064 0.101 0.080 0.142 0.110 0.152
+%folds hpo/Health-ClosedPRs0003 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedPRs0003 lgbm 0.018 0.018 0.018 0.018 0.018 0.017 0.018 0.018 0.018 0.018
+%folds hpo/Health-ClosedPRs0004 balsa(1) 0.315 0.303 0.334 0.282 0.247 0.242 0.300 0.275 0.299 0.282
+%folds hpo/Health-ClosedPRs0004 balsa(30) 0.296 0.258 0.323 0.308 0.350 0.269 0.311 0.301 0.316 0.279
+%folds hpo/Health-ClosedPRs0004 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedPRs0004 lgbm 0.273 0.260 0.273 0.263 0.270 0.262 0.267 0.261 0.261 0.277
+%folds hpo/Health-ClosedPRs0005 balsa(1) 0.075 0.132 0.103 0.120 0.087 0.105 0.111 0.102 0.075 0.083
+%folds hpo/Health-ClosedPRs0005 balsa(30) 0.189 0.186 0.219 0.156 0.160 0.178 0.189 0.176 0.180 0.194
+%folds hpo/Health-ClosedPRs0005 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedPRs0005 lgbm 0.099 0.106 0.100 0.103 0.107 0.101 0.104 0.106 0.099 0.105
+%folds hpo/Health-ClosedPRs0006 balsa(1) 0.231 0.218 0.221 0.244 0.229 0.215 0.202 0.186 0.203 0.193
+%folds hpo/Health-ClosedPRs0006 balsa(30) 0.264 0.221 0.237 0.215 0.217 0.207 0.227 0.212 0.237 0.208
+%folds hpo/Health-ClosedPRs0006 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedPRs0006 lgbm 0.152 0.160 0.161 0.153 0.153 0.159 0.155 0.155 0.153 0.158
+%folds hpo/Health-ClosedPRs0007 balsa(1) 0.358 0.431 0.403 0.478 0.400 0.428 0.388 0.428 0.392 0.408
+%folds hpo/Health-ClosedPRs0007 balsa(30) 0.383 0.417 0.426 0.410 0.439 0.425 0.425 0.429 0.446 0.438
+%folds hpo/Health-ClosedPRs0007 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedPRs0007 lgbm 0.367 0.380 0.372 0.361 0.365 0.372 0.366 0.378 0.361 0.373
+%folds hpo/Health-ClosedPRs0008 balsa(1) 0.288 0.310 0.352 0.317 0.247 0.342 0.280 0.285 0.289 0.274
+%folds hpo/Health-ClosedPRs0008 balsa(30) 0.291 0.344 0.342 0.276 0.334 0.301 0.304 0.326 0.331 0.289
+%folds hpo/Health-ClosedPRs0008 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedPRs0008 lgbm 0.277 0.296 0.292 0.291 0.289 0.279 0.282 0.294 0.288 0.296
+%folds hpo/Health-ClosedPRs0009 balsa(1) 0.598 0.562 0.579 0.595 0.600 0.608 0.519 0.565 0.532 0.572
+%folds hpo/Health-ClosedPRs0009 balsa(30) 0.459 0.462 0.464 0.467 0.506 0.486 0.491 0.488 0.465 0.499
+%folds hpo/Health-ClosedPRs0009 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedPRs0009 lgbm 0.402 0.417 0.411 0.405 0.410 0.413 0.415 0.405 0.409 0.412
+%folds hpo/Health-ClosedPRs0010 balsa(1) 0.419 0.464 0.530 0.451 0.420 0.452 0.439 0.418 0.490 0.482
+%folds hpo/Health-ClosedPRs0010 balsa(30) 0.456 0.510 0.503 0.482 0.471 0.482 0.435 0.446 0.414 0.501
+%folds hpo/Health-ClosedPRs0010 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedPRs0010 lgbm 0.280 0.286 0.282 0.291 0.285 0.283 0.284 0.285 0.282 0.284
+%folds hpo/Health-ClosedPRs0011 balsa(1) 0.017 0.015 0.017 0.015 0.021 0.016 0.016 0.014 0.022 0.014
+%folds hpo/Health-ClosedPRs0011 balsa(30) 0.061 0.099 0.115 0.071 0.137 0.088 0.126 0.100 0.129 0.126
+%folds hpo/Health-ClosedPRs0011 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-ClosedPRs0011 lgbm 0.016 0.017 0.018 0.015 0.016 0.016 0.016 0.016 0.017 0.016
+%folds hpo/Health-Commits0000 balsa(1) 0.151 0.152 0.146 0.139 0.159 0.146 0.149 0.148 0.137 0.153
+%folds hpo/Health-Commits0000 balsa(30) 0.172 0.248 0.259 0.183 0.186 0.210 0.210 0.170 0.168 0.164
+%folds hpo/Health-Commits0000 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-Commits0000 lgbm 0.085 0.083 0.083 0.085 0.086 0.082 0.084 0.085 0.084 0.083
+%folds hpo/Health-Commits0001 balsa(1) 0.053 0.035 0.052 0.056 0.056 0.043 0.090 0.061 0.076 0.052
+%folds hpo/Health-Commits0001 balsa(30) 0.099 0.099 0.176 0.132 0.189 0.173 0.170 0.147 0.102 0.130
+%folds hpo/Health-Commits0001 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-Commits0001 lgbm 0.054 0.056 0.052 0.055 0.055 0.053 0.054 0.057 0.056 0.054
+%folds hpo/Health-Commits0002 balsa(1) 0.034 0.040 0.054 0.036 0.042 0.033 0.046 0.034 0.035 0.044
+%folds hpo/Health-Commits0002 balsa(30) 0.158 0.143 0.082 0.117 0.114 0.162 0.066 0.122 0.156 0.095
+%folds hpo/Health-Commits0002 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-Commits0002 lgbm 0.026 0.028 0.028 0.026 0.028 0.027 0.027 0.028 0.027 0.028
+%folds hpo/Health-Commits0003 balsa(1) 0.502 0.543 0.491 0.456 0.490 0.546 0.504 0.479 0.470 0.515
+%folds hpo/Health-Commits0003 balsa(30) 0.457 0.452 0.481 0.440 0.431 0.448 0.436 0.474 0.445 0.452
+%folds hpo/Health-Commits0003 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-Commits0003 lgbm 0.335 0.342 0.345 0.338 0.342 0.341 0.346 0.337 0.342 0.340
+%folds hpo/Health-Commits0004 balsa(1) 0.341 0.275 0.329 0.290 0.293 0.324 0.274 0.308 0.376 0.316
+%folds hpo/Health-Commits0004 balsa(30) 0.399 0.340 0.347 0.400 0.420 0.404 0.364 0.363 0.347 0.355
+%folds hpo/Health-Commits0004 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-Commits0004 lgbm 0.174 0.174 0.175 0.169 0.170 0.172 0.172 0.174 0.171 0.170
+%folds hpo/Health-Commits0005 balsa(1) 0.200 0.198 0.179 0.196 0.187 0.194 0.184 0.179 0.193 0.186
+%folds hpo/Health-Commits0005 balsa(30) 0.217 0.238 0.203 0.228 0.233 0.244 0.232 0.221 0.243 0.240
+%folds hpo/Health-Commits0005 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-Commits0005 lgbm 0.123 0.119 0.118 0.123 0.119 0.123 0.121 0.121 0.119 0.121
+%folds hpo/Health-Commits0006 balsa(1) 0.175 0.185 0.198 0.195 0.183 0.210 0.215 0.196 0.182 0.203
+%folds hpo/Health-Commits0006 balsa(30) 0.196 0.215 0.228 0.201 0.228 0.238 0.219 0.232 0.213 0.233
+%folds hpo/Health-Commits0006 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-Commits0006 lgbm 0.129 0.128 0.126 0.131 0.132 0.128 0.126 0.132 0.126 0.129
+%folds hpo/Health-Commits0007 balsa(1) 0.254 0.248 0.235 0.240 0.220 0.237 0.247 0.261 0.260 0.263
+%folds hpo/Health-Commits0007 balsa(30) 0.297 0.297 0.302 0.293 0.313 0.309 0.244 0.308 0.293 0.266
+%folds hpo/Health-Commits0007 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-Commits0007 lgbm 0.151 0.152 0.155 0.153 0.149 0.155 0.152 0.152 0.155 0.150
+%folds hpo/Health-Commits0008 balsa(1) 0.516 0.411 0.433 0.613 0.558 0.478 0.487 0.472 0.428 0.485
+%folds hpo/Health-Commits0008 balsa(30) 0.512 0.500 0.479 0.477 0.503 0.502 0.475 0.494 0.522 0.515
+%folds hpo/Health-Commits0008 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-Commits0008 lgbm 0.289 0.280 0.276 0.287 0.281 0.281 0.285 0.281 0.286 0.279
+%folds hpo/Health-Commits0009 balsa(1) 0.439 0.436 0.455 0.426 0.435 0.429 0.484 0.458 0.444 0.419
+%folds hpo/Health-Commits0009 balsa(30) 0.410 0.411 0.400 0.402 0.435 0.413 0.401 0.411 0.400 0.396
+%folds hpo/Health-Commits0009 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-Commits0009 lgbm 0.302 0.303 0.304 0.297 0.305 0.300 0.303 0.304 0.302 0.299
+%folds hpo/Health-Commits0010 balsa(1) 0.315 0.337 0.364 0.367 0.340 0.389 0.354 0.330 0.345 0.359
+%folds hpo/Health-Commits0010 balsa(30) 0.314 0.309 0.323 0.380 0.350 0.353 0.361 0.336 0.332 0.357
+%folds hpo/Health-Commits0010 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-Commits0010 lgbm 0.233 0.238 0.236 0.236 0.233 0.238 0.236 0.233 0.232 0.236
+%folds hpo/Health-Commits0011 balsa(1) 0.360 0.345 0.333 0.393 0.359 0.342 0.339 0.348 0.351 0.330
+%folds hpo/Health-Commits0011 balsa(30) 0.371 0.377 0.381 0.381 0.379 0.377 0.372 0.374 0.367 0.419
+%folds hpo/Health-Commits0011 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds hpo/Health-Commits0011 lgbm 0.332 0.330 0.329 0.335 0.336 0.334 0.328 0.343 0.329 0.337
+%folds process/coc1000 balsa(1) 1.369 1.223 1.421 1.363 1.362 1.338 1.230 1.298 1.287 1.325
+%folds process/coc1000 balsa(30) 1.038 1.051 1.055 1.026 1.039 1.037 1.025 0.994 1.038 1.048
+%folds process/coc1000 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds process/coc1000 lgbm 1.042 1.046 1.023 1.028 1.008 1.013 1.021 1.031 1.019 1.023
+%folds process/nasa93dem balsa(1) 1.433 0.838 1.089 1.368 0.893 0.979 0.988 1.006 1.034 0.940
+%folds process/nasa93dem balsa(30) 0.972 0.881 0.938 0.878 0.831 0.803 0.890 0.957 0.806 0.887
+%folds process/nasa93dem mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds process/nasa93dem lgbm 0.851 0.947 0.981 0.943 1.013 0.881 0.893 1.369 0.907 0.940
+%folds process/pom3a balsa(1) 0.505 0.611 0.511 0.502 0.477 0.517 0.472 0.533 0.502 0.508
+%folds process/pom3a balsa(30) 0.462 0.462 0.423 0.436 0.470 0.437 0.482 0.454 0.474 0.461
+%folds process/pom3a mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds process/pom3a lgbm 0.202 0.200 0.199 0.204 0.199 0.202 0.200 0.202 0.202 0.200
+%folds process/pom3b balsa(1) 0.435 0.479 0.403 0.448 0.396 0.463 0.446 0.397 0.415 0.448
+%folds process/pom3b balsa(30) 0.372 0.409 0.411 0.404 0.401 0.401 0.436 0.460 0.425 0.400
+%folds process/pom3b mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds process/pom3b lgbm 0.264 0.271 0.264 0.270 0.272 0.264 0.270 0.263 0.269 0.264
+%folds process/pom3c balsa(1) 0.485 0.440 0.430 0.431 0.464 0.444 0.407 0.493 0.425 0.425
+%folds process/pom3c balsa(30) 0.450 0.442 0.381 0.416 0.425 0.386 0.436 0.411 0.434 0.391
+%folds process/pom3c mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds process/pom3c lgbm 0.184 0.187 0.185 0.188 0.188 0.184 0.183 0.186 0.184 0.187
+%folds process/pom3d balsa(1) 0.540 0.587 0.585 0.574 0.625 0.555 0.517 0.590 0.624 0.521
+%folds process/pom3d balsa(30) 0.494 0.540 0.489 0.545 0.478 0.459 0.482 0.479 0.495 0.491
+%folds process/pom3d mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds process/pom3d lgbm 0.398 0.418 0.362 0.427 0.399 0.379 0.433 0.413 0.438 0.421
+%folds process/xomo_flight balsa(1) 0.743 0.779 0.716 0.803 0.804 0.732 0.845 0.818 0.851 0.772
+%folds process/xomo_flight balsa(30) 0.645 0.620 0.605 0.599 0.644 0.590 0.618 0.612 0.647 0.601
+%folds process/xomo_flight mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds process/xomo_flight lgbm 1.012 1.019 1.010 1.010 1.014 1.014 1.011 1.018 1.008 1.016
+%folds process/xomo_ground balsa(1) 0.784 0.748 0.844 0.803 0.794 0.808 0.801 0.875 0.866 0.789
+%folds process/xomo_ground balsa(30) 0.632 0.632 0.598 0.621 0.641 0.636 0.630 0.604 0.629 0.651
+%folds process/xomo_ground mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds process/xomo_ground lgbm 1.014 1.019 1.011 1.014 1.019 1.017 1.013 1.012 1.016 1.018
+%folds process/xomo_osp balsa(1) 0.853 0.876 0.804 0.827 0.761 0.759 0.777 0.769 0.776 0.817
+%folds process/xomo_osp balsa(30) 0.641 0.629 0.576 0.644 0.600 0.656 0.634 0.613 0.600 0.690
+%folds process/xomo_osp mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds process/xomo_osp lgbm 1.009 1.014 1.011 1.005 1.015 1.009 1.014 1.013 1.009 1.013
+%folds process/xomo_osp2 balsa(1) 1.058 1.240 1.133 1.039 1.117 1.072 1.119 1.179 1.121 1.098
+%folds process/xomo_osp2 balsa(30) 0.808 0.791 0.836 0.814 0.816 0.819 0.781 0.803 0.845 0.790
+%folds process/xomo_osp2 mean 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000
+%folds process/xomo_osp2 lgbm 0.970 0.972 0.971 0.975 0.973 0.981 0.978 0.976 0.979 0.975

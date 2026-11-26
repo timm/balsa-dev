@@ -50,6 +50,8 @@ def main():
         x = [h for h in head
              if not h.rstrip("+-!").endswith("X") and h[-1] not in "+-!"]
         numeric[s] = all(h[0].isupper() for h in x)
+    minrows = int(os.getenv("MINROWS", "0"))   # drop the tiny sets
+    sets = [s for s in sets if n[s] >= minrows]
     if any("/" in s for s in sets):          # moot/optimize: group by folder
         G = [(d, [s for s in sets if s.split("/")[0] == d])
              for d in sorted({s.split("/")[0] for s in sets})]
@@ -116,8 +118,12 @@ def main():
     # points while the panel is only as wide as its share of the sets, so the
     # layout has to earn its width: one swatch, not two.  The sd column says
     # it is the dashed series by underlining its heading in dashes.
-    wide = len(G[0][1]) / (x0 - 1.2)
-    tx = ax.inset_axes((.012, .74, wide - .025, .22))
+    gbig = max(range(len(G)), key=lambda i: len(G[i][1]))
+    x0s = 0                              # left edge of widest panel
+    for g, fs in G[:gbig]: x0s += len(fs) + 1
+    left = (x0s + .9) / (x0 - 1.2)
+    wide = len(G[gbig][1]) / (x0 - 1.2)
+    tx = ax.inset_axes((left + .012, .74, wide - .025, .22))
     tx.set_xlim(0, 24); tx.set_ylim(0, 4.6)
     tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
     for s_ in tx.spines.values(): s_.set_visible(False)
