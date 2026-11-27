@@ -117,10 +117,13 @@ def xval(rows, m=5, n=2):
       yield ([r for j, r in enumerate(u) if j % n != kf],
              [r for j, r in enumerate(u) if j % n == kf])
 
-ARMS = ["%s.%s" % (a, r) for a in "ar" for r in RANKERS]  # 2x5
+# Which rankers to run this pass. ARMS=dist,b1,b30,rand under pypy
+# (fast, no lightgbm); ARMS=lgbm under CPython. The fold shuffles are
+# the same Mersenne Twister on both, so the two passes align exactly.
+WANT = os.getenv("ARMS", ",".join(RANKERS)).split(",")
+ARMS = ["%s.%s" % (a, r) for a in "ar" for r in RANKERS if r in WANT]
 
 def run(sets):
-  print("#%-22s %s" % ("data", " ".join("%7s" % a for a in ARMS)))
   tot = {a: [] for a in ARMS}
   for f in sets:
     root = os.getenv("MOOTOPT", "~/gits/moot/optimize")
@@ -130,18 +133,25 @@ def run(sets):
     folds = list(xval(tb.rows))                 # fixed splits per set
     for fi, (train, test) in enumerate(folds):
       for aq, smart in (("a", True), ("r", False)):
-        for rn, rk in RANKERS.items():
+        for rn in WANT:
           random.seed(the.seed + fi)            # same pool for every arm
           got["%s.%s" % (aq, rn)].append(
-            optimize(tb, train, test, rk, smart))
-    print("%-23s %s" % (f.split("/")[-1],
-          " ".join("%7.1f" % (sum(got[a]) / len(got[a])) for a in ARMS)))
-    for a in ARMS: tot[a].append(sum(got[a]) / len(got[a]))
-  print("#%-22s %s" % ("mean",
-        " ".join("%7.1f" % (sum(tot[a]) / len(tot[a])) for a in ARMS)))
+            optimize(tb, train, test, RANKERS[rn], smart))
+    for a in ARMS:                              # one line per (set,arm)
+      v = got[a]
+      print("%%folds %s %s %s" % (f, a, " ".join("%.1f" % x for x in v)),
+            flush=True)
+
+def expand(args):
+  "A .txt arg is a file of set names, one per line; else a set name."
+  out = []
+  for a in args:
+    if a.endswith(".txt"):
+      out += [l.split()[0] for l in open(a) if l.split()]
+    else: out.append(a)
+  return out
 
 if __name__ == "__main__":
   srand(the.seed)
   random.seed(the.seed)
-  run(sys.argv[1:] or ["misc/auto93", "config/SS-A", "config/SS-B",
-                       "systems/SS-N", "process/pom3a"])
+  run(expand(sys.argv[1:]) or ["misc/auto93", "config/SS-A"])
