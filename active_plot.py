@@ -115,7 +115,6 @@ bx.set_ylabel("win difference (acquire - random)", fontsize=12)
 ymin = min(bx.get_ylim()[0], cx.get_ylim()[0])     # share y across mid+right
 ymax = max(bx.get_ylim()[1], cx.get_ylim()[1])
 bx.set_ylim(ymin, ymax); cx.set_ylim(ymin, ymax)
-cx.set_yticklabels([])
 
 for p in (ax, bx, cx):
   for s_ in ("top", "right"): p.spines[s_].set_visible(False)
