@@ -35,7 +35,7 @@ import os, re, sys
 
 Here = os.path.dirname(os.path.abspath(__file__))
 Lgbm = 36328
-S    = 3.00          # cm, the WIDTH of each panel's biggest box
+S    = 2.55          # cm, the WIDTH of each panel's biggest box
 Tall = 1.00          # ... and its height, as a multiple of that width
 Gap  = 0.55          # cm between panels, left to right
 VGap = 0.95          # ... and between the two rows
