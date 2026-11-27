@@ -42,7 +42,7 @@ else:    # the 39 non-SE classify sets, grouped by NAME (some sets may
       ("mixed\nattributes",20,30),("large, mixed",30,39)]]
   G=[(h,fs) for h,fs in G if fs]
   order=[f for _,fs in G for f in fs]
-  CAPY,TAB,MONO,LEGIN=52,[.015,.13,.40,.54],9,(1.60,0.76)
+  CAPY,TAB,MONO,LEGIN=52,[.105,.13,.40,.54],9,(1.60,0.76)
 T=[(os.getenv("LAB1","balsa(1)"),0,"#2ca02c","^"),
    ("lgbm(100)",2,"#2a6fdb","o"),
    (os.getenv("LAB30","balsa(30)"),1,"#e8613c","s"),

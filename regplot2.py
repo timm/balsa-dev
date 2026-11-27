@@ -37,6 +37,15 @@ def spread(v):
     return (q(.9) - q(.1)) / 2.56
 
 
+def short(f):
+    """A tick label, trimmed.  `Apache_AllMeasurements` is 22 characters of
+    which 16 say nothing: every set in that folder is AllMeasurements.  The
+    long names set the height of the whole x-axis strip, which on a figure
+    four-to-a-page is height taken from the plot."""
+    f = f.split("/")[-1]
+    return f.replace("_AllMeasurements", "").replace("AllMeasurements", "all")
+
+
 def vals(D, s, a):
     "The folds of one treatment on one set, or [] if it did not run it."
     k = f"rel_{a}"
@@ -91,7 +100,7 @@ def main():
             if line.startswith("#secs"): secs["tabicl"] = float(line.split()[-1])
 
     fig = plt.figure(figsize=(14.3, 3.9))
-    gs = fig.add_gridspec(1, 3, width_ratios=[3.4, 3.6, 20], wspace=0)
+    gs = fig.add_gridspec(1, 3, width_ratios=[3.4, 2.3, 20], wspace=0)
     bx, ax = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
 
     x0, ticks, labs, H = 0, [], [], []
@@ -110,7 +119,7 @@ def main():
                           st.fmean([sd[(s, a)] for s in ok]), len(ok)))
         ax.text(xs.mean(), 1.05, g, ha="center", va="bottom",
                 transform=ax.get_xaxis_transform(), fontsize=FS["head"])
-        ticks += list(xs); labs += [f.split("/")[-1] for f in fs]
+        ticks += list(xs); labs += [short(f) for f in fs]
         x0 += len(fs) + 3
         if gi < len(G) - 1: ax.axvline(x0 - 2, color="#555", lw=1)
 
@@ -203,7 +212,7 @@ def main():
     w    = ax.yaxis.label.get_window_extent(rend).width
     bars = bx.get_tightbbox(rend).x1
     tick = min(t.get_window_extent(rend).x0 for t in ax.get_yticklabels())
-    x = min(bars + 24 + w / 2, tick - 10 - w / 2)      # ticks win a tie
+    x = min(bars + 30 + w / 2, tick - 6 - w / 2)      # ticks win a tie
     ax.yaxis.set_label_coords(
         ax.transAxes.inverted().transform((x, 0))[0], .5)
     plt.savefig(sys.argv[2], dpi=200)
