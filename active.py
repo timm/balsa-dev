@@ -14,8 +14,9 @@ the scale of the score, never a feature.
 usage: pypy3 active.py [set ...]      moot/optimize sets > a table
 """
 # (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
-import os, sys, time, heapq, random
-from balsa import the, srand, csv, Tbl, Col, Num, Sym, Forest, distx, mids
+import os, sys, time, random
+from balsa import (the, srand, csv, bisect, Tbl, Col, Num, Sym, Forest,
+                   distx, mids)
 
 the.warm, the.budget, the.check, the.pool = 4, 50, 5, 256
 the.bexp = .5                                  # best holds n**bexp of both
@@ -54,8 +55,13 @@ def byKnn(tb, both, best, rest):
   "No model: mean d2h of the 3 nearest labelled rows."
   xy = [(x, tb.disty(x)) for x in both.rows]   # label ys once, not per row
   def key(r):
-    ds = heapq.nsmallest(3, ((distx(both, r, x), y) for x, y in xy))
-    return sum(y for _, y in ds) / len(ds)
+    near = []                                  # (dist, y) ascending, max 3
+    for x, y in xy:
+      dy = (distx(both, r, x), y)
+      if len(near) < 3 or dy < near[-1]:       # binary chop into the top 3
+        near.insert(bisect(near, dy), dy)
+        del near[3:]
+    return sum(y for _, y in near) / len(near)
   return key
 
 def byTrees(trees, rf):
