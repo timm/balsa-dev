@@ -64,7 +64,7 @@ sd = {k: spread(v) for k, v in F.items()}
 grand = {a: st.fmean([mu[(s, a)] for s in sets if (s, a) in mu])
          for a in {a for _, a in F}}
 
-fig = plt.figure(figsize=(20, 4.6))
+fig = plt.figure(figsize=(20, 6.4))
 gs = fig.add_gridspec(1, 3, width_ratios=[2.2, 1, 1], wspace=.14)
 lgs = gs[0].subgridspec(2, 1, height_ratios=[3, 1], hspace=.5)
 
