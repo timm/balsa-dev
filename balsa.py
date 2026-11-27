@@ -1,27 +1,48 @@
 # vim: set ts=2 sw=2 sts=2 et cc=75:
 """Label cells once, grow trees over the labels, and combine predictions.
 
-Balsa for Python 3.11+. Column positions are zero-based.
+Balsa for Python 3.11+. Column positions are zero-based. Settings:
+
+  seed=1234567891 prudence=0.01 bins=16 trees=30 cap=200
+  leaf=2 maxd=30 rf=True
 """
 # (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
+import re
 from bisect import bisect_left, bisect_right
 from math import ceil, exp, floor, inf, log, nan, sqrt
 from os.path import expanduser
 from types import SimpleNamespace
 
-the = SimpleNamespace(seed=1234567891, prudence=0.01, bins=16, trees=30,
-                      cap=200, leaf=2, maxd=30, rf=True)
+def thing(s):
+  for f in (int, float):
+    try: return f(s)
+    except ValueError: pass
+  return {"True": True, "False": False}.get(s, s.strip())
+
+def show(x):
+  "Print anything, recursively; floats tersely; dicts lisp-style."
+  isa = isinstance
+  if isa(x, float): x = int(x) if floor(x) == x else "%.2f" % x
+  elif isa(x, (list, tuple)): x = [show(y) for y in x]
+  elif isa(x, set): x = {show(y) for y in x}
+  elif isa(x, dict):
+    return "{" + " ".join(f":{k} {show(x[k])}" for k in x) + "}"
+  elif hasattr(x, "__dict__"): return show(x.__dict__)
+  elif hasattr(x, "__slots__"):
+    return show({k: getattr(x, k) for k in x.__slots__ if hasattr(x, k)})
+  return str(x)
+
+class o(SimpleNamespace):
+  "A generic struct: o(a=1, b=2), printed by show."
+  __repr__ = show
+
+the = o(**{k: thing(v)
+           for k, v in re.findall(r"(\w+)=(\S+)", __doc__)})
 
 # CSV rows. Headers start uppercase for numbers. Suffixes !, +, -, and X
 # mark the class, goals to maximize or minimize, and columns to skip.
 class Row(list):
   __slots__ = ("labels", "d2h")
-
-def thing(s):
-  for f in (int, float):
-    try: return f(s)
-    except ValueError: pass
-  return s.strip()
 
 def csv(file):
   with open(expanduser(file), encoding="utf-8") as f:
@@ -49,6 +70,39 @@ class Column:
       left, right = i.split_bin(bin, prefix, total, rest)
       if min(left.n, right.n) >= leaf:
         yield (i, b), xpect(left, right)
+
+def Col(txt="N", at=0):
+  return (Num if "A" <= txt[:1] <= "Z" else Sym)(txt, at)
+
+class Sym(Column):
+  def __init__(i, txt, at):
+    super().__init__(txt, at)
+    i.has = {}
+
+  def add_known(i, v, inc): i.has[v] = i.has.get(v, 0) + inc
+
+  def div(i):
+    return -sum((p := n/i.n)*log(p) for n in i.has.values() if n>0)/log(2)
+
+  def mid(i): return None
+
+  def labels_for(i, n, rows=None):
+    def key(v):
+      txt = format(v, ".14g") if isinstance(v, float) else str(v)
+      return -i.has[v], txt
+    ranked = sorted(i.has, key=key)
+    return ranked[:max(0, min(len(ranked), n - 1))]
+
+  def label(i, v):
+    try: return i.labels.index(v)
+    except ValueError: return len(i.labels)   # the rare pool
+
+  def class_labels(i): return i.labels_for(inf)
+
+  def split_bin(i, bin, prefix, total, rest):
+    return bin, yfold(total, bin, -1, rest)
+
+  def matches(i, label, cut): return label == cut
 
 class Num(Column):
   def __init__(i, txt="N", at=0):
@@ -92,39 +146,6 @@ class Num(Column):
     return yfold(prefix, bin), yfold(total, bin, -1)
 
   def matches(i, label, cut): return label <= cut
-
-class Sym(Column):
-  def __init__(i, txt, at):
-    super().__init__(txt, at)
-    i.has = {}
-
-  def add_known(i, v, inc): i.has[v] = i.has.get(v, 0) + inc
-
-  def div(i):
-    return -sum((p := n/i.n)*log(p) for n in i.has.values() if n>0)/log(2)
-
-  def mid(i): return None
-
-  def labels_for(i, n, rows=None):
-    def key(v):
-      txt = format(v, ".14g") if isinstance(v, float) else str(v)
-      return -i.has[v], txt
-    ranked = sorted(i.has, key=key)
-    return ranked[:max(0, min(len(ranked), n - 1))]
-
-  def label(i, v):
-    try: return i.labels.index(v)
-    except ValueError: return len(i.labels)   # the rare pool
-
-  def class_labels(i): return i.labels_for(inf)
-
-  def split_bin(i, bin, prefix, total, rest):
-    return bin, yfold(total, bin, -1, rest)
-
-  def matches(i, label, cut): return label == cut
-
-def Col(txt="N", at=0):
-  return (Num if "A" <= txt[:1] <= "Z" else Sym)(txt, at)
 
 class Ys:
   def __init__(i, nk): i.nk, i.n, i.has = nk, 0, [0] * nk
