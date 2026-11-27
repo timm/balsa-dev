@@ -11,7 +11,6 @@ import re
 from bisect import bisect_left, bisect_right
 from math import ceil, exp, floor, inf, log, nan, sqrt
 from os.path import expanduser
-from types import SimpleNamespace
 
 isa = isinstance
 
@@ -31,9 +30,11 @@ def say(x):
     x = say({k: getattr(x, k) for k in x.__slots__ if hasattr(x, k)})
   return str(x)
 
-class o(SimpleNamespace): __repr__ = say
+class Box:
+  def __init__(i, **d): i.__dict__.update(**d)
+  __repr__ = say
 
-the = o(**{k: thing(v) for k,v in re.findall(r"(\w+)=(\S+)",__doc__)})
+the = Box(**{k: thing(v) for k,v in re.findall(r"(\w+)=(\S+)",__doc__)})
 
 # CSV rows. Headers start uppercase for numbers. Suffixes !, +, -, and X
 # mark the class, goals to maximize or minimize, and columns to skip.
@@ -47,7 +48,7 @@ def csv(file):
 
 # Column and target summaries. Known labels are 0..n-1; "?" is -1,
 # so "unknown" is always label < 0.
-class Column:
+class Column(Box):
   def __init__(i, txt, at): i.txt, i.at, i.n = txt, at, 0
 
   def add(i, v, inc=1):
@@ -143,7 +144,7 @@ class Num(Column):
 
   def matches(i, label, cut): return label <= cut
 
-class Ys:
+class Ys(Box):
   def __init__(i, nk): i.nk, i.n, i.has = nk, 0, [0] * nk
 
   def add(i, v):
@@ -164,8 +165,6 @@ class Ys:
     u.n = i.n + inc * b.n
     return u
 
-Column.__repr__ = Ys.__repr__ = say
-
 def adds(vs, col=None):
   col = Num() if col is None else col
   for v in vs: col.add(v)
@@ -177,7 +176,7 @@ def yfold(ys, other, inc=1, u=None):
 def tolabel(col, v): return -1 if v == "?" else col.label(v)
 
 # Tables. Each row keeps its original cells and a list of labels.
-class Cols:
+class Cols(Box):
   def __init__(i, names):
     i.names, i.x, i.y, i.klass = names, [], [], None
     i.all = [Col(txt, j) for j, txt in enumerate(names)]
@@ -192,7 +191,7 @@ class Cols:
     for col in i.all: col.add(row[col.at])
     return row
 
-class Tbl:
+class Tbl(Box):
   def __init__(i, rows):
     i.cols = Cols(rows[0])
     i.rows = [i.cols.add(row) for row in rows[1:]]
@@ -229,7 +228,7 @@ def best_cut(xcols, rows, targets, mk, m, leaf):
           for c in col.cuts(rows, targets, mk, leaf))
   return min(cuts, key=lambda c: c[1], default=(None, None))[0]
 
-class Tree:
+class Tree(Box):
   def __init__(i, rows, y, xcols, mk, m, leaf, maxd, lvl=0):
     targets = [y(row) for row in rows]
     i.ys, i.n, i.yes = adds(targets, mk()), len(rows), None
