@@ -41,6 +41,32 @@ Gap  = 0.55          # cm between panels, left to right
 VGap = 0.95          # ... and between the two rows
 
 
+# The optimizer of sec:active is a handful of functions inside a file
+# that also holds four other rankers and the rig.  These are it: spend a
+# label, chase the best/rest boundary, rank the test set by its nearest
+# labelled neighbour, grade the row you kept.  Everything they lean on
+# (Tbl, distx, mids, disty) is in balsa.py, already counted as the
+# learner, so nothing here is double counted.
+OPT = ("shuffle", "label", "acquire", "byKnn", "scorer", "optimize")
+
+
+def loc_defs(path, names):
+    "Non-blank, non-comment lines of just these top-level definitions."
+    import ast
+    src = open(os.path.join(Here, path)).read()
+    lines = src.splitlines()
+    want = set(names)
+    n = 0
+    for node in ast.parse(src).body:
+        if isinstance(node, (ast.FunctionDef, ast.ClassDef)) and node.name in want:
+            n += sum(1 for l in lines[node.lineno - 1:node.end_lineno]
+                     if not re.match(r"^\s*(#.*)?$", l))
+        # the knobs the optimizer reads: `the.warm, the.budget, ... = ...`
+        elif isinstance(node, ast.Assign) and "the." in ast.unparse(node.targets[0]):
+            n += 1
+    return n
+
+
 def loc(path):
     """Non-blank, non-comment lines -- the same rule the Yue count used.
     Docstrings are left in: they are the learner's own help text, printed
@@ -124,6 +150,7 @@ def panel(x, y, tag, title, big, small, unit="", note=None):
 
 def main():
     learner, harness = loc("balsa.py"), loc("balsa_eg.py")
+    opt = loc_defs("active.py", OPT)
     cls = secs("runs/nose39-yue.txt", "runs/se61-yue.txt")
     reg = secs("runs/reg56.txt", "runs/sereg.txt")
     ct  = cls.get("tabicl", 0)
@@ -153,7 +180,9 @@ def main():
     print(panel(0, 0, "a", "lines of code",
                 ("LightGBM", Lgbm, "lgbmC"),
                 [(f"this learner\\\\{learner}", learner, "balsaC"),
-                 (f"this harness\\\\{harness}", harness, "balsaC!60!white")]))
+                 (f"this optimizer\\\\{opt}", opt, "balsaC!75!white"),
+                 (f"this harness\\\\{harness}", harness,
+                  "balsaC!45!white")]))
     print(panel(S + Gap, 0, "b", "secs, classification",
                 ("TabICL", ct, "tabiclC"),
                 [(f"this learner\\\\{cb:,.0f}s", cb, "balsaC")], unit="s"))
@@ -176,6 +205,7 @@ def main():
 \\end{{figure*}}""", file=sys.stdout)
 
     print(f"% learner {learner}  harness {harness}  lgbm {Lgbm}\n"
+          f"% optimizer {opt} (acquire + 1nn, out of {loc('active.py')} in active.py)\n"
           f"% cls: balsa(30) {cb:.1f}  lgbm {cl:.1f}  tabicl {ct:,.1f}\n"
           f"% reg: balsa(30) {rb:.1f}  lgbm {rl:.1f}  tabicl {rt:,.1f}",
           file=sys.stderr)
