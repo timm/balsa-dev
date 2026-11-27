@@ -42,8 +42,9 @@ totsec = {}
 for ln, c, m in bymean:
   a = "a." + ln
   if a not in grand: continue
+  nm = {"knn": "1nn"}.get(ln, ln)
   ax.plot(xs, [mu.get((s, a), np.nan) for s in order], color=c, marker=m,
-          ms=4, lw=1.4, alpha=.9, label="%-5s %3.0f" % (ln, grand[a]))
+          ms=4, lw=1.4, alpha=.9, label="%-5s %3.0f" % (nm, grand[a]))
   ax.plot(xs, [sd.get((s, a), 0) for s in order], color=c, lw=1,
           ls=(0, (4, 2)), alpha=.7)
   totsec[ln] = sum(v for s in sets if (s, a) in S for v in S[(s, a)])
@@ -53,13 +54,14 @@ hx.bar(range(len(bars)), [t for _, _, t in bars],
 for i, (ln, c, t) in enumerate(bars):
   hx.text(i, t, "{:,}s".format(round(t)) if t >= 1 else "%.1fs" % t,
           ha="center", va="bottom", fontsize=12, fontweight="bold")
-hx.set_xticks(range(len(bars))); hx.set_xticklabels([b[0] for b in bars])
+hx.set_xticks(range(len(bars)))
+hx.set_xticklabels([{"knn": "1nn"}.get(b[0], b[0]) for b in bars])
 hx.set_yscale("log")
 hx.set_title("total secs over all folds (log, 1 thread)", fontsize=10)
 hx.grid(axis="y", color="#eee"); hx.margins(y=.25)
 ax.set_ylim(0, 112); ax.set_xlim(-1, len(order))
 ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
-ax.set_title("acquire, three balsa rankers (mean + dashed fold sd), sorted by knn",
+ax.set_title("acquire, three balsa rankers (mean + dashed fold sd), sorted by 1nn",
              fontsize=12)
 ax.legend(fontsize=11, loc="lower right", bbox_to_anchor=(.995, .12),
           framealpha=.9, title="ranker mean",

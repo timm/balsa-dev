@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 AQ = "a"                                           # acquire only
+NAME = {"knn": "1nn"}                              # data key -> shown name
 LEARNERS = [("knn", "#7b3fa0", "P"), ("b1", "#2ca02c", "v"),
             ("b30", "#e8613c", "s"), ("lgbm", "#2a6fdb", "o"),
             ("tabicl", "#000000", "D")]
@@ -65,7 +66,7 @@ grand = {a: st.fmean([mu[(s, a)] for s in sets if (s, a) in mu])
          for a in {a for _, a in F}}
 
 fig = plt.figure(figsize=(20, 6.4))
-gs = fig.add_gridspec(1, 3, width_ratios=[3.4, .67, .67], wspace=.2)
+gs = fig.add_gridspec(1, 2, width_ratios=[2.6, 1], wspace=.18)
 lgs = gs[0].subgridspec(2, 1, height_ratios=[3, 1], hspace=.5)
 
 # -- left: five acquire learners, sorted by tabicl, legend by mean ------
@@ -79,7 +80,7 @@ for ln, c, m in bymean:
   a = "%s.%s" % (AQ, ln)
   if a not in grand: continue
   ax.plot(xs, [mu.get((s, a), np.nan) for s in order], color=c, marker=m,
-          ms=4, lw=1.4, alpha=.9, label="%-6s %3.0f" % (ln, grand[a]))
+          ms=4, lw=1.4, alpha=.9, label="%-6s %3.0f" % (NAME.get(ln, ln), grand[a]))
   ax.plot(xs, [sd.get((s, a), 0) for s in order], color=c, lw=1,
           ls=(0, (4, 2)), alpha=.7)                # sd curve, low on chart
   totsec[ln] = sum(v for s in sets if (s, a) in S for v in S[(s, a)])
@@ -90,11 +91,12 @@ hx.bar(range(len(bars)), [t for _, _, t in bars],
 for i, (ln, c, t) in enumerate(bars):
   hx.text(i, t, "{:,}s".format(round(t)) if t >= 1 else "%.1fs" % t,
           ha="center", va="bottom", fontsize=11, fontweight="bold")
-hx.set_xticks(range(len(bars))); hx.set_xticklabels([b[0] for b in bars],
+hx.set_xticks(range(len(bars)))
+hx.set_xticklabels([NAME.get(b[0], b[0]) for b in bars],
                                                     fontsize=8)
 ax.set_ylim(0, 112); ax.set_xlim(-1, len(order))
 ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
-ax.set_title("acquire, five learners (mean + dashed fold sd), sorted by knn",
+ax.set_title("acquire, five learners (mean + dashed fold sd), sorted by 1nn",
              fontsize=12)
 ax.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .12),
           framealpha=.9, title="learner mean",
@@ -107,38 +109,30 @@ hx.set_title("total secs over all folds (log, 1 thread)", fontsize=10)
 hx.grid(axis="y", color="#eee")
 hx.margins(y=.25)
 
-# -- middle & right: learner minus random test pick, grey where tied ----
+# -- right: 1nn & tabicl minus random test pick, sorted by 1nn ----------
 BASE = "a.rand"                                    # select test rows at random
-def deltapanel(gsi, arm, c, m, lab):
-  "Full delta line (arm - random test pick), own sort, grey span where tied."
-  px = fig.add_subplot(gsi)
-  d = {s: mu.get((s, arm), 0) - mu.get((s, BASE), 0) for s in sets}
-  o = sorted(sets, key=d.get)
-  x = np.arange(len(o))
-  nsame = 0
-  for i, s in enumerate(o):
-    if (s, arm) in F and (s, BASE) in F and same(F[(s, arm)], F[(s, BASE)]):
-      px.axvspan(i - .5, i + .5, color="#d9d9d9", lw=0, zorder=0)
-      nsame += 1
-  px.axhline(0, color="#999", lw=1)
-  px.plot(x, [d[s] for s in o], color=c, marker=m, ms=4, lw=1.4, alpha=.9,
-          zorder=2, label="%s %+.0f" % (lab, grand[arm] - grand[BASE]))
-  px.set_xlim(-1, len(o))
-  px.set_title("%s minus random test pick\n(grey = same, %d/%d)"
-               % (lab, nsame, len(o)), fontsize=11)
-  px.legend(fontsize=10, loc="upper left", framealpha=.9)
-  px.grid(axis="y", color="#eee")
-  px.set_xlabel("set (sorted by gap)", fontsize=10)
-  return px
-
-bx = deltapanel(gs[1], "a.knn",    "#7b3fa0", "P", "knn")
-cx = deltapanel(gs[2], "a.tabicl", "#000000", "D", "tabicl")
+bx = fig.add_subplot(gs[1])
+gap = {s: mu.get((s, "a.knn"), 0) - mu.get((s, BASE), 0) for s in sets}
+o = sorted(sets, key=gap.get)
+x = np.arange(len(o))
+bx.axhline(0, color="#999", lw=1)
+for arm, c, m, lab in (("a.knn", "#7b3fa0", "P", "1nn"),
+                       ("a.tabicl", "#000000", "D", "tabicl")):
+  n = sum(1 for s in o if (s, arm) in F and (s, BASE) in F
+          and not same(F[(s, arm)], F[(s, BASE)]))
+  bx.plot(x, [mu.get((s, arm), np.nan) - mu.get((s, BASE), np.nan)
+              for s in o], color=c, marker=m, ms=4, lw=1.4, alpha=.9,
+          label="%-7s %+3.0f  %2d/%d differ" % (
+            lab, grand[arm] - grand[BASE], n, len(o)))
+bx.set_xlim(-1, len(o))
+bx.set_title("minus random test pick, sorted by 1nn", fontsize=12)
+bx.legend(fontsize=10, loc="upper left", framealpha=.9,
+          prop={"family": "monospace", "size": 10})
+bx.grid(axis="y", color="#eee")
+bx.set_xlabel("set (sorted by 1nn gap)", fontsize=10)
 bx.set_ylabel("win vs random test pick", fontsize=11)
-ymin = min(bx.get_ylim()[0], cx.get_ylim()[0])     # share y across mid+right
-ymax = max(bx.get_ylim()[1], cx.get_ylim()[1])
-bx.set_ylim(ymin, ymax); cx.set_ylim(ymin, ymax)
 
-for p in (ax, hx, bx, cx):
+for p in (ax, hx, bx):
   for s_ in ("top", "right"): p.spines[s_].set_visible(False)
 fig.set_facecolor("#fcfcfa")
 for a in fig.axes: a.set_facecolor("#fcfcfa")

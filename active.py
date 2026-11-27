@@ -52,12 +52,9 @@ def byDist(tb, both, best, rest):
   return lambda r: distx(both, r, bm) - distx(both, r, rm)
 
 def byKnn(tb, both, best, rest):
-  "No model: mean d2h of the 3 nearest labelled rows."
+  "No model: the d2h of the nearest labelled row."
   xy = [(x, tb.disty(x)) for x in both.rows]   # label ys once, not per row
-  def key(r):
-    near = sorted((distx(both, r, x), y) for x, y in xy)[:3]
-    return sum(y for _, y in near) / len(near)
-  return key
+  return lambda r: min((distx(both, r, x), y) for x, y in xy)[1]
 
 def byTrees(trees, rf):
   "A forest (or one tree) on the labelled rows predicts d2h."
