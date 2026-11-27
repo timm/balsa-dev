@@ -128,20 +128,34 @@ def main():
 
     # legend: name, its solid line (the mean), its dashed line (the sd)
     tx = ax.inset_axes((.02, .05, .4, .4))
-    LEGEND_IN = (2.45, 1.05)
-    tx.set_xlim(0, 23); tx.set_ylim(0, 4.6)
+    LEGEND_IN = (3.20, 1.05)
+    tx.set_xlim(0, 30); tx.set_ylim(0, 4.6)
     tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
     for s_ in tx.spines.values(): s_.set_visible(False)
     mono = dict(family="monospace", fontsize=FS["mono"],
                 bbox=dict(fc="#fcfcfa", ec="none", pad=1))
+    # two significant figures, but one decimal count per column: 2sf on
+    # its own prints 0.07 beside 0.075, which reads as a ragged column
+    def col(vals):
+        d = max((len(f"{v:.2g}".partition(".")[2]) for v in vals), default=0)
+        return [f"{v:.{d}f}" for v in vals]
+    _m, _s = {}, {}
+    for a in ORDER:
+        ok = [s_ for s_ in sets if mu[(s_, a)] == mu[(s_, a)]]
+        _m[a] = st.fmean([mu[(s_, a)] for s_ in ok])
+        _s[a] = st.fmean([sd[(s_, a)] for s_ in ok])
+    _mt = dict(zip(ORDER, col([_m[a] for a in ORDER])))
+    _st = dict(zip(ORDER, col([_s[a] for a in ORDER])))
     for k, a in enumerate(ORDER):
         c, m = INK[a]
         y = 3.6 - 1.0 * k
         tx.text(0, y, a, ha="left", va="center", **mono)
-        tx.plot([11.2, 14.8], [y, y], color=c, lw=2.2)
-        tx.plot(13.0, y, m, color=c, ms=6)
-        tx.text(16.6, y, "sd", ha="left", va="center", **mono)
-        tx.plot([19.0, 22.0], [y, y], color=c, lw=2, ls="--")
+        tx.plot([10.4, 13.6], [y, y], color=c, lw=2.2)
+        tx.plot(12.0, y, m, color=c, ms=6)
+        tx.text(18.2, y, _mt[a], ha="right", va="center", **mono)
+        tx.text(19.8, y, "sd", ha="left", va="center", **mono)
+        tx.plot([23.0, 26.0], [y, y], color=c, lw=2, ls="--")
+        tx.text(30.0, y, _st[a], ha="right", va="center", **mono)
 
     bt = sorted((secs[a], a, INK[a][0]) for a in ORDER if secs.get(a))
     bx.bar(range(len(bt)), [b[0] for b in bt], color=[b[2] for b in bt],
@@ -152,7 +166,10 @@ def main():
         bx.text(i, b[0] * 1.25, f"{b[0]:,.0f}s" if b[0] >= 10
                 else f"{b[0]:.1f}s", ha="center", va="bottom",
                 weight="bold", fontsize=FS["bar"] - 1)
-    bx.set_xticks([])        # the legend names these colours already
+    bx.set_xticks(range(len(bt)))
+    # four names side by side in a narrow panel collide; stand them up
+    bx.set_xticklabels([b[1] for b in bt], rotation=90, ha="center",
+                       va="top", fontsize=FS["bar"] - 4)
     bx.set_title("total secs, log scale\n(summed over folds,\n1 thread each)",
                  fontsize=FS["lab"] - 4)
     bx.set_yticks([]); bx.set_facecolor("#fcfcfa")
