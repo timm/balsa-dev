@@ -65,7 +65,7 @@ grand = {a: st.fmean([mu[(s, a)] for s in sets if (s, a) in mu])
          for a in {a for _, a in F}}
 
 fig = plt.figure(figsize=(20, 6.4))
-gs = fig.add_gridspec(1, 3, width_ratios=[3.4, 1, 1], wspace=.16)
+gs = fig.add_gridspec(1, 3, width_ratios=[3.4, .67, .67], wspace=.2)
 lgs = gs[0].subgridspec(2, 1, height_ratios=[3, 1], hspace=.5)
 
 # -- left: five acquire learners, sorted by tabicl, legend by mean ------
