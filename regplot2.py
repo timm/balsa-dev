@@ -90,7 +90,7 @@ def main():
         for line in open(tt):
             if line.startswith("#secs"): secs["tabicl"] = float(line.split()[-1])
 
-    fig = plt.figure(figsize=(14.3, 5.2))
+    fig = plt.figure(figsize=(14.3, 3.9))
     gs = fig.add_gridspec(1, 3, width_ratios=[3.4, 3.6, 20], wspace=0)
     bx, ax = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
 

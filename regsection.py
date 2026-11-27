@@ -117,12 +117,7 @@ def main():
     dCls, mCls = m_.group(1), m_.group(2)
     loc = sum(1 for l in open("balsa.py") if not re.match(r"^\s*(#.*)?$", l))
 
-    out = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                            "regsection.tmpl")).read()
-    # @@name@@, not str.format: LaTeX is made of braces and this file is
-    # mostly LaTeX.  An unfilled @@...@@ left in the output is a bug, and
-    # the check at the bottom says so rather than shipping it.
-    print(fill(out,
+    KW = dict(
         nA=len(A), nB=len(B), nAll=len(D), nRan=len(ran), nSkip=len(skip),
         skip=", ".join("{\\tt %s}" % tex(s.split("/")[-1]) for s in skip),
         table="\n".join(body), var="\n".join(var),
@@ -151,7 +146,18 @@ def main():
         bcx=f"{bcm['balsa30'] / bcm['lgbm']:.0f}" if bcm else "??",
         bc_lgbm=f"{bcm['lgbm']:.3f}" if bcm else "??",
         bc_b30=f"{bcm['balsa30']:.2f}" if bcm else "??",
-    ))
+    )
+    Here = os.path.dirname(os.path.abspath(__file__))
+    out = open(os.path.join(Here, "regsection.tmpl")).read()
+    # the two figures ship in their own file: they are declared early in
+    # main.tex so they can float onto page 2 with Figures 2 and 3
+    if len(sys.argv) > 3:
+        open(sys.argv[3], "w").write(
+            fill(open(os.path.join(Here, "regfigs.tmpl")).read(), **KW))
+    # @@name@@, not str.format: LaTeX is made of braces and this file is
+    # mostly LaTeX.  An unfilled @@...@@ left in the output is a bug, and
+    # the check at the bottom says so rather than shipping it.
+    print(fill(out, **KW))
 
 
 if __name__ == "__main__": main()

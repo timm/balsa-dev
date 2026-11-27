@@ -53,7 +53,7 @@ XT=14 if len(order)<50 else 10   # x tick font
 FS=dict(tick=14,lab=14,head=17,cap=15,mono=14,bar=15,loc=15)
 SHORT={"blood-transfusion-service-center":"blood-transfusion",
        "Internet-Advertisements":"internet-ads"}
-fig=plt.figure(figsize=(14.3,5.2))
+fig=plt.figure(figsize=(14.3,3.9))
 gs=fig.add_gridspec(1,3,width_ratios=[3.4,1.6,20],wspace=0)   # runtime bars | gap | AUC
 bx=fig.add_subplot(gs[0]); ax=fig.add_subplot(gs[2])
 x0=0; ticks=[]; labs=[]; H=[]

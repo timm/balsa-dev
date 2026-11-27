@@ -18,8 +18,8 @@ msg ?= saving
 push: ## git add this dir, commit (msg="..."), push
 	git add . && { git commit -m "$(msg)" || true; } && git push
 
-run: ## 5x2 classification over the 39 sets (pypy3)
-	pypy3 balsa_eg.py
+run: ## 5x2 classification over the 39 sets (pypy3) -> a dat
+	pypy3 gen.py
 
 docs: ## render balsa.py + balsa_eg.py 3-col into ../balsa/docs
 	mkdir -p $(HOME)/gh/balsa/docs
@@ -46,8 +46,8 @@ regfigs: ## redraw the two regression figures into the paper
 
 regtex: ## regenerate the paper's regression section from runs/
 	python3 -B regsection.py runs/reg56.csv runs/sereg.csv \
-	  > $(Paper)/regression.tex
-	echo "wrote $(Paper)/regression.tex"
+	  $(Paper)/regfigs.tex > $(Paper)/regression.tex
+	echo "wrote $(Paper)/regression.tex and regfigs.tex"
 
 clstex: ## regenerate the paper's classification variance table
 	python3 -B clsvar.py runs/nose39-yue.txt runs/se61-yue.txt \

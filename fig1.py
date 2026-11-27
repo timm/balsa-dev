@@ -122,14 +122,14 @@ def main():
     \\definecolor{{tabiclC}}{{HTML}}{{000000}}""")
     print(panel(0, "a", "lines of code",
                 ("LightGBM", Lgbm, "lgbmC"),
-                [(f"learner\\\\{learner}", learner, "balsaC"),
-                 (f"harness\\\\{harness}", harness, "balsaC!60!white")]))
+                [(f"this learner\\\\{learner}", learner, "balsaC"),
+                 (f"this harness\\\\{harness}", harness, "balsaC!60!white")]))
     print(panel(S + Gap, "b", "secs, classification",
                 ("TabICL", ct, "tabiclC"),
-                [(f"balsa(30)\\\\{cb:,.0f}s", cb, "balsaC")], unit="s"))
+                [(f"this learner\\\\{cb:,.0f}s", cb, "balsaC")], unit="s"))
     print(panel(2 * (S + Gap), "c", "secs, regression",
                 ("TabICL", rt, "tabiclC"),
-                [(f"balsa(30)\\\\{rb:,.0f}s", rb, "balsaC")], unit="s"))
+                [(f"this learner\\\\{rb:,.0f}s", rb, "balsaC")], unit="s"))
     print(f"""  \\end{{tikzpicture}}
   \\caption{{Area $\\propto$ size, so a square's {{\\em side}} is the square
   root of its number. (a) lines of code: LightGBM's C++ core against the

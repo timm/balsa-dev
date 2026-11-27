@@ -79,28 +79,7 @@ ask 32GB for a single fold. At a cap of 20,000 rows it finishes
 @@nRan@@ sets TabICL finished, with one extra row for the other three
 treatments over everything.
 
-\begin{figure*}[t]
-  \centering
-  \includegraphics[width=\textwidth]{ens-balsa-reg-noxse.pdf}
-  \caption{@@nA@@ non-SE regression sets from {\tt moot/regression}, 5x2
-  cross-validation, same layout as Figure~\ref{fig:nose}. $y$ is
-  $\mathit{rel} = \mathrm{MAE}/\mathrm{MAE}(\text{predict the mean})$, so
-  {\em lower is better} and the dashed grey line at 1.0 is the lazy
-  learner. Solid: the mean over the ten folds. Dashed, same colour: their
-  spread, as (90th$-$10th)/2.56. Within each panel, sets are ordered by
-  LightGBM's mean. A line breaks where that treatment has no score: TabICL
-  is capped at 20,000 rows.}
-  \label{fig:regnose}
-\end{figure*}
 
-\begin{figure*}[t]
-  \centering
-  \includegraphics[width=\textwidth]{ens-balsa-reg-se.pdf}
-  \caption{@@nB@@ SE regression sets from {\tt moot/optimize}, grouped by
-  their folder. Same layout and same score as
-  Figure~\ref{fig:regnose}.}
-  \label{fig:regse}
-\end{figure*}
 
 \subsection{What We Found}
 
