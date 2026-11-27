@@ -19,22 +19,21 @@ def thing(s):
     except ValueError: pass
   return {"True": True, "False": False}.get(s, s.strip())
 
-def show(x):
-  "Print anything, recursively; floats tersely; dicts lisp-style."
-  isa = isinstance
-  if isa(x, float): x = int(x) if floor(x) == x else "%.2f" % x
-  elif isa(x, (list, tuple)): x = [show(y) for y in x]
-  elif isa(x, set): x = {show(y) for y in x}
-  elif isa(x, dict):
-    return "{" + " ".join(f":{k} {show(x[k])}" for k in x) + "}"
-  elif hasattr(x, "__dict__"): return show(x.__dict__)
-  elif hasattr(x, "__slots__"):
-    return show({k: getattr(x, k) for k in x.__slots__ if hasattr(x, k)})
+def say(x):
+  "Anything, recursively, tersely; dicts lisp-style."
+  if isinstance(x, float): return ("%.2f" % x).rstrip("0").rstrip(".")
+  if isinstance(x, (list, tuple)):
+    return "[" + ", ".join(say(y) for y in x) + "]"
+  if isinstance(x, dict):
+    return "{" + " ".join(f":{k} {say(v)}" for k, v in x.items()) + "}"
+  if hasattr(x, "__dict__"): return say(vars(x))
+  if hasattr(x, "__slots__"):
+    return say({k: getattr(x, k) for k in x.__slots__ if hasattr(x, k)})
   return str(x)
 
 class o(SimpleNamespace):
-  "A generic struct: o(a=1, b=2), printed by show."
-  __repr__ = show
+  "A generic struct: o(a=1, b=2), printed by say."
+  __repr__ = say
 
 the = o(**{k: thing(v)
            for k, v in re.findall(r"(\w+)=(\S+)", __doc__)})
@@ -167,6 +166,8 @@ class Ys:
       u.has[j] = i.has[j] + inc * c
     u.n = i.n + inc * b.n
     return u
+
+Column.__repr__ = Ys.__repr__ = say
 
 def adds(vs, col=None):
   col = Num() if col is None else col
