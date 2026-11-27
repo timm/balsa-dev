@@ -53,9 +53,11 @@ def byDist(tb, both, best, rest):
 
 def byKnn(tb, both, best, rest):
   "No model: mean d2h of the 3 nearest labelled rows."
+  import heapq
+  xy = [(x, tb.disty(x)) for x in both.rows]   # label ys once, not per row
   def key(r):
-    ds = sorted((distx(both, r, x), tb.disty(x)) for x in both.rows)
-    return sum(y for _, y in ds[:3]) / 3
+    ds = heapq.nsmallest(3, ((distx(both, r, x), y) for x, y in xy))
+    return sum(y for _, y in ds) / len(ds)
   return key
 
 def byForest(tb, both, best, rest):
