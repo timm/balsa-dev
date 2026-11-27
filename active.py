@@ -2,8 +2,8 @@
 """Active learning for optimization: spend a label budget to find a
 good row. Warm-start W random labels, then acquire B-C more by
 chasing the best/rest boundary, then spend C labels checking the
-top of a held-out test set -- ranked either by the best/rest
-centroid distance (no model) or by a forest/tree trained on the
+top of a held-out test set -- ranked by centroids, nearest
+neighbours, trees, or a boosted/pretrained regressor fit to the
 labelled rows. One win per ranker, higher is better.
 
 The leak line: inference (acquisition, the test ranker) sees only
@@ -15,8 +15,7 @@ usage: pypy3 active.py [set ...]      moot/optimize sets > a table
 """
 # (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 import os, sys, time, random
-from math import sqrt
-from balsa import (the, srand, csv, Tbl, Col, Num, Sym, Forest, distx, mids)
+from balsa import the, srand, csv, Tbl, Col, Num, Sym, Forest, distx, mids
 
 the.warm, the.budget, the.check, the.pool = 4, 50, 5, 256
 the.bexp = .5                                  # best holds n**bexp of both
@@ -60,81 +59,74 @@ def byKnn(tb, both, best, rest):
     return sum(y for _, y in ds) / len(ds)
   return key
 
-def byForest(tb, both, best, rest):
-  "A regression forest on the labelled rows predicts d2h."
-  m = Tbl([both.cols.names] + both.rows)
-  y = lambda r: m.disty(r)
-  the.trees, the.rf = 30, True
-  return Forest(m, m.rows, y, Col).predict
+def byTrees(trees, rf):
+  "A forest (or one tree) on the labelled rows predicts d2h."
+  def rank(tb, both, best, rest):
+    m = Tbl([both.cols.names] + both.rows)
+    the.trees, the.rf = trees, rf
+    return Forest(m, m.rows, lambda r: m.disty(r), Col).predict
+  return rank
 
-def byTree(tb, both, best, rest):
-  "One tree instead of thirty."
-  m = Tbl([both.cols.names] + both.rows)
-  y = lambda r: m.disty(r)
-  the.trees, the.rf = 1, False
-  return Forest(m, m.rows, y, Col).predict
-
-def byLgbm(tb, both, best, rest):
-  "LightGBM regressor on the labelled rows predicts d2h (CPython only)."
-  import numpy as np, lightgbm as lgb
-  xs = tb.cols.x
-  cats = [j for j, c in enumerate(xs) if isinstance(c, Sym)]
+def matrix(tb, rows, impute=False):
+  "Rows as floats: ? is nan (or the column median), syms their code."
+  import numpy as np
   def cell(c, v):
-    if v == "?": return float("nan")             # lgbm handles nan natively
-    if isinstance(c, Num): return float(v)
-    return c.labels.index(v) if v in c.labels else len(c.labels)
-  def X(rows):
-    return np.array([[cell(c, r[c.at]) for c in xs] for r in rows],
-                    dtype=float)
-  ys = [tb.disty(r) for r in both.rows]
-  m = lgb.LGBMRegressor(verbose=-1, n_jobs=1)
-  m.fit(X(both.rows), ys, categorical_feature=cats)
+    if v == "?": return float("nan")
+    return float(v) if isinstance(c, Num) else (
+      c.labels.index(v) if v in c.labels else len(c.labels))
+  a = np.array([[cell(c, r[c.at]) for c in tb.cols.x] for r in rows],
+               dtype=float)
+  if impute:                                   # TabICL takes no NaN
+    for j in range(a.shape[1]):
+      m = np.nanmedian(a[:, j])
+      a[np.isnan(a[:, j]), j] = 0.0 if np.isnan(m) else m
+  return a
+
+def batch(model, tb, impute=False):
+  "A sort key that predicts the whole test set in one call."
   pred = {}
-  def key(r):                                  # cache a one-shot batch
+  def key(r):
     if not pred:
-      pred.update(zip(map(id, key.test), m.predict(X(key.test))))
+      pred.update(zip(map(id, key.test),
+                      model.predict(matrix(tb, key.test, impute))))
     return pred[id(r)]
   key.test = None                              # optimize fills this in
   return key
 
-def byTabicl(tb, both, best, rest):
-  "TabICL in-context regressor on the labelled rows predicts d2h."
-  for v in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
-            "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS",
-            "LOKY_MAX_CPU_COUNT"):
+def byModel(fit, impute=False):
+  "Fit any regressor to the labelled x,y; batch-rank the holdout."
+  def rank(tb, both, best, rest):
+    X = matrix(tb, both.rows, impute)
+    y = [tb.disty(r) for r in both.rows]
+    return batch(fit(tb, X, y), tb, impute)
+  return rank
+
+def lgbm(tb, X, y):
+  "LightGBM; nan is native, syms are declared (CPython only)."
+  import lightgbm as lgb
+  m = lgb.LGBMRegressor(verbose=-1, n_jobs=1)
+  m.fit(X, y, categorical_feature=[j for j, c in enumerate(tb.cols.x)
+                                   if isinstance(c, Sym)])
+  return m
+
+def tabicl(tb, X, y):
+  "TabICL in-context; pin its threads or it eats the machine."
+  for v in ("OMP_NUM_THREADS MKL_NUM_THREADS OPENBLAS_NUM_THREADS "
+            "NUMEXPR_NUM_THREADS VECLIB_MAXIMUM_THREADS "
+            "LOKY_MAX_CPU_COUNT").split():
     os.environ.setdefault(v, "1")
-  import numpy as np
   from tabicl import TabICLRegressor
-  xs = tb.cols.x
-  def cell(c, v):
-    if v == "?": return float("nan")
-    if isinstance(c, Num): return float(v)
-    return c.labels.index(v) if v in c.labels else len(c.labels)
-  def X(rows):
-    a = np.array([[cell(c, r[c.at]) for c in xs] for r in rows], dtype=float)
-    for c in range(a.shape[1]):                  # TabICL takes no NaN
-      m = np.nanmedian(a[:, c])
-      a[np.isnan(a[:, c]), c] = 0.0 if np.isnan(m) else m
-    return a
-  Xtr = X(both.rows)
-  ys = np.array([tb.disty(r) for r in both.rows])
   m = TabICLRegressor(batch_size=1, device="cpu")
-  m.fit(Xtr, ys)
-  pred = {}
-  def key(r):                                    # cache a one-shot batch
-    if not pred:
-      pred.update(zip(map(id, key.test), m.predict(X(key.test))))
-    return pred[id(r)]
-  key.test = None                                # optimize fills this in
-  return key
+  m.fit(X, y)
+  return m
 
 def byRand(tb, both, best, rest):
   "Floor: ignore the model, rank the holdout at random."
-  import random
   return lambda r: random.random()
 
-RANKERS = {"dist": byDist, "knn": byKnn, "b1": byTree, "b30": byForest,
-           "lgbm": byLgbm, "tabicl": byTabicl, "rand": byRand}
+RANKERS = {"dist": byDist, "knn": byKnn, "b1": byTrees(1, False),
+           "b30": byTrees(30, True), "lgbm": byModel(lgbm),
+           "tabicl": byModel(tabicl, True), "rand": byRand}
 
 # -- optimize ----------------------------------------------------------
 def scorer(tb, y):
@@ -145,10 +137,10 @@ def scorer(tb, y):
 
 def optimize(tb, train, test, rank, smart=True):
   "Acquire on train, rank test, check the top C, grade the best."
-  y = lambda r: tb.disty(r)
-  both, best, rest = acquire(tb, y, the.warm, the.budget - the.check, smart)
+  y, b = (lambda r: tb.disty(r)), the.budget - the.check
+  both, best, rest = acquire(tb, y, the.warm, b, smart)
   key = rank(tb, both, best, rest)
-  if hasattr(key, "test"): key.test = test     # byLgbm batches once
+  if hasattr(key, "test"): key.test = test     # batch rankers fill once
   checked = sorted(test, key=key)[:the.check]
   return scorer(tb, y)(min(checked, key=y))
 
@@ -160,16 +152,17 @@ def xval(rows, m=5, n=2):
       yield ([r for j, r in enumerate(u) if j % n != kf],
              [r for j, r in enumerate(u) if j % n == kf])
 
-# Which rankers to run this pass. ARMS=dist,b1,b30,rand under pypy
-# (fast, no lightgbm); ARMS=lgbm under CPython. The fold shuffles are
-# the same Mersenne Twister on both, so the two passes align exactly.
+# Which arms to run this pass. ARMS=dist,knn,b1,b30,rand under pypy
+# (fast, no numpy); ARMS=lgbm,tabicl under CPython. ACQS="a" skips the
+# random-acquisition twin. The fold shuffles are the same Mersenne
+# Twister everywhere, so separate passes align exactly.
 WANT = os.getenv("ARMS", ",".join(RANKERS)).split(",")
-ACQS = os.getenv("ACQS", "ar")                    # "a" = acquire only
+ACQS = os.getenv("ACQS", "ar")
 ARMS = ["%s.%s" % (a, r) for a in ACQS for r in RANKERS if r in WANT]
 
 def run(sets):
+  root = os.getenv("MOOTOPT", "~/gits/moot/optimize")
   for f in sets:
-    root = os.getenv("MOOTOPT", "~/gits/moot/optimize")
     tb = Tbl(csv("%s/%s.csv" % (root, f)))
     got = {a: [] for a in ARMS}
     sec = {a: [] for a in ARMS}
@@ -184,11 +177,10 @@ def run(sets):
           got["%s.%s" % (aq, rn)].append(
             optimize(tb, train, test, RANKERS[rn], smart))
           sec["%s.%s" % (aq, rn)].append(time.process_time() - t0)
-    for a in ARMS:                              # one line per (set,arm)
-      print("%%folds %s %s %s" % (f, a, " ".join("%.1f" % x for x in got[a])),
-            flush=True)
-      print("%%secs %s %s %s" % (f, a, " ".join("%.4f" % x for x in sec[a])),
-            flush=True)
+    for a in ARMS:                              # two lines per (set,arm)
+      for tag, fmt, v in (("folds", "%.1f", got), ("secs", "%.4f", sec)):
+        print("%%%s %s %s %s" % (tag, f, a,
+              " ".join(fmt % x for x in v[a])), flush=True)
 
 def expand(args):
   "A .txt arg is a file of set names, one per line; else a set name."
