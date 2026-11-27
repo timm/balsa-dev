@@ -11,7 +11,7 @@ import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-LEARNERS = [("dist", "#d62728", "^"), ("b1", "#2ca02c", "v"),
+LEARNERS = [("knn", "#7b3fa0", "P"), ("b1", "#2ca02c", "v"),
             ("b30", "#e8613c", "s")]
 
 def spread(v):
@@ -35,7 +35,7 @@ grand = {a: st.fmean([mu[(s, a)] for s in sets if (s, a) in mu])
 fig = plt.figure(figsize=(9, 6.4))
 gs = fig.add_gridspec(2, 1, height_ratios=[3, 1], hspace=.45)
 ax = fig.add_subplot(gs[0]); hx = fig.add_subplot(gs[1])
-order = sorted(sets, key=lambda s: mu.get((s, "a.b30"), 0))
+order = sorted(sets, key=lambda s: mu.get((s, "a.knn"), 0))
 xs = np.arange(len(order))
 bymean = sorted(LEARNERS, key=lambda t: -grand.get("a." + t[0], 0))
 totsec = {}
@@ -59,7 +59,7 @@ hx.set_title("total secs over all folds (log, 1 thread)", fontsize=10)
 hx.grid(axis="y", color="#eee"); hx.margins(y=.25)
 ax.set_ylim(0, 112); ax.set_xlim(-1, len(order))
 ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
-ax.set_title("acquire, three balsa rankers (mean + dashed fold sd), sorted by b30",
+ax.set_title("acquire, three balsa rankers (mean + dashed fold sd), sorted by knn",
              fontsize=12)
 ax.legend(fontsize=11, loc="lower right", bbox_to_anchor=(.995, .12),
           framealpha=.9, title="ranker mean")
