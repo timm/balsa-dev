@@ -85,14 +85,14 @@ for ln, c, m in bymean:
   totsec[ln] = sum(v for s in sets if (s, a) in S for v in S[(s, a)])
 # runtime: one horizontal bar per learner, total secs, log scale
 bars = [(ln, c, totsec[ln]) for ln, c, _ in bymean if totsec.get(ln)]
-hx.barh(range(len(bars)), [t for _, _, t in bars],
-        color=[c for _, c, _ in bars], height=.7)
+hx.bar(range(len(bars)), [t for _, _, t in bars],
+       color=[c for _, c, _ in bars], width=.7)
 for i, (ln, c, t) in enumerate(bars):
-  hx.text(t, i, " {:,}s".format(round(t)), ha="left", va="center",
+  hx.text(i, t, "{:,}s".format(round(t)), ha="center", va="bottom",
           fontsize=10, fontweight="bold")
-hx.set_yticks(range(len(bars)))
-hx.set_yticklabels([NAME.get(b[0], b[0]) for b in bars], fontsize=9)
-hx.margins(x=.6)
+hx.set_xticks(range(len(bars)))
+hx.set_xticklabels([NAME.get(b[0], b[0]) for b in bars], fontsize=9)
+hx.margins(y=.3)
 ax.set_ylim(0, 112); ax.set_xlim(-1, len(order))
 ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
 ax.set_title("acquire, five learners (mean + dashed fold sd), sorted by 1nn",
@@ -106,9 +106,9 @@ for v_ in (10, 30, 50, 70, 90):
   ax.axhline(v_, color="#bbb", lw=.8, ls=(0, (4, 4)), zorder=0)
 ax.set_ylabel("win (100 = optimum)\nmean over 5x2 folds", fontsize=12)
 ax.set_xlabel("optimize set (sorted)", fontsize=11)
-hx.set_xscale("log")
+hx.set_yscale("log")
 hx.set_title("total secs over all\nfolds (log, 1 thread)", fontsize=10)
-hx.grid(axis="x", color="#eee")
+hx.grid(axis="y", color="#eee")
 
 # -- right: 1nn & tabicl minus random test pick, sorted by 1nn ----------
 BASE = "a.rand"                                    # select test rows at random
