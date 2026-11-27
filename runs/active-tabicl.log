@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "/Users/timm/gh/balsa-dev/active.py", line 189, in <module>
+    run(expand(sys.argv[1:]) or ["misc/auto93", "config/SS-A"])
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timm/gh/balsa-dev/active.py", line 171, in run
+    optimize(tb, train, test, RANKERS[rn], smart))
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/timm/gh/balsa-dev/active.py", line 139, in optimize
+    checked = sorted(test, key=key)[:the.check]
+              ~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/timm/gh/balsa-dev/active.py", line 113, in key
+    pred.update(zip(map(id, key.test), m.predict(X(key.test))))
+                                                 ~^^^^^^^^^^
+  File "/Users/timm/gh/balsa-dev/active.py", line 98, in X
+    a = np.array([[r[c.at] if (isinstance(c, Num) or r[c.at] == "?")
+                   else (c.labels.index(r[c.at]) if r[c.at] in c.labels
+                         else len(c.labels))
+                   for c in xs] for r in rows], dtype=float)
+ValueError: could not convert string to float: '?'

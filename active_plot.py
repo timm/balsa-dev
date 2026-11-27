@@ -17,7 +17,8 @@ import numpy as np
 
 AQ = "a"                                           # acquire only
 LEARNERS = [("dist", "#2ca02c", "^"), ("b1", "#e8613c", "v"),
-            ("b30", "#d62728", "s"), ("lgbm", "#2a6fdb", "o")]
+            ("b30", "#d62728", "s"), ("lgbm", "#2a6fdb", "o"),
+            ("tabicl", "#7b3fa0", "D")]
 PRUDENCE = 0.01
 
 def spread(v):
@@ -49,10 +50,11 @@ def same(xs, ys):
   return cliffs(xs, ys) <= 0.195 and ks(xs, ys) <= 1.36
 
 F = {}
-for l in open(sys.argv[1]):
-  if l.startswith("%folds"):
-    _, s, a, *v = l.split()
-    F[(s, a)] = [float(x) for x in v]
+for path in sys.argv[1:-1]:                        # all inputs but the png
+  for l in open(path):
+    if l.startswith("%folds"):
+      _, s, a, *v = l.split()
+      F[(s, a)] = [float(x) for x in v]
 sets = list(dict.fromkeys(s for s, _ in F))
 mu = {k: st.fmean(v) for k, v in F.items()}
 sd = {k: spread(v) for k, v in F.items()}
@@ -75,7 +77,7 @@ for ln, c, m in LEARNERS:
           ls=(0, (4, 2)), alpha=.7)                # sd curve, low on chart
 ax.set_ylim(0, 112); ax.set_xlim(-1, len(order))
 ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
-ax.set_title("acquire, four learners (mean + dashed fold sd), sorted by b30",
+ax.set_title("acquire, five learners (mean + dashed fold sd), sorted by b30",
              fontsize=12)
 ax.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .12),
           framealpha=.9, title="learner mean")
@@ -112,8 +114,8 @@ for p in (ax, bx):
 fig.suptitle("62 optimize sets", fontsize=14)
 fig.set_facecolor("#fcfcfa")
 for a in fig.axes: a.set_facecolor("#fcfcfa")
-plt.savefig(sys.argv[2], dpi=200, bbox_inches="tight")
-plt.savefig(sys.argv[2].rsplit(".", 1)[0] + ".pdf", bbox_inches="tight")
+plt.savefig(sys.argv[-1], dpi=200, bbox_inches="tight")
+plt.savefig(sys.argv[-1].rsplit(".", 1)[0] + ".pdf", bbox_inches="tight")
 print("b30 acquire vs random: same on %d of %d sets" % (nsame, len(sets)))
 for a in sorted(grand, key=lambda a: -grand[a]):
   print("%-8s %5.1f" % (a, grand[a]))

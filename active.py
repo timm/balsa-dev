@@ -85,13 +85,44 @@ def byLgbm(tb, both, best, rest):
   key.test = None                              # optimize fills this in
   return key
 
+def byTabicl(tb, both, best, rest):
+  "TabICL in-context regressor on the labelled rows predicts d2h."
+  for v in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
+            "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS",
+            "LOKY_MAX_CPU_COUNT"):
+    os.environ.setdefault(v, "1")
+  import numpy as np
+  from tabicl import TabICLRegressor
+  xs = tb.cols.x
+  def cell(c, v):
+    if v == "?": return float("nan")
+    if isinstance(c, Num): return float(v)
+    return c.labels.index(v) if v in c.labels else len(c.labels)
+  def X(rows):
+    a = np.array([[cell(c, r[c.at]) for c in xs] for r in rows], dtype=float)
+    for c in range(a.shape[1]):                  # TabICL takes no NaN
+      m = np.nanmedian(a[:, c])
+      a[np.isnan(a[:, c]), c] = 0.0 if np.isnan(m) else m
+    return a
+  Xtr = X(both.rows)
+  ys = np.array([tb.disty(r) for r in both.rows])
+  m = TabICLRegressor(batch_size=1, device="cpu")
+  m.fit(Xtr, ys)
+  pred = {}
+  def key(r):                                    # cache a one-shot batch
+    if not pred:
+      pred.update(zip(map(id, key.test), m.predict(X(key.test))))
+    return pred[id(r)]
+  key.test = None                                # optimize fills this in
+  return key
+
 def byRand(tb, both, best, rest):
   "Floor: ignore the model, rank the holdout at random."
   import random
   return lambda r: random.random()
 
 RANKERS = {"dist": byDist, "b1": byTree, "b30": byForest,
-           "lgbm": byLgbm, "rand": byRand}
+           "lgbm": byLgbm, "tabicl": byTabicl, "rand": byRand}
 
 # -- optimize ----------------------------------------------------------
 def scorer(tb, y):
@@ -121,7 +152,8 @@ def xval(rows, m=5, n=2):
 # (fast, no lightgbm); ARMS=lgbm under CPython. The fold shuffles are
 # the same Mersenne Twister on both, so the two passes align exactly.
 WANT = os.getenv("ARMS", ",".join(RANKERS)).split(",")
-ARMS = ["%s.%s" % (a, r) for a in "ar" for r in RANKERS if r in WANT]
+ACQS = os.getenv("ACQS", "ar")                    # "a" = acquire only
+ARMS = ["%s.%s" % (a, r) for a in ACQS for r in RANKERS if r in WANT]
 
 def run(sets):
   tot = {a: [] for a in ARMS}
@@ -133,6 +165,7 @@ def run(sets):
     folds = list(xval(tb.rows))                 # fixed splits per set
     for fi, (train, test) in enumerate(folds):
       for aq, smart in (("a", True), ("r", False)):
+        if aq not in ACQS: continue
         for rn in WANT:
           random.seed(the.seed + fi)            # same pool for every arm
           got["%s.%s" % (aq, rn)].append(
