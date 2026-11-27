@@ -35,6 +35,34 @@ ORDER = ["balsa(1)", "lgbm(100)", "balsa(30)", "TabICL"]
 FS = dict(tick=14, lab=15, mono=13, bar=15)
 
 
+# The variance split of the paper's Table 7, over the three learners a
+# reader is choosing between.  balsa(1) is left out for the reason that
+# table gives: a deliberately crippled single tree would inflate the
+# learner share with a gap nobody is weighing.
+VARARMS = ("lgbm(100)", "balsa(30)", "TabICL")
+PARTS   = [("data", "#3d4a5c"), ("learner", "#e8613c"),
+           ("fold", "#9aa3ad"), ("other", "#d6dae0")]
+
+
+def split(F, sets, arms):
+    """eta-squared for data set, learner, fold and interaction, as four
+    percentages that sum to 100.  Needs a full set x learner x fold grid,
+    so `sets` must be the ones every arm actually ran."""
+    I, J = len(sets), len(arms)
+    R = len(F[sets[0]][arms[0]])
+    y = [v for s in sets for a in arms for v in F[s][a]]
+    hat = st.fmean(y)
+    row  = {s: st.fmean([v for a in arms for v in F[s][a]]) for s in sets}
+    col  = {a: st.fmean([v for s in sets for v in F[s][a]]) for a in arms}
+    cell = {(s, a): st.fmean(F[s][a]) for s in sets for a in arms}
+    tot  = sum((v - hat) ** 2 for v in y)
+    d = 100 * J * R * sum((row[s] - hat) ** 2 for s in sets) / tot
+    m = 100 * I * R * sum((col[a] - hat) ** 2 for a in arms) / tot
+    f = 100 * sum((v - cell[(s, a)]) ** 2
+                  for s in sets for a in arms for v in F[s][a]) / tot
+    return d, m, f, 100 - d - m - f
+
+
 def spread(v):
     "The sd the other figures draw: a robust (p90-p10)/2.56 over folds."
     v = sorted(v); n = len(v)
@@ -106,8 +134,10 @@ def main():
     xs = np.arange(len(sets))
 
     fig = plt.figure(figsize=(14.3, 3.75))
-    gs = fig.add_gridspec(1, 3, width_ratios=[3.4, 2.3, 20], wspace=0)
+    gs = fig.add_gridspec(1, 5, width_ratios=[3.4, 2.3, 20, 1.2, 3.6],
+                          wspace=0)
     bx, ax = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
+    vx = fig.add_subplot(gs[4])
 
     for a in ORDER:
         c, m = INK[a]
@@ -188,6 +218,33 @@ def main():
     bx.set_xlim(-.55, len(bt) - .45)
     for s_ in ("top", "right", "left"): bx.spines[s_].set_visible(False)
 
+    # right: where the variance in these curves actually comes from
+    full = [s for s in sets if all(a in F[s] for a in VARARMS)]
+    parts = split(F, sorted(full), VARARMS)
+    # four upright bars, laid out like the runtime panel on the left:
+    # not a stack, because the point is that one of these is twenty times
+    # another, and a height beside a height says that at a glance.
+    # tallest first, which puts `learner` last: the ordering is itself
+    # the finding, so let the chart state it rather than hide it in the
+    # middle of a fixed order.
+    bars = sorted(zip(PARTS, parts), key=lambda t: -t[1])
+    xsv = range(len(bars))
+    vx.bar(list(xsv), [v for _, v in bars],
+           color=[c for (_, c), _ in bars], width=.7)
+    for x, (_p, v) in zip(xsv, bars):
+        vx.text(x, v + 2.5, f"{v:.0f}", ha="center", va="bottom",
+                weight="bold", fontsize=FS["bar"] - 3)
+    vx.set_ylim(0, 112); vx.set_xlim(-.6, len(PARTS) - .4)
+    vx.set_yticks([])
+    vx.set_xticks(list(xsv))
+    vx.set_xticklabels([nm for (nm, _c), _v in bars], rotation=90,
+                       ha="center",
+                       va="top", fontsize=FS["bar"] - 4)
+    vx.set_title(f"what moves the score, %\n({len(full)} sets, "
+                 f"{len(VARARMS)} learners)", fontsize=FS["lab"] - 4)
+    vx.set_facecolor("#fcfcfa")
+    for s_ in vx.spines.values(): s_.set_visible(False)
+
     fig.set_facecolor("#fcfcfa"); ax.set_facecolor("#fcfcfa")
     plt.tight_layout()
     # park the y label against its own axis, clear of the runtime bars
@@ -210,6 +267,8 @@ def main():
         v = [mu[(s, a)] for s in sets if mu[(s, a)] == mu[(s, a)]]
         print(f"{a:10s} mean {st.fmean(v):6.2f}  ({len(v)} sets)"
               f"  {secs.get(a, 0):,.0f}s")
+    print("variance over %d sets: data %.0f  learner %.0f  fold %.0f"
+          "  other %.0f" % (len(full), *parts))
 
 
 if __name__ == "__main__": main()
