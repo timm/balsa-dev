@@ -69,14 +69,13 @@ xs = np.arange(len(order))
 for ln, c, m in LEARNERS:
   a = "%s.%s" % (AQ, ln)
   if a not in grand: continue
-  ys = np.array([mu.get((s, a), np.nan) for s in order])
-  es = np.array([sd.get((s, a), 0) for s in order])
-  ax.fill_between(xs, ys - es, ys + es, color=c, alpha=.1, lw=0)
-  ax.plot(xs, ys, color=c, marker=m, ms=4, lw=1.4, alpha=.9,
-          label="%-5s %4.1f" % (ln, grand[a]))
+  ax.plot(xs, [mu.get((s, a), np.nan) for s in order], color=c, marker=m,
+          ms=4, lw=1.4, alpha=.9, label="%-5s %4.1f" % (ln, grand[a]))
+  ax.plot(xs, [sd.get((s, a), 0) for s in order], color=c, lw=1,
+          ls=(0, (4, 2)), alpha=.7)                # sd curve, low on chart
 ax.set_ylim(0, 112); ax.set_xlim(-1, len(order))
 ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
-ax.set_title("acquire, four learners (band = fold sd), sorted by b30",
+ax.set_title("acquire, four learners (mean + dashed fold sd), sorted by b30",
              fontsize=12)
 ax.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .12),
           framealpha=.9, title="learner mean")
@@ -95,21 +94,18 @@ for i, s in enumerate(order2):
      and same(F[(s, "a.b30")], F[(s, "r.b30")]):
     bx.axvspan(i - .5, i + .5, color="#d9d9d9", lw=0, zorder=0)
     nsame += 1
-for arm, c, m, lab in (("a.b30", "#d62728", "s", "acquire"),
-                       ("r.b30", "#2a6fdb", "o", "random")):
-  bx.plot(x2, [mu.get((s, arm), np.nan) for s in order2], color=c,
-          marker=m, ms=4, lw=1.4, alpha=.9, zorder=2,
-          label="%-7s %4.1f" % (lab, grand[arm]))
-bx.set_ylim(0, 112); bx.set_xlim(-1, len(order2))
-bx.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
-bx.set_title("b30: acquire vs random, sorted by gap "
+bx.axhline(0, color="#999", lw=1)
+bx.plot(x2, [gap[s] for s in order2], color="#333", marker="o", ms=3,
+        lw=1.4, zorder=2, label="acquire - random  %+.1f" % (
+        grand["a.b30"] - grand["r.b30"]))
+bx.set_xlim(-1, len(order2))
+bx.set_title("b30: acquire minus random, sorted "
              "(grey = statistically same, %d/%d)" % (nsame, len(order2)),
              fontsize=12)
-bx.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .12),
-          framealpha=.9, title="acquisition mean")
+bx.legend(fontsize=10, loc="upper left", framealpha=.9)
 bx.grid(axis="y", color="#eee")
 bx.set_xlabel("optimize set (sorted by acquire - random)", fontsize=11)
-bx.set_yticklabels([])
+bx.set_ylabel("win difference (acquire - random)", fontsize=12)
 
 for p in (ax, bx):
   for s_ in ("top", "right"): p.spines[s_].set_visible(False)
