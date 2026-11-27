@@ -38,6 +38,12 @@ package: docs ## copy the learner into ../balsa
 Paper := $(HOME)/gh/jssprimer
 Reg   := MOOTREG=$(HOME)/gits/moot
 
+allfigs: ## the two overview figures: whole corpus, one axis, no groups
+	python3 -B allplot.py cls $(Paper)/ens-all-cls.png \
+	  runs/nose39-yue.txt runs/se61-yue.txt
+	python3 -B allplot.py reg $(Paper)/ens-all-reg.png \
+	  runs/reg56.csv runs/sereg.csv
+
 regfigs: ## redraw the two regression figures into the paper
 	$(Reg)/regression python3 -B regplot2.py runs/reg56.csv \
 	  $(Paper)/ens-balsa-reg-noxse.png
@@ -58,7 +64,7 @@ fig1: ## regenerate the paper's opening figure (LOC + the two runtimes)
 	python3 -B fig1.py > $(Paper)/fig1.tex
 	echo "wrote $(Paper)/fig1.tex"
 
-reg: regfigs regtex clstex fig1 ## every generated number in the paper, recomputed
+reg: regfigs allfigs regtex clstex fig1 ## every generated number in the paper, recomputed
 
 sh: $(Tmp)/bashrc $(Tmp)/nvim.lua ## bash with our prompt; vi = clean nvim
 	bash --rcfile $(Tmp)/bashrc -i
