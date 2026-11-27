@@ -286,7 +286,10 @@ def main():
     _bb = ax.get_position()
     _lh = LEGEND_IN[1] / fig.get_figheight()
     tx.set_axes_locator(None)
-    tx.set_position([_bb.x0 + .006, _bb.y0 + .20 * _bb.height,
+    # In reg the axis is inverted, so the lazy-learner line at 1.0 sits
+    # LOW on screen; clear it rather than straddle it.
+    _y0 = .35 if mode == "reg" else .20
+    tx.set_position([_bb.x0 + .006, _bb.y0 + _y0 * _bb.height,
                      LEGEND_IN[0] / fig.get_figwidth(), _lh])
     plt.savefig(out, dpi=200, bbox_inches="tight", pad_inches=.02)
     plt.savefig(out.rsplit(".", 1)[0] + ".pdf",
