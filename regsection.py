@@ -108,7 +108,9 @@ def main():
 
     # the learner's own line count, counted from the source, never typed
     import re
-    cap = int(re.search(r"cap=(\d+)", open("balsa.py").read()).group(1))
+    src_ = open("balsa.py").read()
+    cap  = int(re.search(r"\bcap=(\d+)", src_).group(1))
+    rcap = int(re.search(r"\brcap=(\d+)", src_).group(1))
     loc = sum(1 for l in open("balsa.py") if not re.match(r"^\s*(#.*)?$", l))
 
     out = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -140,7 +142,7 @@ def main():
         sec_lgbm=f"{secs.get('lgbm', 0):,.0f}",
         sec_tab=f"{secs.get('TabICL', 0):,.0f}",
         costx=f"{secs.get('TabICL', 0) / max(secs.get('lgbm', 1), 1):,.0f}",
-        loc=loc, cap=cap, caphalf=cap // 2,
+        loc=loc, cap=cap, caphalf=cap // 2, rcap=rcap,
         bcx=f"{bcm['balsa30'] / bcm['lgbm']:.0f}" if bcm else "??",
         bc_lgbm=f"{bcm['lgbm']:.3f}" if bcm else "??",
         bc_b30=f"{bcm['balsa30']:.2f}" if bcm else "??",

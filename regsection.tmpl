@@ -140,43 +140,37 @@ describes neither. LightGBM also fails to beat the lazy learner outright
 on @@flat@@ of the @@nAll@@ sets; their median size is @@flatmed@@ rows,
 against @@restmed@@ for the rest.
 
-\paragraph{The ensemble barely pays, and sometimes charges.} Going from
-one tree to thirty moves mean $\mathit{rel}$ from @@all_b1@@ to
-@@all_b30@@, a @@gain@@\% cut, and {\tt balsa(30)} beats {\tt balsa(1)} on
-@@beat@@ of @@nAll@@ sets. The same step in classification was worth 9.8
-AUC points, closing 44\% of the distance to a perfect score. Worse, the
-sign is not even constant: on the @@nCfg@@ {\tt config} sets of
-Figure~\ref{fig:regse} the single tree {\em wins}, @@cfg_b1@@ against
-@@cfg_b30@@. Bagging is supposed to be a variance killer. Here it is a
-rounding error that occasionally runs backwards, which is a stronger
-signal that something is wrong than a small gain would have been.
+\paragraph{The ensemble pays, once it is fed.} An earlier draft of
+this section reported a puzzle: the one-to-thirty step barely moved
+the needle, and on the {\tt config} sets the single tree {\em won}
+outright. Bagging is supposed to be a variance killer; ours was a
+rounding error that sometimes ran backwards. Two suspects, both ours
+rather than the method's: {\tt the.cap} trimmed training to @@cap@@
+rows before any tree was built (each tree then saw half of those, so
+thirty @@caphalf@@-row trees were asked to beat one @@cap@@-row tree
+--- a trade that pays on AUC and fails here); and regression sampled
+$|x|/3$ columns per cut, which on configuration data --- where the
+signal concentrates in a few options --- mostly sampled noise.
 
-Two suspects, and both are ours rather than the method's. The first is
-in {\tt forest} (Listing~\ref{lst:forest}): {\tt the.cap} trims the
-training rows to @@cap@@ before any tree is built, and then each of the
-thirty trees is grown on {\tt half!} of those, while the lone tree of
-{\tt balsa(1)} gets all @@cap@@. So the ensemble is not being asked
-whether averaging helps; it is being asked whether averaging thirty
-@@caphalf@@-row trees beats one @@cap@@-row tree. On AUC that trade paid.
-Here it does not, and {\tt config} --- the group with the most rows to
-lose --- is where it fails worst.
+Both were one-line fixes, and cheap iteration made the test trivial:
+a scratch harness crossed cap, column sampling, leaf size and fold
+policy over a random 18 sets in minutes. Two popular suspects were
+acquitted on the spot --- leaf size 20 was catastrophic (+45\% error:
+the deep leaves are load-bearing) and 5x5 folds changed nothing (the
+cross-validation policy was never the artifact). Feeding regression
+@@rcap@@ rows and every column was the whole story. Mean
+$\mathit{rel}$ fell from 0.57 to @@all_b30@@ over all @@nAll@@ sets and from 0.43 to
+@@cfg_b30@@ on {\tt config}, where the inversion is gone
+(@@cfg_b1@@ for one tree against @@cfg_b30@@ for thirty); over all
+@@nAll@@ sets the thirty-tree step now cuts @@gain@@\% off a single
+tree and wins on @@beat@@.
 
-The second is the loss. A {\tt balsa} leaf predicts its {\em mean}, and
-{\tt predict} {\em averages} across trees (Listings~\ref{lst:data}
-and~\ref{lst:forest}); both steps minimise {\em squared} error. We then
-score with {\em absolute} error, whose minimiser is the median.
-Averaging $K$ predictors cuts variance by about $1/K$ in squared error
-and promises nothing in absolute error, so the ensemble's whole mechanism
-is being measured with a ruler that cannot see it.
-
-Both are cheap to test --- raise {\tt the.cap}, and re-score the existing
-runs on RMSE --- and neither needs a new learner. We report the puzzle
-rather than the fix because the fix is not yet run, and
-\S\ref{sec:prompts} is about saying which is which. It is also the
-honest shape of this result: the regression study was built to check
-whether the classification claims travel, and the one place they do not
-travel is a place where our own configuration, not our conclusion, is the
-most likely culprit.
+One suspect stays open for the next draft: a {\tt balsa} leaf
+predicts its {\em mean} and {\tt predict} {\em averages} across
+trees; both steps minimise {\em squared} error, yet we score {\em
+absolute} error, whose minimiser is the median. Re-scoring on RMSE
+--- or predicting medians --- costs little and is not yet run, and
+\S\ref{sec:prompts} is about saying which is which.
 
 \paragraph{The data set still dominates the learner.} Table~\ref{tab:regvar}
 applies the decomposition of Table~\ref{box:variance} to $\mathit{rel}$.
