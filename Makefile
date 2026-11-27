@@ -54,7 +54,11 @@ clstex: ## regenerate the paper's classification variance table
 	  > $(Paper)/clsvar.tex
 	echo "wrote $(Paper)/clsvar.tex"
 
-reg: regfigs regtex clstex ## every generated number in the paper, recomputed
+fig1: ## regenerate the paper's opening figure (LOC + the two runtimes)
+	python3 -B fig1.py > $(Paper)/fig1.tex
+	echo "wrote $(Paper)/fig1.tex"
+
+reg: regfigs regtex clstex fig1 ## every generated number in the paper, recomputed
 
 sh: $(Tmp)/bashrc $(Tmp)/nvim.lua ## bash with our prompt; vi = clean nvim
 	bash --rcfile $(Tmp)/bashrc -i
