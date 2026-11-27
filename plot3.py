@@ -25,7 +25,7 @@ if SE:   # moot/classify/se: one panel per task
        ("se/defect/","defects"),("se/static/cooked/","static\nwarnings")]
   G=[(h,[f for f in order if f.startswith(p)]) for p,h in SEG]
   order=[f for _,fs in G for f in fs]
-  CAPY,TAB=48,[.30,.14,.40,.40]
+  CAPY,TAB,MONO=48,[.40,.10,.40,.54],14   # FS['mono'] is set below
 else:    # the 39 non-SE classify sets, grouped by NAME (some sets may
          # be missing: TabICL never terminated there)
   ENS=["balance.scale","blood-transfusion-service-center","breast.w",
@@ -42,10 +42,10 @@ else:    # the 39 non-SE classify sets, grouped by NAME (some sets may
       ("mixed\nattributes",20,30),("large, mixed",30,39)]]
   G=[(h,fs) for h,fs in G if fs]
   order=[f for _,fs in G for f in fs]
-  CAPY,TAB=52,[.555,.14,.40,.40]
-T=[(os.getenv("LAB1","lisp(1)"),0,"#2ca02c","^"),
+  CAPY,TAB,MONO=52,[.595,.06,.40,.54],11
+T=[(os.getenv("LAB1","balsa(1)"),0,"#2ca02c","^"),
    ("lgbm(100)",2,"#2a6fdb","o"),
-   (os.getenv("LAB30","bald(30)"),1,"#e8613c","s"),
+   (os.getenv("LAB30","balsa(30)"),1,"#e8613c","s"),
    ("TabICL",3,"#000000","D")]
 # sized for an IEEE 2-col figure: drawn at 2x (14.3in wide), printed at 7.16in,
 # so a FS of n pt prints at n/2 pt
@@ -69,28 +69,28 @@ for gi,(g,fs) in enumerate(G):
   if gi<len(G)-1: ax.axvline(x0-1,color="#555",lw=1)
 ax.set_xticks(ticks)
 ax.set_xticklabels(labs,rotation=60,ha="right",rotation_mode="anchor",fontsize=XT)
-ax.set_ylim(0,100); ax.set_xlim(-.7,x0-1.3); ax.set_yticks(range(0,101,10))
-ax.set_yticks(range(5,100,10),minor=True); ax.tick_params(axis="y",which="minor",length=0)
+ax.set_ylim(0,100); ax.set_xlim(-.7,x0-1.3); ax.set_yticks(range(0,101,20))
+ax.set_yticks(range(10,100,20),minor=True); ax.tick_params(axis="y",which="minor",length=0)
 ax.grid(axis="y",which="major",color="#ddd")
 ax.grid(axis="y",which="minor",color="#b0b0b0",ls=(0,(4,4)),lw=1)
 # nudged right: the runtime panel's "28,066s" was touching this label
 ax.set_ylabel("AUC (0..100), 5x2 folds",fontsize=FS["lab"],labelpad=-2); ax.tick_params(axis="y",labelsize=FS["tick"])
 for s_ in ("top","right"): ax.spines[s_].set_visible(False)
 
-# legend table (inset over panels 3+4): name | solid mean | dashed sd
-tx=ax.inset_axes(TAB); tx.set_xlim(0,30); tx.set_ylim(0,5)
+# legend: name | its solid line (the mean) | its dashed line (the sd).
+# The mean and sd NUMBERS used to sit here too; they are in the tables,
+# and dropping them buys the width that makes the names legible.
+tx=ax.inset_axes(TAB); tx.set_xlim(0,22); tx.set_ylim(0,5)
 tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
 for s_ in tx.spines.values(): s_.set_visible(False)
-mono=dict(family="monospace",fontsize=FS["mono"],bbox=dict(fc="#fcfcfa",ec="none",pad=1))
-tx.text(17.5,4.5,"mean",ha="right",va="center",**mono)
-tx.text(29.5,4.5,"sd",ha="right",va="center",**mono)
+mono=dict(family="monospace",fontsize=MONO,bbox=dict(fc="#fcfcfa",ec="none",pad=1))
+tx.text(13.0,4.4,"mean",ha="center",va="center",**mono)
+tx.text(19.5,4.4,"sd",ha="center",va="center",**mono)
 for k,(name,c,m,med,spr) in enumerate(H):
   y=3.1-1.0*k
   tx.text(0,y,name,ha="left",va="center",**mono)
-  tx.plot([9.6,12.2],[y,y],color=c,lw=2.2); tx.plot(10.9,y,m,color=c,ms=6)
-  tx.text(17.5,y,f"{med:.1f}",ha="right",va="center",**mono)
-  tx.plot([20.3,23.3],[y,y],color=c,lw=2,ls="--")
-  tx.text(29.5,y,f"{spr:.1f}",ha="right",va="center",**mono)
+  tx.plot([11.2,14.8],[y,y],color=c,lw=2.2); tx.plot(13.0,y,m,color=c,ms=6)
+  tx.plot([17.8,21.2],[y,y],color=c,lw=2,ls="--")
 
 # TabICL is ~300x the others, so a linear bar hides bald and lgbm entirely
 bt=sorted([(sec[j],n,c) for n,j,c,_ in T])
@@ -108,5 +108,19 @@ bx.set_yticks([]); bx.set_facecolor("#fcfcfa"); bx.set_xlim(-.55,len(bt)-.45)
 for s_ in ("top","right","left"): bx.spines[s_].set_visible(False)
 
 fig.set_facecolor("#fcfcfa"); ax.set_facecolor("#fcfcfa"); plt.tight_layout()
+# The legend's text is fixed in points but its box was fixed as a FRACTION
+# of the axes, and the axes height depends on how tall the rotated x labels
+# turned out.  Figure 3's names are longer than Figure 2's, so the same
+# fraction gave it a shorter box and the rows collided.  Size the box in
+# INCHES instead, once the layout has settled.
+fig.canvas.draw()
+_bb = ax.get_position()                 # figure fractions, after layout
+# inset_axes installs an axes locator that overrides set_position, so drop
+# it first; coordinates are then figure fractions, not axes fractions.
+tx.set_axes_locator(None)
+tx.set_position([_bb.x0 + TAB[0] * _bb.width,
+                 _bb.y0 + TAB[1] * _bb.height,
+                 (2.35 if MONO >= 14 else 1.85) / fig.get_figwidth(),
+                 (1.15 if MONO >= 14 else 0.92) / fig.get_figheight()])
 plt.savefig(sys.argv[2],dpi=200)
 plt.savefig(sys.argv[2].rsplit(".",1)[0]+".pdf")   # vector copy for the paper

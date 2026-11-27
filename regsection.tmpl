@@ -24,8 +24,10 @@ there is:
 \[ \mathit{rel} = \mathrm{MAE} \;/\; \mathrm{MAE}(\text{always predict the
 training mean}) \]
 so $\mathit{rel}=1$ is no better than that lazy learner, $\mathit{rel}=0$
-is perfect, and {\bf lower is better} --- the reverse of every AUC figure
-above. The divisor is a denominator, not a treatment: its own
+is perfect, and {\bf a smaller number is better} --- the reverse of AUC.
+Figures~\ref{fig:regnose} and~\ref{fig:regse} therefore {\em invert} their
+$y$ axis, so that a higher line means a better learner in all four of this
+paper's figures, and only the tables need reading in the other direction. The divisor is a denominator, not a treatment: its own
 $\mathit{rel}$ is 1.0 on every fold, a constant column that would flatter
 any variance decomposition it was included in.
 

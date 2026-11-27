@@ -4,23 +4,21 @@
 % point it is declared, so these cannot live in sec:reg.
 \begin{figure*}[p]
   \centering
-  \includegraphics[width=\textwidth]{ens-balsa-reg-noxse.pdf}
+  \includegraphics[width=\ensw]{ens-balsa-reg-noxse.pdf}
   \caption{@@nA@@ non-SE regression sets from {\tt moot/regression}, 5x2
   cross-validation, same layout as Figure~\ref{fig:nose}. $y$ is
-  $\mathit{rel} = \mathrm{MAE}/\mathrm{MAE}(\text{predict the mean})$, so
-  {\em lower is better} and the dashed grey line at 1.0 is the lazy
-  learner. Solid: the mean over the ten folds. Dashed, same colour: their
-  spread, as (90th$-$10th)/2.56. Within each panel, sets are ordered by
-  LightGBM's mean. A line breaks where that treatment has no score: TabICL
-  is capped at 20,000 rows.}
+  $\mathit{rel} = \mathrm{MAE}/\mathrm{MAE}(\text{predict the mean})$, on an
+  {\em inverted} axis, so a higher line is a better learner here exactly as
+  in Figures~\ref{fig:se} and~\ref{fig:nose}. The dashed grey line at 1.0 is
+  the lazy learner. A line breaks where a treatment has no score (TabICL is
+  capped at 20,000 rows). Details in \S\ref{sec:reg}.}
   \label{fig:regnose}
 \end{figure*}
 
 \begin{figure*}[p]
   \centering
-  \includegraphics[width=\textwidth]{ens-balsa-reg-se.pdf}
+  \includegraphics[width=\ensw]{ens-balsa-reg-se.pdf}
   \caption{@@nB@@ SE regression sets from {\tt moot/optimize}, grouped by
-  their folder. Same layout and same score as
-  Figure~\ref{fig:regnose}.}
+  folder. Same layout and score as Figure~\ref{fig:regnose}.}
   \label{fig:regse}
 \end{figure*}

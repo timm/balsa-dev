@@ -108,7 +108,8 @@ def main():
                                    if mu[(s, a)] == mu[(s, a)]]):
                 H.append((lab, c, m, st.fmean([mu[(s, a)] for s in ok]),
                           st.fmean([sd[(s, a)] for s in ok]), len(ok)))
-        ax.text(xs.mean(), 1.47, g, ha="center", va="bottom", fontsize=FS["head"])
+        ax.text(xs.mean(), 1.02, g, ha="center", va="bottom",
+                transform=ax.get_xaxis_transform(), fontsize=FS["head"])
         ticks += list(xs); labs += [f.split("/")[-1] for f in fs]
         x0 += len(fs) + 3
         if gi < len(G) - 1: ax.axvline(x0 - 2, color="#555", lw=1)
@@ -117,13 +118,14 @@ def main():
     ax.set_xticks(ticks)
     ax.set_xticklabels(labs, rotation=60, ha="right", rotation_mode="anchor",
                        fontsize=10)
-    ax.set_ylim(0, 1.45); ax.set_xlim(-.9, x0 - 2.1)
+    ax.set_ylim(1.45, 0); ax.set_xlim(-.9, x0 - 2.1)
     ax.set_yticks([0, .25, .5, .75, 1, 1.25])
     ax.set_yticks([.125, .375, .625, .875, 1.125], minor=True)
     ax.tick_params(axis="y", which="minor", length=0)
     ax.grid(axis="y", which="major", color="#ddd")
     ax.grid(axis="y", which="minor", color="#b0b0b0", ls=(0, (4, 4)), lw=1)
-    ax.set_ylabel("MAE / MAE(predict the mean)\nlower is better, 5x2 folds",
+    # short, because the axis is only so tall and this label is rotated
+    ax.set_ylabel("MAE / MAE(mean), 5x2 folds\naxis inverted: higher is better",
                   fontsize=FS["lab"])
     ax.tick_params(axis="y", labelsize=FS["tick"])
     ax.spines["top"].set_visible(False)
@@ -139,31 +141,30 @@ def main():
     gbig = min(wide_enough or range(len(G)), key=peak)
     # the baseline label takes whichever end the legend did not
     if gbig == 0:
-        ax.text(x0 - 1.6, 1.03, "predict the mean", ha="right",
+        ax.text(x0 - 1.6, 1.0, "predict the mean", ha="right",
                 va="bottom", fontsize=FS["tick"] - 1, color="#666")
     else:
-        ax.text(-0.4, 1.03, "predict the mean", ha="left",
+        ax.text(-0.4, 1.0, "predict the mean", ha="left",
                 va="bottom", fontsize=FS["tick"] - 1, color="#666")
     x0s = 0                              # left edge of widest panel
     for g, fs in G[:gbig]: x0s += len(fs) + 1
     left = (x0s + .9) / (x0 - 1.2)
     wide = len(G[gbig][1]) / (x0 - 1.2)
-    tx = ax.inset_axes((left + .012, .66, wide - .025, .30))
-    tx.set_xlim(0, 24); tx.set_ylim(0, 5.7)
+    tx = ax.inset_axes((left + .012, .56, wide - .025, .40))
+    LEGEND_IN = (2.00, 1.00)          # inches: width, height
+    tx.set_xlim(0, 22); tx.set_ylim(0, 5.7)
     tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
     for s_ in tx.spines.values(): s_.set_visible(False)
-    mono = dict(family="monospace", fontsize=FS["mono"] - 2,
+    mono = dict(family="monospace", fontsize=FS["mono"] - 3,
                 bbox=dict(fc="#fcfcfa", ec="none", pad=1))
-    tx.text(17.2, 5.2, "mean", ha="right", va="center", **mono)
-    tx.text(23.8, 5.2, "sd", ha="right", va="center", **mono)
-    tx.plot([21.4, 23.8], [4.6, 4.6], color="#555", lw=1.4, ls=(0, (3, 2)))
+    tx.text(13.0, 5.1, "mean", ha="center", va="center", **mono)
+    tx.text(19.5, 5.1, "sd", ha="center", va="center", **mono)
     for k, (lab, c, m, a, b, _n) in enumerate(H):
         y = 4.0 - 1.1 * k
         tx.text(0, y, lab, ha="left", va="center", **mono)
-        tx.plot([9.4, 11.4], [y, y], color=c, lw=2.2)
-        tx.plot(10.4, y, m, color=c, ms=6)
-        tx.text(17.2, y, f"{a:.2f}", ha="right", va="center", **mono)
-        tx.text(23.8, y, f"{b:.2f}", ha="right", va="center", **mono)
+        tx.plot([11.2, 14.8], [y, y], color=c, lw=2.2)
+        tx.plot(13.0, y, m, color=c, ms=6)
+        tx.plot([17.8, 21.2], [y, y], color=c, lw=2, ls="--")
 
     if sum(secs.get(a, 0) for a, *_ in ARMS) > 0:
         bt = sorted((secs[a], lab, c) for a, lab, c, _ in ARMS if a in secs)
@@ -196,11 +197,21 @@ def main():
     # gap is not enough: the label is two lines wide, so its own left half
     # still reaches back over the bars.
     fig.canvas.draw()
+    # inset_axes installs an axes locator that ignores set_position, so
+    # drop it; the coordinates below are then figure fractions.
+    _bb = ax.get_position()
+    tx.set_axes_locator(None)
+    # hang the box from the TOP of the axes: a fixed fraction would put a
+    # fixed-inch box through the ceiling whenever the axes came out short
+    _lh = LEGEND_IN[1] / fig.get_figheight()
+    tx.set_position([_bb.x0 + (left + .012) * _bb.width,
+                     _bb.y0 + _bb.height - _lh - .005,
+                     LEGEND_IN[0] / fig.get_figwidth(), _lh])
     rend = fig.canvas.get_renderer()
     w    = ax.yaxis.label.get_window_extent(rend).width
     bars = bx.get_tightbbox(rend).x1
     tick = min(t.get_window_extent(rend).x0 for t in ax.get_yticklabels())
-    x = min(bars + 40 + w / 2, tick - 12 - w / 2)      # ticks win a tie
+    x = min(bars + 24 + w / 2, tick - 10 - w / 2)      # ticks win a tie
     ax.yaxis.set_label_coords(
         ax.transAxes.inverted().transform((x, 0))[0], .5)
     plt.savefig(sys.argv[2], dpi=200)
