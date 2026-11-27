@@ -59,8 +59,8 @@ def byKnn(tb, both, best, rest):
     for x, y in xy:
       dy = (distx(both, r, x), y)
       if len(near) < 3 or dy < near[-1]:       # binary chop into the top 3
-        near.insert(bisect(near, dy), dy)
-        del near[3:]
+        i = bisect(near, dy)
+        near = (near[:i] + [dy] + near[i:])[:3]
     return sum(y for _, y in near) / len(near)
   return key
 
