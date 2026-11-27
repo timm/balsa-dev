@@ -16,9 +16,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 AQ = "a"                                           # acquire only
-LEARNERS = [("dist", "#2ca02c", "^"), ("b1", "#e8613c", "v"),
-            ("b30", "#d62728", "s"), ("lgbm", "#2a6fdb", "o"),
-            ("tabicl", "#7b3fa0", "D")]
+LEARNERS = [("dist", "#d62728", "^"), ("b1", "#2ca02c", "v"),
+            ("b30", "#e8613c", "s"), ("lgbm", "#2a6fdb", "o"),
+            ("tabicl", "#000000", "D")]
 PRUDENCE = 0.01
 
 def spread(v):
@@ -130,8 +130,8 @@ def deltapanel(gsi, arm, c, m, lab):
   px.set_xlabel("set (sorted by gap)", fontsize=10)
   return px
 
-bx = deltapanel(gs[1], "a.b30",    "#d62728", "s", "b30")
-cx = deltapanel(gs[2], "a.tabicl", "#7b3fa0", "D", "tabicl")
+bx = deltapanel(gs[1], "a.b30",    "#e8613c", "s", "b30")
+cx = deltapanel(gs[2], "a.tabicl", "#000000", "D", "tabicl")
 bx.set_ylabel("win vs random test pick", fontsize=11)
 ymin = min(bx.get_ylim()[0], cx.get_ylim()[0])     # share y across mid+right
 ymax = max(bx.get_ylim()[1], cx.get_ylim()[1])
