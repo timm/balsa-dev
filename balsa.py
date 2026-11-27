@@ -13,6 +13,7 @@ Options:
   leaf=2            no cut may leave fewer rows than this
   maxd=30           max tree depth
   rf=True           cols per cut: sqrt(|x|); regression |x|/3
+  p=2               Minkowski exponent for x-distance
 """
 import re
 from bisect import bisect_left, bisect_right
@@ -85,7 +86,9 @@ class Sym(Column):
     super().__init__(txt, at)
     i.has = {}
 
-  def add_known(i, v, inc): i.has[v] = i.has.get(v, 0) + inc
+  def add_known(i, v, inc):
+    i.has[v] = i.has.get(v, 0) + inc
+    if i.has[v] <= 0: del i.has[v]              # drop emptied keys
 
   def div(i):
     return -sum((p := n/i.n)*log(p) for n in i.has.values() if n>0)/log(2)
@@ -120,6 +123,7 @@ class Num(Column):
     i.mu, i.m2, i.goal = 0, 0, int(not txt.endswith("-"))
 
   def add_known(i, v, inc):
+    if i.n <= 0: i.n = i.mu = i.m2 = 0; return   # removed the last row
     d = v - i.mu
     i.mu += inc * d / i.n
     i.m2 = max(0, i.m2 + inc * d * (v - i.mu))
@@ -208,9 +212,18 @@ class Cols(Box):
 
 class Tbl(Box):
   def __init__(i, rows):
-    i.cols = Cols(rows[0])
+    i.cols, i._mids = Cols(rows[0]), None
     i.rows = [i.cols.add(row) for row in rows[1:]]
     i.labelall()
+
+  def add(i, row, inc=1):
+    "Grow (inc=1) or shrink (inc=-1) by one row; returns the row."
+    i._mids = None
+    row = row if isa(row, Row) else Row(row)
+    (i.rows.append if inc > 0 else i.rows.remove)(row)
+    for col in i.cols.all:
+      if row[col.at] != "?": col.add(row[col.at], inc)
+    return row
 
   def labelall(i):
     cols, klass, i.nk = i.cols.x[:], i.cols.klass, 0
@@ -231,6 +244,26 @@ class Tbl(Box):
         d += (col.norm(v) - col.goal) ** 2
         n += 1
     return sqrt(d / max(n, 1))
+
+def mids(tb):
+  "Cached centroid: one mid per column; Tbl.add invalidates it."
+  tb._mids = tb._mids or [col.mid() for col in tb.cols.all]
+  return tb._mids
+
+def gap(col, a, b):
+  "0..1 distance between two values of one column; ? is far."
+  if a == "?" and b == "?": return 1
+  if isa(col, Sym): return a != b
+  a = col.norm(a) if a != "?" else (1 if col.norm(b) < .5 else 0)
+  b = col.norm(b) if b != "?" else (1 if a < .5 else 0)
+  return abs(a - b)
+
+def distx(tb, row, point):
+  "Minkowski x-distance from row to point, over tb's x columns."
+  d = n = 0
+  for col in tb.cols.x:
+    d += gap(col, row[col.at], point[col.at]) ** the.p; n += 1
+  return (d / max(n, 1)) ** (1 / the.p)
 
 # Tree -------------------------------------------------------------
 # split search and trees. Numeric cuts use a threshold, symbolic cuts
