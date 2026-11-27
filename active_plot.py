@@ -98,7 +98,7 @@ ax.set_ylim(0, 112); ax.set_xlim(-1, len(order))
 ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
 ax.set_title("acquire, five learners (mean + dashed fold sd), sorted by 1nn",
              fontsize=12)
-ax.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .12),
+ax.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.88, .28),
           framealpha=.9, title="learner mean",
           prop={"family": "monospace", "size": 10})
 ax.set_yticks([20, 40, 60, 80, 100])
