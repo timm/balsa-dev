@@ -36,9 +36,11 @@ mu = {k: st.fmean(v) for k, v in F.items()}
 grand = {a: st.fmean([mu[(s, a)] for s in sets if (s, a) in mu])
          for a in {a for _, a in F}}
 best = max(grand, key=grand.get)                 # strongest arm (legend)
+ranked = sorted(grand, key=grand.get)             # arms, weakest..strongest
+pivot = ranked[len(ranked) // 2]                  # the median-mean arm
 allmu = {s: st.fmean([mu[(s, a)] for a in grand if (s, a) in mu])
          for s in sets}                           # each set's mean-of-all
-order = sorted(sets, key=allmu.get)               # sort by set difficulty
+order = sorted(sets, key=lambda s: mu.get((s, pivot), 0))  # sort by pivot
 xs = np.arange(len(order))
 
 fig = plt.figure(figsize=(14.3, 6.2))
@@ -46,11 +48,15 @@ gs = fig.add_gridspec(2, 2, height_ratios=[3, 1], hspace=.33, wspace=.12)
 for col, (aq, title) in enumerate(ACQ):
   ax = fig.add_subplot(gs[0, col])
   bx = fig.add_subplot(gs[1, col])
+  ax.plot(xs, [mu.get((s, pivot), np.nan) for s in order], color="#333",
+          lw=2.4, ls=(0, (5, 2)), zorder=1,
+          label="%-7s %4.1f" % ("pivot " + pivot, grand[pivot]))
   for rn, c, m in RANKERS:
     a = "%s.%s" % (aq, rn)
     if a not in grand: continue
     ax.plot(xs, [mu.get((s, a), np.nan) for s in order], color=c,
-            marker=m, ms=4, lw=1.6, label="%-5s %4.1f" % (rn, grand[a]))
+            marker=m, ms=4, lw=1.3, alpha=.9, zorder=2,
+            label="%-5s %4.1f" % (rn, grand[a]))
     bx.hist([spread(F[(s, a)]) for s in sets if (s, a) in F],
             bins=list(np.arange(0, 40, 3)), histtype="step", color=c, lw=1.5)
   ax.set_ylim(0, 108); ax.set_xlim(-1, len(order))
@@ -69,8 +75,8 @@ for col, (aq, title) in enumerate(ACQ):
   for p in (ax, bx):
     for s_ in ("top", "right"): p.spines[s_].set_visible(False)
 
-fig.suptitle("%d optimize sets, sorted by mean win over all arms "
-             "(best arm %s = %.1f)" % (len(order), best, grand[best]),
+fig.suptitle("%d optimize sets, sorted by the median arm %s "
+             "(best arm %s = %.1f)" % (len(order), pivot, best, grand[best]),
              fontsize=14, y=.98)
 fig.set_facecolor("#fcfcfa")
 for a in fig.axes: a.set_facecolor("#fcfcfa")
