@@ -97,7 +97,8 @@ ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
 ax.set_title("acquire, five learners (mean + dashed fold sd), sorted by knn",
              fontsize=12)
 ax.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .12),
-          framealpha=.9, title="learner mean")
+          framealpha=.9, title="learner mean",
+          prop={"family": "monospace", "size": 10})
 ax.grid(axis="y", color="#eee")
 ax.set_ylabel("win (100 = optimum)\nmean over 5x2 folds", fontsize=12)
 ax.set_xlabel("optimize set (sorted)", fontsize=11)

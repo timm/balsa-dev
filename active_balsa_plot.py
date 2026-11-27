@@ -62,7 +62,8 @@ ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
 ax.set_title("acquire, three balsa rankers (mean + dashed fold sd), sorted by knn",
              fontsize=12)
 ax.legend(fontsize=11, loc="lower right", bbox_to_anchor=(.995, .12),
-          framealpha=.9, title="ranker mean")
+          framealpha=.9, title="ranker mean",
+          prop={"family": "monospace", "size": 11})
 ax.grid(axis="y", color="#eee")
 ax.set_ylabel("win (100 = optimum)\nmean over 5x2 folds", fontsize=12)
 ax.set_xlabel("optimize set (sorted)", fontsize=11)
