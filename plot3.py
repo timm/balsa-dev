@@ -80,17 +80,16 @@ for s_ in ("top","right"): ax.spines[s_].set_visible(False)
 # legend: name | its solid line (the mean) | its dashed line (the sd).
 # The mean and sd NUMBERS used to sit here too; they are in the tables,
 # and dropping them buys the width that makes the names legible.
-tx=ax.inset_axes(TAB); tx.set_xlim(0,22); tx.set_ylim(0,5)
+tx=ax.inset_axes(TAB); tx.set_xlim(0,23); tx.set_ylim(0,4.6)
 tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
 for s_ in tx.spines.values(): s_.set_visible(False)
 mono=dict(family="monospace",fontsize=MONO,bbox=dict(fc="#fcfcfa",ec="none",pad=1))
-tx.text(13.0,4.4,"mean",ha="center",va="center",**mono)
-tx.text(19.5,4.4,"sd",ha="center",va="center",**mono)
 for k,(name,c,m,med,spr) in enumerate(H):
-  y=3.1-1.0*k
+  y=3.6-1.0*k
   tx.text(0,y,name,ha="left",va="center",**mono)
   tx.plot([11.2,14.8],[y,y],color=c,lw=2.2); tx.plot(13.0,y,m,color=c,ms=6)
-  tx.plot([17.8,21.2],[y,y],color=c,lw=2,ls="--")
+  tx.text(16.6,y,"sd",ha="left",va="center",**mono)   # names the dashes
+  tx.plot([19.0,22.0],[y,y],color=c,lw=2,ls="--")
 
 # TabICL is ~300x the others, so a linear bar hides bald and lgbm entirely
 bt=sorted([(sec[j],n,c) for n,j,c,_ in T])

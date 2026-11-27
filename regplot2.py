@@ -108,7 +108,7 @@ def main():
                                    if mu[(s, a)] == mu[(s, a)]]):
                 H.append((lab, c, m, st.fmean([mu[(s, a)] for s in ok]),
                           st.fmean([sd[(s, a)] for s in ok]), len(ok)))
-        ax.text(xs.mean(), 1.02, g, ha="center", va="bottom",
+        ax.text(xs.mean(), 1.05, g, ha="center", va="bottom",
                 transform=ax.get_xaxis_transform(), fontsize=FS["head"])
         ticks += list(xs); labs += [f.split("/")[-1] for f in fs]
         x0 += len(fs) + 3
@@ -125,7 +125,7 @@ def main():
     ax.grid(axis="y", which="major", color="#ddd")
     ax.grid(axis="y", which="minor", color="#b0b0b0", ls=(0, (4, 4)), lw=1)
     # short, because the axis is only so tall and this label is rotated
-    ax.set_ylabel("MAE / MAE(mean), 5x2 folds\naxis inverted: higher is better",
+    ax.set_ylabel("MAE / MAE(mean), 5x2 folds\naxis inverted: up is better",
                   fontsize=FS["lab"])
     ax.tick_params(axis="y", labelsize=FS["tick"])
     ax.spines["top"].set_visible(False)
@@ -134,37 +134,26 @@ def main():
     # points while the panel is only as wide as its share of the sets, so the
     # layout has to earn its width: one swatch, not two.  The sd column says
     # it is the dashed series by underlining its heading in dashes.
-    peak = lambda i: max((mu[(s_, a)] for s_ in G[i][1]
-                          for a, *_ in ARMS if mu[(s_, a)] == mu[(s_, a)]),
-                         default=9)
     wide_enough = [i for i in range(len(G)) if len(G[i][1]) >= 8]
-    gbig = min(wide_enough or range(len(G)), key=peak)
-    # the baseline label takes whichever end the legend did not
-    if gbig == 0:
-        ax.text(x0 - 1.6, 1.0, "predict the mean", ha="right",
-                va="bottom", fontsize=FS["tick"] - 1, color="#666")
-    else:
-        ax.text(-0.4, 1.0, "predict the mean", ha="left",
-                va="bottom", fontsize=FS["tick"] - 1, color="#666")
+    gbig = (wide_enough or [max(range(len(G)), key=lambda i: len(G[i][1]))])[0]
     x0s = 0                              # left edge of widest panel
     for g, fs in G[:gbig]: x0s += len(fs) + 1
     left = (x0s + .9) / (x0 - 1.2)
     wide = len(G[gbig][1]) / (x0 - 1.2)
     tx = ax.inset_axes((left + .012, .56, wide - .025, .40))
     LEGEND_IN = (2.00, 1.00)          # inches: width, height
-    tx.set_xlim(0, 22); tx.set_ylim(0, 5.7)
+    tx.set_xlim(0, 23); tx.set_ylim(0, 5.2)
     tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
     for s_ in tx.spines.values(): s_.set_visible(False)
     mono = dict(family="monospace", fontsize=FS["mono"] - 3,
                 bbox=dict(fc="#fcfcfa", ec="none", pad=1))
-    tx.text(13.0, 5.1, "mean", ha="center", va="center", **mono)
-    tx.text(19.5, 5.1, "sd", ha="center", va="center", **mono)
     for k, (lab, c, m, a, b, _n) in enumerate(H):
-        y = 4.0 - 1.1 * k
+        y = 4.6 - 1.1 * k
         tx.text(0, y, lab, ha="left", va="center", **mono)
         tx.plot([11.2, 14.8], [y, y], color=c, lw=2.2)
         tx.plot(13.0, y, m, color=c, ms=6)
-        tx.plot([17.8, 21.2], [y, y], color=c, lw=2, ls="--")
+        tx.text(16.6, y, "sd", ha="left", va="center", **mono)
+        tx.plot([19.0, 22.0], [y, y], color=c, lw=2, ls="--")
 
     if sum(secs.get(a, 0) for a, *_ in ARMS) > 0:
         bt = sorted((secs[a], lab, c) for a, lab, c, _ in ARMS if a in secs)
@@ -204,8 +193,7 @@ def main():
     # hang the box from the TOP of the axes: a fixed fraction would put a
     # fixed-inch box through the ceiling whenever the axes came out short
     _lh = LEGEND_IN[1] / fig.get_figheight()
-    tx.set_position([_bb.x0 + (left + .012) * _bb.width,
-                     _bb.y0 + _bb.height - _lh - .005,
+    tx.set_position([_bb.x0 + (left + .012) * _bb.width, _bb.y0 + .005,
                      LEGEND_IN[0] / fig.get_figwidth(), _lh])
     rend = fig.canvas.get_renderer()
     w    = ax.yaxis.label.get_window_extent(rend).width
