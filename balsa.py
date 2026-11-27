@@ -9,7 +9,7 @@ Options:
   bins=16           labels per numeric column (syms: commonest 15)
   trees=30          trees per forest
   cap=200           rows kept per class (classification)
-  rcap=2000         rows kept, total (regression)
+  rcap=1000         rows kept, total (regression)
   leaf=2            no cut may leave fewer rows than this
   maxd=30           max tree depth
   rf=True           cols per cut: sqrt(|x|); regression |x|/3
