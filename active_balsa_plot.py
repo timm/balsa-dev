@@ -43,7 +43,7 @@ for ln, c, m in bymean:
   a = "a." + ln
   if a not in grand: continue
   ax.plot(xs, [mu.get((s, a), np.nan) for s in order], color=c, marker=m,
-          ms=4, lw=1.4, alpha=.9, label="%-5s %4.1f" % (ln, grand[a]))
+          ms=4, lw=1.4, alpha=.9, label="%-5s %3.0f" % (ln, grand[a]))
   ax.plot(xs, [sd.get((s, a), 0) for s in order], color=c, lw=1,
           ls=(0, (4, 2)), alpha=.7)
   totsec[ln] = sum(v for s in sets if (s, a) in S for v in S[(s, a)])

@@ -79,7 +79,7 @@ for ln, c, m in bymean:
   a = "%s.%s" % (AQ, ln)
   if a not in grand: continue
   ax.plot(xs, [mu.get((s, a), np.nan) for s in order], color=c, marker=m,
-          ms=4, lw=1.4, alpha=.9, label="%-6s %4.1f" % (ln, grand[a]))
+          ms=4, lw=1.4, alpha=.9, label="%-6s %3.0f" % (ln, grand[a]))
   ax.plot(xs, [sd.get((s, a), 0) for s in order], color=c, lw=1,
           ls=(0, (4, 2)), alpha=.7)                # sd curve, low on chart
   totsec[ln] = sum(v for s in sets if (s, a) in S for v in S[(s, a)])
@@ -121,7 +121,7 @@ def deltapanel(gsi, arm, c, m, lab):
       nsame += 1
   px.axhline(0, color="#999", lw=1)
   px.plot(x, [d[s] for s in o], color=c, marker=m, ms=4, lw=1.4, alpha=.9,
-          zorder=2, label="%s %+.1f" % (lab, grand[arm] - grand[BASE]))
+          zorder=2, label="%s %+.0f" % (lab, grand[arm] - grand[BASE]))
   px.set_xlim(-1, len(o))
   px.set_title("%s minus random test pick\n(grey = same, %d/%d)"
                % (lab, nsame, len(o)), fontsize=11)
