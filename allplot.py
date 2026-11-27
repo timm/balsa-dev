@@ -286,7 +286,7 @@ def main():
     _bb = ax.get_position()
     _lh = LEGEND_IN[1] / fig.get_figheight()
     tx.set_axes_locator(None)
-    tx.set_position([_bb.x0 + .006, _bb.y0 + .085 * _bb.height,
+    tx.set_position([_bb.x0 + .006, _bb.y0 + .20 * _bb.height,
                      LEGEND_IN[0] / fig.get_figwidth(), _lh])
     plt.savefig(out, dpi=200, bbox_inches="tight", pad_inches=.02)
     plt.savefig(out.rsplit(".", 1)[0] + ".pdf",
