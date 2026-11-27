@@ -8,7 +8,8 @@ Options:
   prudence=0.01     mean gaps under this are never 'different'
   bins=16           labels per numeric column (syms: commonest 15)
   trees=30          trees per forest
-  cap=200           rows per class (regression: rows, total)
+  cap=200           rows kept per class (classification)
+  rcap=2000         rows kept, total (regression)
   leaf=2            no cut may leave fewer rows than this
   maxd=30           max tree depth
   rf=True           cols per cut: sqrt(|x|); regression |x|/3
@@ -304,10 +305,10 @@ class Forest(list):
     if mk is None: mk = lambda: Ys(tb.nk)
     nk = getattr(mk(), "nk", None)
     xcols, m = tb.cols.x, None
-    if the.rf:
-      m = ceil(sqrt(len(xcols)) if nk is not None else len(xcols) / 3)
-    if the.cap is not False and the.cap is not None:
-      rows = capped(rows, y, the.cap, nk)
+    if the.rf and nk is not None:
+      m = ceil(sqrt(len(xcols)))          # regression: all columns
+    cap = the.cap if nk is not None else the.rcap
+    if cap: rows = capped(rows, y, cap, nk)
     for _ in range(the.trees):
       sample = rows if the.trees == 1 else pick(rows, len(rows) // 2)
       i.append(Tree(sample, y, xcols, mk, m, the.leaf, the.maxd))
