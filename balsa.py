@@ -22,23 +22,18 @@ def thing(s):
   return {"True": True, "False": False}.get(s, s.strip())
 
 def say(x):
-  "Anything, recursively, tersely; dicts lisp-style."
-  if isa(x, float): return ("%.2f" % x).rstrip("0").rstrip(".")
-  if isa(x, (list, tuple)):
-    return "[" + ", ".join(say(y) for y in x) + "]"
-  if isa(x, dict):
-    return "{" + " ".join(f":{k} {say(v)}" for k, v in x.items()) + "}"
-  if hasattr(x, "__dict__"): return say(vars(x))
-  if hasattr(x, "__slots__"):
-    return say({k: getattr(x, k) for k in x.__slots__ if hasattr(x, k)})
+  if isa(x, float): x = ("%.2f" % x).rstrip("0").rstrip(".")
+  elif isa(x, (list, tuple)): x = "[" + ", ".join(map(say, x)) + "]"
+  elif isa(x, dict):
+    x = "{" + " ".join(f":{k} {say(v)}" for k, v in x.items()) + "}"
+  elif hasattr(x, "__dict__"): x = say(vars(x))
+  elif hasattr(x, "__slots__"):
+    x = say({k: getattr(x, k) for k in x.__slots__ if hasattr(x, k)})
   return str(x)
 
-class o(SimpleNamespace):
-  "A generic struct: o(a=1, b=2), printed by say."
-  __repr__ = say
+class o(SimpleNamespace): __repr__ = say
 
-the = o(**{k: thing(v)
-           for k, v in re.findall(r"(\w+)=(\S+)", __doc__)})
+the = o(**{k: thing(v) for k,v in re.findall(r"(\w+)=(\S+)",__doc__)})
 
 # CSV rows. Headers start uppercase for numbers. Suffixes !, +, -, and X
 # mark the class, goals to maximize or minimize, and columns to skip.
