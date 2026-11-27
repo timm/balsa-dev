@@ -35,12 +35,6 @@ package: docs ## copy the learner into ../balsa
 	  git status --short
 	echo "now: cd ~/gh/balsa && git commit -am ... && git push"
 
-charts: ## redraw bald.png, bald30.png from runs/ (no data files needed)
-	python3 -B plot.py bald.png "lightgbm(100 trees)=lgbm.txt:lgbm" \
-	  "hair(10 trees, 8 bins)=lgbm.txt:q8" "bald(10 trees, 8 bins)=n10q8.dat:1"
-	python3 -B plot.py bald30.png --tabicl "lightgbm(100 trees)=lgbm.txt:lgbm" \
-	  "bald(10 trees, 8 bins)=n10q8.dat:1" "bald(30 trees, 16 bins)=grid-q16.dat:0"
-
 Paper := $(HOME)/gh/jssprimer
 Reg   := MOOTREG=$(HOME)/gits/moot
 

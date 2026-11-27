@@ -20,7 +20,7 @@ from os.path import expanduser
 
 isa = isinstance
 
-# Root all things -------------------------------------------------------
+# Root of all things ----------------------------------------------------
 def say(x):
   if   isa(x, float):          x = ("%.2f" % x).rstrip("0").rstrip(".")
   elif isa(x, (list, tuple)):  x = "[%s]" % ", ".join(map(say, x))
