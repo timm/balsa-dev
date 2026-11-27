@@ -95,7 +95,7 @@ def main():
                   reverse=(mode == "cls"))     # worst LightGBM first
     xs = np.arange(len(sets))
 
-    fig = plt.figure(figsize=(14.3, 2.5))
+    fig = plt.figure(figsize=(14.3, 3.75))
     gs = fig.add_gridspec(1, 3, width_ratios=[3.4, 2.3, 20], wspace=0)
     bx, ax = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
 
@@ -128,11 +128,11 @@ def main():
 
     # legend: name, its solid line (the mean), its dashed line (the sd)
     tx = ax.inset_axes((.02, .05, .4, .4))
-    LEGEND_IN = (1.90, 0.66)
+    LEGEND_IN = (2.45, 1.05)
     tx.set_xlim(0, 23); tx.set_ylim(0, 4.6)
     tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
     for s_ in tx.spines.values(): s_.set_visible(False)
-    mono = dict(family="monospace", fontsize=FS["mono"] - 3,
+    mono = dict(family="monospace", fontsize=FS["mono"],
                 bbox=dict(fc="#fcfcfa", ec="none", pad=1))
     for k, a in enumerate(ORDER):
         c, m = INK[a]
