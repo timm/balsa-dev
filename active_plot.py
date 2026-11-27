@@ -59,7 +59,7 @@ sd = {k: spread(v) for k, v in F.items()}
 grand = {a: st.fmean([mu[(s, a)] for s in sets if (s, a) in mu])
          for a in {a for _, a in F}}
 
-fig = plt.figure(figsize=(16, 6))
+fig = plt.figure(figsize=(16, 4.2))
 gs = fig.add_gridspec(1, 2, wspace=.1)
 
 # -- left: four acquire learners, sd-banded, sorted by b30 --------------
