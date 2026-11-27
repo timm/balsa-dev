@@ -212,7 +212,11 @@ def main():
     w    = ax.yaxis.label.get_window_extent(rend).width
     bars = bx.get_tightbbox(rend).x1
     tick = min(t.get_window_extent(rend).x0 for t in ax.get_yticklabels())
-    x = min(bars + 30 + w / 2, tick - 6 - w / 2)      # ticks win a tie
+    # sit as close to the y axis as the tick labels allow, but never
+    # let the left edge fall back onto the runtime bars
+    # the measured extent of a rotated two-line label overstates the
+    # ink by a few points, so lean into it rather than leave a gutter
+    x = max(bars + 8 + w / 2, tick + 7 - w / 2)
     ax.yaxis.set_label_coords(
         ax.transAxes.inverted().transform((x, 0))[0], .5)
     plt.savefig(sys.argv[2], dpi=200)
