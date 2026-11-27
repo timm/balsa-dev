@@ -61,12 +61,12 @@ sd = {k: spread(v) for k, v in F.items()}
 grand = {a: st.fmean([mu[(s, a)] for s in sets if (s, a) in mu])
          for a in {a for _, a in F}}
 
-fig = plt.figure(figsize=(16, 4.2))
-gs = fig.add_gridspec(1, 2, wspace=.1)
+fig = plt.figure(figsize=(21, 4.2))
+gs = fig.add_gridspec(1, 3, wspace=.12)
 
-# -- left: four acquire learners, sd-banded, sorted by b30 --------------
+# -- left: five acquire learners, sd-banded, sorted by tabicl -----------
 ax = fig.add_subplot(gs[0])
-order = sorted(sets, key=lambda s: mu.get((s, "a.b30"), 0))
+order = sorted(sets, key=lambda s: mu.get((s, "a.tabicl"), 0))
 xs = np.arange(len(order))
 for ln, c, m in LEARNERS:
   a = "%s.%s" % (AQ, ln)
@@ -77,7 +77,7 @@ for ln, c, m in LEARNERS:
           ls=(0, (4, 2)), alpha=.7)                # sd curve, low on chart
 ax.set_ylim(0, 112); ax.set_xlim(-1, len(order))
 ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
-ax.set_title("acquire, five learners (mean + dashed fold sd), sorted by b30",
+ax.set_title("acquire, five learners (mean + dashed fold sd), sorted by tabicl",
              fontsize=12)
 ax.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .12),
           framealpha=.9, title="learner mean")
@@ -85,38 +85,39 @@ ax.grid(axis="y", color="#eee")
 ax.set_ylabel("win (100 = optimum)\nmean over 5x2 folds", fontsize=12)
 ax.set_xlabel("optimize set (sorted)", fontsize=11)
 
-# -- right: b30 & tabicl acquire minus random, gaps where tied ----------
-bx = fig.add_subplot(gs[1])
-gap = {s: mu.get((s, "a.b30"), 0) - mu.get((s, "r.b30"), 0) for s in sets}
-order2 = sorted(sets, key=gap.get)
-x2 = np.arange(len(order2))
-def deltaline(arm):                                # a.arm - r.b30, nan if tied
-  out = []
-  for s in order2:
-    k, rk = (s, arm), (s, "r.b30")
-    if k in F and rk in F and not same(F[k], F[rk]):
-      out.append(mu[k] - mu[rk])
-    else:
-      out.append(np.nan)
-  return out
-bx.axhline(0, color="#999", lw=1)
-for arm, c, m, lab in (("a.b30", "#d62728", "s", "b30"),
-                       ("a.tabicl", "#7b3fa0", "D", "tabicl")):
-  n = sum(1 for s in order2 if (s, arm) in F and (s, "r.b30") in F
-          and not same(F[(s, arm)], F[(s, "r.b30")]))
-  bx.plot(x2, deltaline(arm), color=c, marker=m, ms=4, lw=1.4, alpha=.9,
-          label="%-7s %+4.1f (%d differ)" % (
-          lab, grand[arm] - grand["r.b30"], n))
-bx.set_xlim(-1, len(order2))
-bx.set_title("acquire minus random, drawn only where it differs",
-             fontsize=12)
-bx.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .06),
-          framealpha=.9, title="learner  mean")
-bx.grid(axis="y", color="#eee")
-bx.set_xlabel("optimize set (sorted by b30 acquire - random)", fontsize=11)
-bx.set_ylabel("win difference (acquire - random)", fontsize=12)
+# -- middle & right: one learner minus random, contiguous + grey ties ---
+def deltapanel(gsi, arm, c, m, lab):
+  "Full delta line (arm - r.b30), own sort, grey span where tied."
+  px = fig.add_subplot(gsi)
+  d = {s: mu.get((s, arm), 0) - mu.get((s, "r.b30"), 0) for s in sets}
+  o = sorted(sets, key=d.get)
+  x = np.arange(len(o))
+  nsame = 0
+  for i, s in enumerate(o):
+    if (s, arm) in F and (s, "r.b30") in F and same(F[(s, arm)], F[(s, "r.b30")]):
+      px.axvspan(i - .5, i + .5, color="#d9d9d9", lw=0, zorder=0)
+      nsame += 1
+  px.axhline(0, color="#999", lw=1)
+  px.plot(x, [d[s] for s in o], color=c, marker=m, ms=4, lw=1.4, alpha=.9,
+          zorder=2, label="%s - random  %+.1f" % (lab, grand[arm] - grand["r.b30"]))
+  px.set_xlim(-1, len(o))
+  px.set_title("%s acquire minus random, sorted "
+               "(grey = same, %d/%d)" % (lab, nsame, len(o)), fontsize=12)
+  px.legend(fontsize=10, loc="upper left", framealpha=.9)
+  px.grid(axis="y", color="#eee")
+  px.set_xlabel("optimize set (sorted by %s acquire - random)" % lab,
+                fontsize=11)
+  return px
 
-for p in (ax, bx):
+bx = deltapanel(gs[1], "a.b30",    "#d62728", "s", "b30")
+cx = deltapanel(gs[2], "a.tabicl", "#7b3fa0", "D", "tabicl")
+bx.set_ylabel("win difference (acquire - random)", fontsize=12)
+ymin = min(bx.get_ylim()[0], cx.get_ylim()[0])     # share y across mid+right
+ymax = max(bx.get_ylim()[1], cx.get_ylim()[1])
+bx.set_ylim(ymin, ymax); cx.set_ylim(ymin, ymax)
+cx.set_yticklabels([])
+
+for p in (ax, bx, cx):
   for s_ in ("top", "right"): p.spines[s_].set_visible(False)
 fig.suptitle("62 optimize sets", fontsize=14)
 fig.set_facecolor("#fcfcfa")
