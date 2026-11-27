@@ -66,7 +66,7 @@ grand = {a: st.fmean([mu[(s, a)] for s in sets if (s, a) in mu])
          for a in {a for _, a in F}}
 
 fig = plt.figure(figsize=(20, 4.8))
-gs = fig.add_gridspec(1, 2, width_ratios=[.8, 2.6], wspace=.26)
+gs = fig.add_gridspec(1, 2, width_ratios=[.55, 3.2], wspace=.18)
 
 # -- secs bars at far left; win lines centre; delta right ---------------
 hx = fig.add_subplot(gs[0])                        # runtime bars
