@@ -16,7 +16,7 @@ usage: pypy3 active.py [set ...]      moot/optimize sets > a table
 # (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 import os, sys, random
 from math import sqrt
-from balsa import (the, srand, csv, Tbl, Col, Forest, distx, mids)
+from balsa import (the, srand, csv, Tbl, Col, Num, Sym, Forest, distx, mids)
 
 the.warm, the.budget, the.check, the.pool = 4, 50, 5, 256
 
@@ -64,7 +64,34 @@ def byTree(tb, both, best, rest):
   the.trees, the.rf = 1, False
   return Forest(m, m.rows, y, Col).predict
 
-RANKERS = {"dist": byDist, "forest": byForest, "tree": byTree}
+def byLgbm(tb, both, best, rest):
+  "LightGBM regressor on the labelled rows predicts d2h (CPython only)."
+  import numpy as np, lightgbm as lgb
+  xs = tb.cols.x
+  cats = [j for j, c in enumerate(xs) if isinstance(c, Sym)]
+  def X(rows):
+    return np.array([[r[c.at] if (isinstance(c, Num) or r[c.at] == "?")
+                      else (c.labels.index(r[c.at]) if r[c.at] in c.labels
+                            else len(c.labels))
+                      for c in xs] for r in rows], dtype=float)
+  ys = [tb.disty(r) for r in both.rows]
+  m = lgb.LGBMRegressor(verbose=-1, n_jobs=1)
+  m.fit(X(both.rows), ys, categorical_feature=cats)
+  pred = {}
+  def key(r):                                  # cache a one-shot batch
+    if not pred:
+      pred.update(zip(map(id, key.test), m.predict(X(key.test))))
+    return pred[id(r)]
+  key.test = None                              # optimize fills this in
+  return key
+
+def byRand(tb, both, best, rest):
+  "Floor: ignore the model, rank the holdout at random."
+  import random
+  return lambda r: random.random()
+
+RANKERS = {"dist": byDist, "b1": byTree, "b30": byForest,
+           "lgbm": byLgbm, "rand": byRand}
 
 # -- optimize ----------------------------------------------------------
 def scorer(tb, y):
@@ -77,7 +104,9 @@ def optimize(tb, train, test, rank, smart=True):
   "Acquire on train, rank test, check the top C, grade the best."
   y = lambda r: tb.disty(r)
   both, best, rest = acquire(tb, y, the.warm, the.budget - the.check, smart)
-  checked = sorted(test, key=rank(tb, both, best, rest))[:the.check]
+  key = rank(tb, both, best, rest)
+  if hasattr(key, "test"): key.test = test     # byLgbm batches once
+  checked = sorted(test, key=key)[:the.check]
   return scorer(tb, y)(min(checked, key=y))
 
 # -- rig ---------------------------------------------------------------
@@ -88,32 +117,28 @@ def xval(rows, m=5, n=2):
       yield ([r for j, r in enumerate(u) if j % n != kf],
              [r for j, r in enumerate(u) if j % n == kf])
 
+ARMS = ["%s.%s" % (a, r) for a in "ar" for r in RANKERS]  # 2x5
+
 def run(sets):
-  arms = list(RANKERS) + ["rAcq", "rand"]
-  print("#%-28s %s" % ("data", " ".join("%7s" % a for a in arms)))
-  tot = {a: [] for a in arms}
+  print("#%-22s %s" % ("data", " ".join("%7s" % a for a in ARMS)))
+  tot = {a: [] for a in ARMS}
   for f in sets:
     root = os.getenv("MOOTOPT", "~/gits/moot/optimize")
     tb = Tbl(csv("%s/%s.csv" % (root, f)))
-    y, win = (lambda r: tb.disty(r)), None
-    win = scorer(tb, y)
-    got = {a: [] for a in arms}
+    got = {a: [] for a in ARMS}
     random.seed(the.seed)
     folds = list(xval(tb.rows))                 # fixed splits per set
     for fi, (train, test) in enumerate(folds):
-      def go(fn):                               # same pool for every arm
-        random.seed(the.seed + fi); return fn()
-      for a, rk in RANKERS.items():
-        got[a].append(go(lambda: optimize(tb, train, test, rk)))
-      got["rAcq"].append(
-        go(lambda: optimize(tb, train, test, byDist, smart=False)))
-      got["rand"].append(
-        go(lambda: win(min(shuffle(test)[:the.check], key=y))))
-    print("%-29s %s" % (f.split("/")[-1],
-          " ".join("%7.1f" % (sum(got[a]) / len(got[a])) for a in arms)))
-    for a in arms: tot[a].append(sum(got[a]) / len(got[a]))
-  print("#%-28s %s" % ("mean",
-        " ".join("%7.1f" % (sum(tot[a]) / len(tot[a])) for a in arms)))
+      for aq, smart in (("a", True), ("r", False)):
+        for rn, rk in RANKERS.items():
+          random.seed(the.seed + fi)            # same pool for every arm
+          got["%s.%s" % (aq, rn)].append(
+            optimize(tb, train, test, rk, smart))
+    print("%-23s %s" % (f.split("/")[-1],
+          " ".join("%7.1f" % (sum(got[a]) / len(got[a])) for a in ARMS)))
+    for a in ARMS: tot[a].append(sum(got[a]) / len(got[a]))
+  print("#%-22s %s" % ("mean",
+        " ".join("%7.1f" % (sum(tot[a]) / len(tot[a])) for a in ARMS)))
 
 if __name__ == "__main__":
   srand(the.seed)
