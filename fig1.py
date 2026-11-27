@@ -34,7 +34,8 @@ import os, re, sys
 
 Here = os.path.dirname(os.path.abspath(__file__))
 Lgbm = 36328
-S    = 2.50          # cm, the side of each panel's biggest square
+S    = 2.50          # cm, the WIDTH of each panel's biggest box
+Tall = 1.50          # ... and its height, as a multiple of that width
 Gap  = 0.40          # cm between panels
 
 
@@ -71,30 +72,34 @@ def tabicl(*paths):
 
 
 def panel(x, tag, title, big, small, unit="", note=None):
-    """One panel: the biggest square, then each smaller one nested in its
-    bottom-left corner, with a leader line out to its label."""
+    """One panel: the biggest box, then each smaller one nested in its
+    bottom-left corner, with a leader line out to its label.
+
+    All three panels are the same width, and every box is the same shape,
+    so AREA still carries the number: a box holding a fraction r of the
+    biggest is drawn at sqrt(r) of both its width and its height."""
+    H = S * Tall
     bn, bv, bc = big
     o = [f"  \\begin{{scope}}[xshift={x:.2f}cm]",
          f"    \\node[anchor=south west,font=\\scriptsize\\bfseries]"
-         f" at (0,{S + .06:.2f}) {{{tag}. {title}}};",
-         f"    \\filldraw[fill={bc},draw={bc}] (0,0) rectangle ({S},{S});",
+         f" at (0,{H + .06:.2f}) {{{tag}. {title}}};",
+         f"    \\filldraw[fill={bc},draw={bc}] (0,0) rectangle ({S},{H:.2f});",
          f"    \\node[anchor=north east,align=right,text=white,"
-         f"font=\\scriptsize\\bfseries] at ({S - .08:.2f},{S - .08:.2f})"
+         f"font=\\scriptsize\\bfseries] at ({S - .08:.2f},{H - .08:.2f})"
          f" {{{bn}\\\\{bv:,.0f}{unit}}};"]
     for k, (nm, v, c) in enumerate(small):
-        side = S * (v / bv) ** .5
-        # tiny squares get a minimum drawn size, or they vanish in print;
-        # the label carries the number, the square carries the comparison
+        r = (v / bv) ** .5
+        side, tall = S * r, H * r
         dx = sum(S * (u / bv) ** .5 + .06 for _, u, _ in small[:k])
         o.append(f"    \\fill[{c}] ({dx:.3f},0) rectangle "
-                 f"++({side:.3f},{side:.3f});")
-        y = 1.25 - .62 * k
+                 f"++({side:.3f},{tall:.3f});")
+        y = H * .52 - .62 * k
         o.append(f"    \\node[anchor=west,text=white,inner sep=1pt,align=left,"
                  f"text width={S - .70:.2f}cm,font=\\scriptsize] (l{tag}{k})"
                  f" at (.62,{y:.2f}) {{{nm}}};")
         o.append(f"    \\draw[->,white,line width=.4pt,shorten >=2.5pt]"
                  f" (l{tag}{k}.west) to[out=180,in=60]"
-                 f" ({dx + side * .6:.3f},{side * .9:.3f});")
+                 f" ({dx + side * .6:.3f},{tall * .9:.3f});")
     if note:
         o.append(f"    \\node[anchor=south west,text=white,inner sep=1pt,"
                  f"font=\\scriptsize\\itshape] at (.1,.08) {{{note}}};")
@@ -136,8 +141,9 @@ def main():
                 ("TabICL", rt, "tabiclC"),
                 [(f"this learner\\\\{rb:,.0f}s", rb, "balsaC")], unit="s"))
     print(f"""  \\end{{tikzpicture}}
-  \\caption{{Area $\\propto$ size, so a square's {{\\em side}} is the square
-  root of its number. (a) lines of code: LightGBM's C++ core against the
+  \\caption{{Area $\\propto$ size: every box here is the same shape, so a
+  box holding a tenth of another is drawn at $\\sqrt{{1/10}}$ of its width
+  and of its height. (a) lines of code: LightGBM's C++ core against the
   learner of \\S\\ref{{sec:code}} and the harness that runs it, counted from
   the source. (b) and (c) total run time, one thread each, summed over the
   folds of Figures~\\ref{{fig:se}}--\\ref{{fig:nose}} and
