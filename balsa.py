@@ -30,7 +30,7 @@ def say(x):
 
 class Box:
   def __init__(i, **d) : i.__dict__.update(**d)
-  def __repr__(i)      : type(i).__name__ + say(vars(i))
+  def __repr__(i)      : return type(i).__name__ + say(vars(i))
 
 # config ----------------------------------------------------------------
 def thing(s):
@@ -42,7 +42,7 @@ def thing(s):
 the = Box(**{k: thing(v) for k,v in re.findall(r"(\w+)=(\S+)",__doc__)})
 
 # csv ------------------------------------------------------------------
-# CSV rows. Headers start uppercase for numbers. Suffixes !, +, -, and X
+# csV rows. Headers start uppercase for numbers. Suffixes !, +, -, and X
 # mark the class, goals to maximize or minimize, and columns to skip.
 class Row(list):
   __slots__ = ("labels", "d2h")
@@ -53,7 +53,7 @@ def csv(file):
             for s in f if (line := s.replace("\r", "").strip())]
 
 # Column ----------------------------------------------------------------
-# Column and target summaries. Known labels are 0..n-1; "?" is -1,
+# column and target summaries. Known labels are 0..n-1; "?" is -1,
 # so "unknown" is always label < 0.
 class Column(Box):
   def __init__(i, txt, at): i.txt, i.at, i.n = txt, at, 0
@@ -178,7 +178,7 @@ class Ys(Box):
     u.n = i.n + inc * b.n
     return u
 
-# xxxxx y -------------------------------------------------------------
+# Generics -------------------------------------------------------------
 def adds(vs, col=None):
   col = Num() if col is None else col
   for v in vs: col.add(v)
@@ -232,7 +232,7 @@ class Tbl(Box):
     return sqrt(d / max(n, 1))
 
 # Tree -------------------------------------------------------------
-# Split search and trees. Numeric cuts use a threshold, symbolic cuts
+# split search and trees. Numeric cuts use a threshold, symbolic cuts
 # use equality, and unknowns go left.
 def xpect(left, right):
   return ((left.n * left.div() + right.n * right.div())
