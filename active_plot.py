@@ -16,9 +16,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 AQ = "a"                                           # acquire only
-LEARNERS = [("dist", "#d62728", "^"), ("b1", "#2ca02c", "v"),
-            ("b30", "#e8613c", "s"), ("lgbm", "#2a6fdb", "o"),
-            ("tabicl", "#000000", "D")]
+LEARNERS = [("dist", "#d62728", "^"), ("knn", "#7b3fa0", "P"),
+            ("b1", "#2ca02c", "v"), ("b30", "#e8613c", "s"),
+            ("lgbm", "#2a6fdb", "o"), ("tabicl", "#000000", "D")]
 PRUDENCE = 0.01
 
 def spread(v):
@@ -94,7 +94,7 @@ hx.set_xticks(range(len(bars))); hx.set_xticklabels([b[0] for b in bars],
                                                     fontsize=8)
 ax.set_ylim(0, 112); ax.set_xlim(-1, len(order))
 ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
-ax.set_title("acquire, five learners (mean + dashed fold sd), sorted by tabicl",
+ax.set_title("acquire, six learners (mean + dashed fold sd), sorted by tabicl",
              fontsize=12)
 ax.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .12),
           framealpha=.9, title="learner mean")

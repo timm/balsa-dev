@@ -19,6 +19,7 @@ from math import sqrt
 from balsa import (the, srand, csv, Tbl, Col, Num, Sym, Forest, distx, mids)
 
 the.warm, the.budget, the.check, the.pool = 4, 50, 5, 256
+the.bexp = .5                                  # best holds n**bexp of both
 
 def shuffle(t):
   t = t[:]; random.shuffle(t); return t
@@ -27,7 +28,7 @@ def shuffle(t):
 def label(both, best, rest, row, y):
   "Pay for one label: the row joins best; best's worst spills to rest."
   both.add(best.add(row))
-  while len(best.rows) > int(len(both.rows) ** .5):
+  while len(best.rows) > int(len(both.rows) ** the.bexp):
     best.add(rest.add(max(best.rows, key=y)), -1)
 
 def acquire(tb, y, warm, budget, smart=True):
@@ -49,6 +50,13 @@ def byDist(tb, both, best, rest):
   "No model: nearer best's centroid than rest's."
   bm, rm = mids(best), mids(rest)
   return lambda r: distx(both, r, bm) - distx(both, r, rm)
+
+def byKnn(tb, both, best, rest):
+  "No model: mean d2h of the 3 nearest labelled rows."
+  def key(r):
+    ds = sorted((distx(both, r, x), tb.disty(x)) for x in both.rows)
+    return sum(y for _, y in ds[:3]) / 3
+  return key
 
 def byForest(tb, both, best, rest):
   "A regression forest on the labelled rows predicts d2h."
@@ -123,7 +131,7 @@ def byRand(tb, both, best, rest):
   import random
   return lambda r: random.random()
 
-RANKERS = {"dist": byDist, "b1": byTree, "b30": byForest,
+RANKERS = {"dist": byDist, "knn": byKnn, "b1": byTree, "b30": byForest,
            "lgbm": byLgbm, "tabicl": byTabicl, "rand": byRand}
 
 # -- optimize ----------------------------------------------------------
