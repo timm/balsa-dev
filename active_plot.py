@@ -92,7 +92,6 @@ for i, (ln, c, t) in enumerate(bars):
           fontsize=10, fontweight="bold")
 hx.set_yticks(range(len(bars)))
 hx.set_yticklabels([NAME.get(b[0], b[0]) for b in bars], fontsize=9)
-hx.invert_yaxis()                                  # best learner on top
 hx.margins(x=.6)
 ax.set_ylim(0, 112); ax.set_xlim(-1, len(order))
 ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
@@ -101,7 +100,10 @@ ax.set_title("acquire, five learners (mean + dashed fold sd), sorted by 1nn",
 ax.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .12),
           framealpha=.9, title="learner mean",
           prop={"family": "monospace", "size": 10})
-ax.grid(axis="y", color="#eee")
+ax.set_yticks([10, 30, 50, 70, 90])
+ax.tick_params(axis="y", length=0)
+for v_ in (10, 30, 50, 70, 90):
+  ax.axhline(v_, color="#bbb", lw=.8, ls=(0, (4, 4)), zorder=0)
 ax.set_ylabel("win (100 = optimum)\nmean over 5x2 folds", fontsize=12)
 ax.set_xlabel("optimize set (sorted)", fontsize=11)
 hx.set_xscale("log")

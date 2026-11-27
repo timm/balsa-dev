@@ -56,7 +56,6 @@ for i, (ln, c, t) in enumerate(bars):
           fontsize=10, fontweight="bold")
 hx.set_yticks(range(len(bars)))
 hx.set_yticklabels([{"knn": "1nn"}.get(b[0], b[0]) for b in bars])
-hx.invert_yaxis()
 hx.set_xscale("log")
 hx.set_title("total secs over all\nfolds (log, 1 thread)", fontsize=10)
 hx.grid(axis="x", color="#eee"); hx.margins(x=.6)
@@ -67,7 +66,10 @@ ax.set_title("acquire, three balsa rankers (mean + dashed fold sd), sorted by 1n
 ax.legend(fontsize=11, loc="lower right", bbox_to_anchor=(.995, .12),
           framealpha=.9, title="ranker mean",
           prop={"family": "monospace", "size": 11})
-ax.grid(axis="y", color="#eee")
+ax.set_yticks([10, 30, 50, 70, 90])
+ax.tick_params(axis="y", length=0)
+for v_ in (10, 30, 50, 70, 90):
+  ax.axhline(v_, color="#bbb", lw=.8, ls=(0, (4, 4)), zorder=0)
 ax.set_ylabel("win (100 = optimum)\nmean over 5x2 folds", fontsize=12)
 ax.set_xlabel("optimize set (sorted)", fontsize=11)
 for p in (ax, hx):
