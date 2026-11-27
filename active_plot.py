@@ -130,7 +130,7 @@ def deltapanel(gsi, arm, c, m, lab):
   px.set_xlabel("set (sorted by gap)", fontsize=10)
   return px
 
-bx = deltapanel(gs[1], "a.b30",    "#e8613c", "s", "b30")
+bx = deltapanel(gs[1], "a.knn",    "#7b3fa0", "P", "knn")
 cx = deltapanel(gs[2], "a.tabicl", "#000000", "D", "tabicl")
 bx.set_ylabel("win vs random test pick", fontsize=11)
 ymin = min(bx.get_ylim()[0], cx.get_ylim()[0])     # share y across mid+right
