@@ -55,12 +55,12 @@ def byKnn(tb, both, best, rest):
   "No model: mean d2h of the 3 nearest labelled rows."
   xy = [(x, tb.disty(x)) for x in both.rows]   # label ys once, not per row
   def key(r):
-    near = []                                  # (dist, y) ascending, max 3
+    near = []                                  # (xdist, y) ascending, max 3
     for x, y in xy:
-      dy = (distx(both, r, x), y)
-      if len(near) < 3 or dy < near[-1]:       # binary chop into the top 3
-        i = bisect(near, dy)
-        near = (near[:i] + [dy] + near[i:])[:3]
+      d = distx(both, r, x)                    # sort on x-distance; y only
+      if len(near) < 3 or (d, y) < near[-1]:   # breaks exact-distance ties
+        i = bisect(near, (d, y))
+        near = (near[:i] + [(d, y)] + near[i:])[:3]
     return sum(y for _, y in near) / len(near)
   return key
 
