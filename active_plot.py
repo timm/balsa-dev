@@ -1,14 +1,10 @@
 #!/usr/bin/env python3 -B
-"""active_plot: the active-learning figure from runs/active.txt.
+"""active_plot: the active-learning figure. Left, total seconds per
+learner (log bars, sorted by cost). Right, the five acquire arms --
+1nn, b1, b30, lgbm, tabicl -- mean win per set (solid) and fold sd
+(dashed), sets sorted by 1nn. Win = 100 is the best row in the table.
 
-Left: acquire only (chase the best centroid), four learners -- dist,
-b1, b30, lgbm -- each line banded by its fold sd, sorted by b30.
-Right: acquire-b30 vs random-b30, sets sorted by their gap, with a
-grey column wherever the two are statistically the same (Cliff's
-delta and a KS test both small, or means within prudence).
-Win = 100 is the best row in the table.
-
-usage: python3 active_plot.py runs/active.txt ens-active.png
+usage: python3 active_plot.py <folds-files...> ens-active.png
 """
 import sys, statistics as st
 import matplotlib; matplotlib.use("Agg")
@@ -20,35 +16,11 @@ NAME = {"knn": "1nn"}                              # data key -> shown name
 LEARNERS = [("knn", "#7b3fa0", "P"), ("b1", "#2ca02c", "v"),
             ("b30", "#e8613c", "s"), ("lgbm", "#2a6fdb", "o"),
             ("tabicl", "#000000", "D")]
-PRUDENCE = 0.01
 
 def spread(v):
   v = sorted(v); n = len(v)
   q = lambda p: v[min(n - 1, int(p * n))]
   return (q(.9) - q(.1)) / 2.56
-
-def bisect(a, x, right=False):
-  lo, hi = 0, len(a)
-  while lo < hi:
-    m = (lo + hi) // 2
-    if (a[m] <= x if right else a[m] < x): lo = m + 1
-    else: hi = m
-  return lo
-
-def cliffs(xs, ys):
-  d = sum(bisect(ys, x) - (len(ys) - bisect(ys, x, True)) for x in xs)
-  return abs(d) / (len(xs) * len(ys))
-
-def ks(xs, ys):
-  n, m = len(xs), len(ys)
-  d = max(abs(bisect(xs, v, True) / n - bisect(ys, v, True) / m)
-          for v in xs + ys)
-  return d / ((n + m) / (n * m)) ** .5
-
-def same(xs, ys):
-  xs, ys = sorted(xs), sorted(ys)
-  if abs(sum(xs)/len(xs) - sum(ys)/len(ys)) < PRUDENCE: return True
-  return cliffs(xs, ys) <= 0.195 and ks(xs, ys) <= 1.36
 
 F, S = {}, {}                                      # wins, seconds
 for path in sys.argv[1:-1]:                        # all inputs but the png
