@@ -1,24 +1,25 @@
 # vim: set ts=2 sw=2 sts=2 et cc=75:
-"""Label cells once, grow trees over the labels, and combine predictions.
-
-Balsa for Python 3.11+. Column positions are zero-based. Settings:
-
-  seed=1234567891 prudence=0.01 bins=16 trees=30 cap=200
-  leaf=2 maxd=30 rf=True
 """
-# (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
+balsa: lightweight ensemble trees for classification, regression
+(c) 2026 Tim Menzies <timm@ieee.org>, MIT license
+
+
+Options:
+  seed=1234567891   random number seed (Park-Miller)
+  prudence=0.01     mean gaps under this are never 'different'
+  bins=16           labels per numeric column (syms: commonest 15)
+  trees=30          trees per forest
+  cap=200           rows per class (regression: rows, total)
+  leaf=2            no cut may leave fewer rows than this
+  maxd=30           max tree depth
+  rf=True           cols per cut: sqrt(|x|); regression |x|/3
+"""
 import re
 from bisect import bisect_left, bisect_right
 from math import ceil, exp, floor, inf, log, nan, sqrt
 from os.path import expanduser
 
 isa = isinstance
-
-def thing(s):
-  for f in (int, float):
-    try: return f(s)
-    except ValueError: pass
-  return {"True": True, "False": False}.get(s, s.strip())
 
 def say(x):
   if hasattr(x, "__dict__"): x = say(vars(x))
@@ -31,8 +32,14 @@ def say(x):
   return str(x)
 
 class Box:
-  def __init__(i, **d): i.__dict__.update(**d)
+  __init__ = lambda i, **d: i.__dict__.update(**d)
   __repr__ = say
+
+def thing(s):
+  for f in (int, float):
+    try: return f(s)
+    except ValueError: pass
+  return {"True": True, "False": False}.get(s, s.strip())
 
 the = Box(**{k: thing(v) for k,v in re.findall(r"(\w+)=(\S+)",__doc__)})
 
