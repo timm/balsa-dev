@@ -28,8 +28,8 @@ def say(x):
   return str(x)
 
 class Box:
-  __init__ = lambda i, **d: i.__dict__.update(**d)
-  __repr__ = lambda i: type(i).__name__ + say(vars(i))
+  def __init__(i, **d) : i.__dict__.update(**d)
+  def __repr__(i)      : type(i).__name__ + say(vars(i))
 
 def thing(s):
   for f in (int, float):
