@@ -193,7 +193,11 @@ def main():
     # hang the box from the TOP of the axes: a fixed fraction would put a
     # fixed-inch box through the ceiling whenever the axes came out short
     _lh = LEGEND_IN[1] / fig.get_figheight()
-    tx.set_position([_bb.x0 + (left + .012) * _bb.width, _bb.y0 + .005,
+    _axw = _bb.width * fig.get_figwidth()            # axes width, inches
+    _f   = min(LEGEND_IN[0] / _axw, .45)             # legend's share of it
+    _lo, _hi = ax.get_xlim()
+    ax.set_xlim(_hi - (_hi - _lo) / (1 - _f) if _f < .99 else _lo, _hi)
+    tx.set_position([_bb.x0 + .004, _bb.y0 + .005,
                      LEGEND_IN[0] / fig.get_figwidth(), _lh])
     rend = fig.canvas.get_renderer()
     w    = ax.yaxis.label.get_window_extent(rend).width

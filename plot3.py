@@ -25,7 +25,7 @@ if SE:   # moot/classify/se: one panel per task
        ("se/defect/","defects"),("se/static/cooked/","static\nwarnings")]
   G=[(h,[f for f in order if f.startswith(p)]) for p,h in SEG]
   order=[f for _,fs in G for f in fs]
-  CAPY,TAB,MONO=48,[.40,.10,.40,.54],14   # FS['mono'] is set below
+  CAPY,TAB,MONO,LEGIN=48,[.40,.10,.40,.54],11,(1.95,0.98)
 else:    # the 39 non-SE classify sets, grouped by NAME (some sets may
          # be missing: TabICL never terminated there)
   ENS=["balance.scale","blood-transfusion-service-center","breast.w",
@@ -42,7 +42,7 @@ else:    # the 39 non-SE classify sets, grouped by NAME (some sets may
       ("mixed\nattributes",20,30),("large, mixed",30,39)]]
   G=[(h,fs) for h,fs in G if fs]
   order=[f for _,fs in G for f in fs]
-  CAPY,TAB,MONO=52,[.595,.06,.40,.54],11
+  CAPY,TAB,MONO,LEGIN=52,[.015,.13,.40,.54],9,(1.60,0.76)
 T=[(os.getenv("LAB1","balsa(1)"),0,"#2ca02c","^"),
    ("lgbm(100)",2,"#2a6fdb","o"),
    (os.getenv("LAB30","balsa(30)"),1,"#e8613c","s"),
@@ -119,7 +119,7 @@ _bb = ax.get_position()                 # figure fractions, after layout
 tx.set_axes_locator(None)
 tx.set_position([_bb.x0 + TAB[0] * _bb.width,
                  _bb.y0 + TAB[1] * _bb.height,
-                 (2.35 if MONO >= 14 else 1.85) / fig.get_figwidth(),
-                 (1.15 if MONO >= 14 else 0.92) / fig.get_figheight()])
+                 LEGIN[0] / fig.get_figwidth(),
+                 LEGIN[1] / fig.get_figheight()])
 plt.savefig(sys.argv[2],dpi=200)
 plt.savefig(sys.argv[2].rsplit(".",1)[0]+".pdf")   # vector copy for the paper
