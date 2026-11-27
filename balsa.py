@@ -13,6 +13,8 @@ from math import ceil, exp, floor, inf, log, nan, sqrt
 from os.path import expanduser
 from types import SimpleNamespace
 
+isa = isinstance
+
 def thing(s):
   for f in (int, float):
     try: return f(s)
@@ -21,10 +23,10 @@ def thing(s):
 
 def say(x):
   "Anything, recursively, tersely; dicts lisp-style."
-  if isinstance(x, float): return ("%.2f" % x).rstrip("0").rstrip(".")
-  if isinstance(x, (list, tuple)):
+  if isa(x, float): return ("%.2f" % x).rstrip("0").rstrip(".")
+  if isa(x, (list, tuple)):
     return "[" + ", ".join(say(y) for y in x) + "]"
-  if isinstance(x, dict):
+  if isa(x, dict):
     return "{" + " ".join(f":{k} {say(v)}" for k, v in x.items()) + "}"
   if hasattr(x, "__dict__"): return say(vars(x))
   if hasattr(x, "__slots__"):
@@ -87,7 +89,7 @@ class Sym(Column):
 
   def labels_for(i, n, rows=None):
     def key(v):
-      txt = format(v, ".14g") if isinstance(v, float) else str(v)
+      txt = format(v, ".14g") if isa(v, float) else str(v)
       return -i.has[v], txt
     ranked = sorted(i.has, key=key)
     return ranked[:max(0, min(len(ranked), n - 1))]
@@ -191,7 +193,7 @@ class Cols:
       if suffix == "!": i.klass = col
 
   def add(i, row):
-    row = row if isinstance(row, Row) else Row(row)
+    row = row if isa(row, Row) else Row(row)
     for col in i.all: col.add(row[col.at])
     return row
 
@@ -204,7 +206,7 @@ class Tbl:
   def labelall(i):
     cols, klass, i.nk = i.cols.x[:], i.cols.klass, 0
     for col in cols: col.labels = col.labels_for(the.bins, i.rows)
-    if isinstance(klass, Sym):
+    if isa(klass, Sym):
       klass.labels = klass.class_labels()
       cols.append(klass)
       i.nk = len(klass.labels)
