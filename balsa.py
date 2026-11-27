@@ -20,7 +20,7 @@ from os.path import expanduser
 
 isa = isinstance
 
-# root all things -------------------------------------------------------
+# Root all things -------------------------------------------------------
 def say(x):
   if   isa(x, float):          x = ("%.2f" % x).rstrip("0").rstrip(".")
   elif isa(x, (list, tuple)):  x = "[%s]" % ", ".join(map(say, x))
@@ -190,6 +190,21 @@ def yfold(ys, other, inc=1, u=None):
 def tolabel(col, v): return -1 if v == "?" else col.label(v)
 
 # Tables -------------------------------------------------------------
+class Cols(Box):
+  def __init__(i, names):
+    i.names, i.x, i.y, i.klass = names, [], [], None
+    i.all = [Col(txt, j) for j, txt in enumerate(names)]
+    for col in i.all:
+      suffix = col.txt[-1:]
+      if suffix == "X": continue
+      (i.y if suffix in ("+", "-", "!") else i.x).append(col)
+      if suffix == "!": i.klass = col
+
+  def add(i, row):
+    row = row if isa(row, Row) else Row(row)
+    for col in i.all: col.add(row[col.at])
+    return row
+
 class Tbl(Box):
   def __init__(i, rows):
     i.cols = Cols(rows[0])
@@ -215,21 +230,6 @@ class Tbl(Box):
         d += (col.norm(v) - col.goal) ** 2
         n += 1
     return sqrt(d / max(n, 1))
-
-class Cols(Box):
-  def __init__(i, names):
-    i.names, i.x, i.y, i.klass = names, [], [], None
-    i.all = [Col(txt, j) for j, txt in enumerate(names)]
-    for col in i.all:
-      suffix = col.txt[-1:]
-      if suffix == "X": continue
-      (i.y if suffix in ("+", "-", "!") else i.x).append(col)
-      if suffix == "!": i.klass = col
-
-  def add(i, row):
-    row = row if isa(row, Row) else Row(row)
-    for col in i.all: col.add(row[col.at])
-    return row
 
 # Tree -------------------------------------------------------------
 # Split search and trees. Numeric cuts use a threshold, symbolic cuts
