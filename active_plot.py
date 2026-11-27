@@ -101,9 +101,9 @@ ax.set_title("acquire, five learners (mean + dashed fold sd), sorted by 1nn",
 ax.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .12),
           framealpha=.9, title="learner mean",
           prop={"family": "monospace", "size": 10})
-ax.set_yticks([10, 30, 50, 70, 90])
+ax.set_yticks([20, 40, 60, 80, 100])
 ax.tick_params(axis="y", length=0)
-for v_ in (10, 30, 50, 70, 90):
+for v_ in range(10, 101, 10):
   ax.axhline(v_, color="#bbb", lw=.8, ls=(0, (4, 4)), zorder=0)
 ax.set_ylabel("win (100 = optimum)\nmean over 5x2 folds", fontsize=12)
 ax.set_xlabel("optimize set (sorted)", fontsize=11)
