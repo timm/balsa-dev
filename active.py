@@ -14,7 +14,7 @@ the scale of the score, never a feature.
 usage: pypy3 active.py [set ...]      moot/optimize sets > a table
 """
 # (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
-import os, sys, random
+import os, sys, time, random
 from math import sqrt
 from balsa import (the, srand, csv, Tbl, Col, Num, Sym, Forest, distx, mids)
 
@@ -69,11 +69,13 @@ def byLgbm(tb, both, best, rest):
   import numpy as np, lightgbm as lgb
   xs = tb.cols.x
   cats = [j for j, c in enumerate(xs) if isinstance(c, Sym)]
+  def cell(c, v):
+    if v == "?": return float("nan")             # lgbm handles nan natively
+    if isinstance(c, Num): return float(v)
+    return c.labels.index(v) if v in c.labels else len(c.labels)
   def X(rows):
-    return np.array([[r[c.at] if (isinstance(c, Num) or r[c.at] == "?")
-                      else (c.labels.index(r[c.at]) if r[c.at] in c.labels
-                            else len(c.labels))
-                      for c in xs] for r in rows], dtype=float)
+    return np.array([[cell(c, r[c.at]) for c in xs] for r in rows],
+                    dtype=float)
   ys = [tb.disty(r) for r in both.rows]
   m = lgb.LGBMRegressor(verbose=-1, n_jobs=1)
   m.fit(X(both.rows), ys, categorical_feature=cats)
@@ -156,11 +158,11 @@ ACQS = os.getenv("ACQS", "ar")                    # "a" = acquire only
 ARMS = ["%s.%s" % (a, r) for a in ACQS for r in RANKERS if r in WANT]
 
 def run(sets):
-  tot = {a: [] for a in ARMS}
   for f in sets:
     root = os.getenv("MOOTOPT", "~/gits/moot/optimize")
     tb = Tbl(csv("%s/%s.csv" % (root, f)))
     got = {a: [] for a in ARMS}
+    sec = {a: [] for a in ARMS}
     random.seed(the.seed)
     folds = list(xval(tb.rows))                 # fixed splits per set
     for fi, (train, test) in enumerate(folds):
@@ -168,11 +170,14 @@ def run(sets):
         if aq not in ACQS: continue
         for rn in WANT:
           random.seed(the.seed + fi)            # same pool for every arm
+          t0 = time.process_time()
           got["%s.%s" % (aq, rn)].append(
             optimize(tb, train, test, RANKERS[rn], smart))
+          sec["%s.%s" % (aq, rn)].append(time.process_time() - t0)
     for a in ARMS:                              # one line per (set,arm)
-      v = got[a]
-      print("%%folds %s %s %s" % (f, a, " ".join("%.1f" % x for x in v)),
+      print("%%folds %s %s %s" % (f, a, " ".join("%.1f" % x for x in got[a])),
+            flush=True)
+      print("%%secs %s %s %s" % (f, a, " ".join("%.4f" % x for x in sec[a])),
             flush=True)
 
 def expand(args):
