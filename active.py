@@ -14,7 +14,7 @@ the scale of the score, never a feature.
 usage: pypy3 active.py [set ...]      moot/optimize sets > a table
 """
 # (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
-import os, sys, time, random
+import os, sys, time, heapq, random
 from balsa import the, srand, csv, Tbl, Col, Num, Sym, Forest, distx, mids
 
 the.warm, the.budget, the.check, the.pool = 4, 50, 5, 256
@@ -52,7 +52,6 @@ def byDist(tb, both, best, rest):
 
 def byKnn(tb, both, best, rest):
   "No model: mean d2h of the 3 nearest labelled rows."
-  import heapq
   xy = [(x, tb.disty(x)) for x in both.rows]   # label ys once, not per row
   def key(r):
     ds = heapq.nsmallest(3, ((distx(both, r, x), y) for x, y in xy))
@@ -62,8 +61,7 @@ def byKnn(tb, both, best, rest):
 def byTrees(trees, rf):
   "A forest (or one tree) on the labelled rows predicts d2h."
   def rank(tb, both, best, rest):
-    m = Tbl([both.cols.names] + both.rows)
-    the.trees, the.rf = trees, rf
+    the.trees, the.rf, m = trees, rf, Tbl([both.cols.names] + both.rows)
     return Forest(m, m.rows, lambda r: m.disty(r), Col).predict
   return rank
 
@@ -71,9 +69,9 @@ def matrix(tb, rows, impute=False):
   "Rows as floats: ? is nan (or the column median), syms their code."
   import numpy as np
   def cell(c, v):
-    if v == "?": return float("nan")
-    return float(v) if isinstance(c, Num) else (
-      c.labels.index(v) if v in c.labels else len(c.labels))
+    return (float("nan") if v == "?" else
+            float(v) if isinstance(c, Num) else
+            c.labels.index(v) if v in c.labels else len(c.labels))
   a = np.array([[cell(c, r[c.at]) for c in tb.cols.x] for r in rows],
                dtype=float)
   if impute:                                   # TabICL takes no NaN
@@ -164,8 +162,7 @@ def run(sets):
   root = os.getenv("MOOTOPT", "~/gits/moot/optimize")
   for f in sets:
     tb = Tbl(csv("%s/%s.csv" % (root, f)))
-    got = {a: [] for a in ARMS}
-    sec = {a: [] for a in ARMS}
+    got, sec = {a: [] for a in ARMS}, {a: [] for a in ARMS}
     random.seed(the.seed)
     folds = list(xval(tb.rows))                 # fixed splits per set
     for fi, (train, test) in enumerate(folds):
@@ -184,12 +181,9 @@ def run(sets):
 
 def expand(args):
   "A .txt arg is a file of set names, one per line; else a set name."
-  out = []
-  for a in args:
-    if a.endswith(".txt"):
-      out += [l.split()[0] for l in open(a) if l.split()]
-    else: out.append(a)
-  return out
+  return [s for a in args for s in
+          ([l.split()[0] for l in open(a) if l.split()]
+           if a.endswith(".txt") else [a])]
 
 if __name__ == "__main__":
   srand(the.seed)
