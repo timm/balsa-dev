@@ -85,29 +85,35 @@ ax.grid(axis="y", color="#eee")
 ax.set_ylabel("win (100 = optimum)\nmean over 5x2 folds", fontsize=12)
 ax.set_xlabel("optimize set (sorted)", fontsize=11)
 
-# -- right: acquire-b30 vs random-b30, sorted by gap, grey where same ---
+# -- right: b30 & tabicl acquire, only where they beat random (r.b30) ---
 bx = fig.add_subplot(gs[1])
 gap = {s: mu.get((s, "a.b30"), 0) - mu.get((s, "r.b30"), 0) for s in sets}
 order2 = sorted(sets, key=gap.get)
 x2 = np.arange(len(order2))
-nsame = 0
-for i, s in enumerate(order2):
-  if (s, "a.b30") in F and (s, "r.b30") in F \
-     and same(F[(s, "a.b30")], F[(s, "r.b30")]):
-    bx.axvspan(i - .5, i + .5, color="#d9d9d9", lw=0, zorder=0)
-    nsame += 1
-bx.axhline(0, color="#999", lw=1)
-bx.plot(x2, [gap[s] for s in order2], color="#333", marker="o", ms=3,
-        lw=1.4, zorder=2, label="acquire - random  %+.1f" % (
-        grand["a.b30"] - grand["r.b30"]))
-bx.set_xlim(-1, len(order2))
-bx.set_title("b30: acquire minus random, sorted "
-             "(grey = statistically same, %d/%d)" % (nsame, len(order2)),
+def diffline(arm):                                 # win, masked where tied
+  out = []
+  for s in order2:
+    k, rk = (s, arm), (s, "r.b30")
+    if k in F and rk in F and not same(F[k], F[rk]):
+      out.append(mu[k])
+    else:
+      out.append(np.nan)
+  return out
+for arm, c, m, lab in (("a.b30", "#d62728", "s", "b30"),
+                       ("a.tabicl", "#7b3fa0", "D", "tabicl")):
+  n = sum(1 for s in order2 if (s, arm) in F and (s, "r.b30") in F
+          and not same(F[(s, arm)], F[(s, "r.b30")]))
+  bx.plot(x2, diffline(arm), color=c, marker=m, ms=4, lw=1.4, alpha=.9,
+          label="%-7s %4.1f (%d differ)" % (lab, grand[arm], n))
+bx.set_ylim(0, 112); bx.set_xlim(-1, len(order2))
+bx.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
+bx.set_title("acquire win, shown only where it differs from random",
              fontsize=12)
-bx.legend(fontsize=10, loc="upper left", framealpha=.9)
+bx.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .12),
+          framealpha=.9, title="learner mean")
 bx.grid(axis="y", color="#eee")
-bx.set_xlabel("optimize set (sorted by acquire - random)", fontsize=11)
-bx.set_ylabel("win difference (acquire - random)", fontsize=12)
+bx.set_xlabel("optimize set (sorted by b30 acquire - random)", fontsize=11)
+bx.set_yticklabels([])
 
 for p in (ax, bx):
   for s_ in ("top", "right"): p.spines[s_].set_visible(False)
@@ -116,6 +122,5 @@ fig.set_facecolor("#fcfcfa")
 for a in fig.axes: a.set_facecolor("#fcfcfa")
 plt.savefig(sys.argv[-1], dpi=200, bbox_inches="tight")
 plt.savefig(sys.argv[-1].rsplit(".", 1)[0] + ".pdf", bbox_inches="tight")
-print("b30 acquire vs random: same on %d of %d sets" % (nsame, len(sets)))
 for a in sorted(grand, key=lambda a: -grand[a]):
   print("%-8s %5.1f" % (a, grand[a]))
