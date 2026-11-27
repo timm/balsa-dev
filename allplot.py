@@ -91,8 +91,18 @@ def main():
           for s in F for a in ORDER}
     sd = {(s, a): (spread(F[s][a]) if a in F[s] else nan)
           for s in F for a in ORDER}
-    sets = sorted(F, key=lambda s: mu[(s, "lgbm(100)")],
-                  reverse=(mode == "cls"))     # worst LightGBM first
+    # ordered by TabICL, the strongest treatment, so the curve it traces
+    # is monotone and the others are read against it.  TabICL is capped by
+    # rows in regression, so the sets it never ran sort last, among
+    # themselves by LightGBM -- a NaN key would otherwise order nothing.
+    SORT, FALL = "TabICL", "lgbm(100)"
+    hi = mode == "cls"                     # in AUC, bigger is better
+    def key(s):
+        v = mu[(s, SORT)]
+        if v == v: return (0, -v if hi else v)
+        w = mu[(s, FALL)]
+        return (1, -w if hi else w)
+    sets = sorted(F, key=key)
     xs = np.arange(len(sets))
 
     fig = plt.figure(figsize=(14.3, 3.75))
@@ -122,7 +132,9 @@ def main():
     ax.tick_params(axis="y", labelsize=FS["tick"])
     ax.set_xlim(-1, len(sets))
     ax.set_xticks([])
-    ax.set_xlabel(f"{len(sets)} data sets, ordered by LightGBM's mean",
+    miss = sum(1 for s in sets if mu[(s, SORT)] != mu[(s, SORT)])
+    ax.set_xlabel(f"{len(sets)} data sets, ordered by TabICL's mean"
+                  + (f" ({miss} it did not run come last)" if miss else ""),
                   fontsize=FS["lab"])
     for s_ in ("top", "right"): ax.spines[s_].set_visible(False)
 
