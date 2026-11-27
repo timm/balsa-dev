@@ -21,12 +21,13 @@ from os.path import expanduser
 isa = isinstance
 
 def say(x):
-  if hasattr(x, "__dict__"):   x = vars(x)
+  pre = type(x).__name__ if hasattr(x, "__dict__") else ""
+  if pre:                      x = vars(x)
   if isa(x, float):            x = ("%.2f" % x).rstrip("0").rstrip(".")
   elif isa(x, (list, tuple)):  x = "[%s]" % ", ".join(map(say, x))
-  elif hasattr(x, "__slots__"): x = {k:getattr(x,k) for k in x.__slots__}
+  elif hasattr(x,"__slots__"): x = {k:getattr(x,k) for k in x.__slots__}
   if isa(x, dict): x = "{%s}" % " ".join(f":{k} {say(x[k])}" for k in x)
-  return str(x)
+  return pre + str(x)
 
 class Box:
   __init__ = lambda i, **d: i.__dict__.update(**d)
