@@ -25,6 +25,9 @@ docs: ## render balsa.py + balsa_eg.py 3-col into ../balsa/docs
 	mkdir -p $(HOME)/gh/balsa/docs
 	python3 hi.py 3 balsa.py balsa_eg.py > $(HOME)/gh/balsa/docs/index.html
 
+html: docs ## render the docs, then open them in the browser
+	open $(HOME)/gh/balsa/docs/index.html
+
 package: docs ## copy the learner into ../balsa
 	cp balsa.py $(HOME)/gh/balsa/
 	cd $(HOME)/gh/balsa && \
