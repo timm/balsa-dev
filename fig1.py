@@ -65,7 +65,7 @@ def tabicl(*paths):
     return t
 
 
-def panel(x, tag, title, big, small, note=None):
+def panel(x, tag, title, big, small, unit="", note=None):
     """One panel: the biggest square, then each smaller one nested in its
     bottom-left corner, with a leader line out to its label."""
     bn, bv, bc = big
@@ -75,7 +75,7 @@ def panel(x, tag, title, big, small, note=None):
          f"    \\filldraw[fill={bc},draw={bc}] (0,0) rectangle ({S},{S});",
          f"    \\node[anchor=north east,align=right,text=white,"
          f"font=\\scriptsize\\bfseries] at ({S - .08:.2f},{S - .08:.2f})"
-         f" {{{bn}\\\\{bv:,.0f}}};"]
+         f" {{{bn}\\\\{bv:,.0f}{unit}}};"]
     for k, (nm, v, c) in enumerate(small):
         side = S * (v / bv) ** .5
         # tiny squares get a minimum drawn size, or they vanish in print;
@@ -126,12 +126,10 @@ def main():
                  (f"harness\\\\{harness}", harness, "balsaC!60!white")]))
     print(panel(S + Gap, "b", "secs, classification",
                 ("TabICL", ct, "tabiclC"),
-                [(f"balsa(30)\\\\{cb:,.0f}s", cb,
-                  "balsaC")]))
+                [(f"balsa(30)\\\\{cb:,.0f}s", cb, "balsaC")], unit="s"))
     print(panel(2 * (S + Gap), "c", "secs, regression",
                 ("TabICL", rt, "tabiclC"),
-                [(f"balsa(30)\\\\{rb:,.0f}s", rb,
-                  "balsaC")]))
+                [(f"balsa(30)\\\\{rb:,.0f}s", rb, "balsaC")], unit="s"))
     print(f"""  \\end{{tikzpicture}}
   \\caption{{Area $\\propto$ size, so a square's {{\\em side}} is the square
   root of its number. (a) lines of code: LightGBM's C++ core against the
