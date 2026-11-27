@@ -2,8 +2,8 @@
 """Active learning for optimization: spend a label budget to find a
 good row. Warm-start W random labels, then acquire B-C more by
 chasing the best/rest boundary, then spend C labels checking the
-top of a held-out test set -- ranked by centroids, nearest
-neighbours, trees, or a boosted/pretrained regressor fit to the
+top of a held-out test set -- ranked by the nearest labelled
+neighbour, trees, or a boosted/pretrained regressor fit to the
 labelled rows. One win per ranker, higher is better.
 
 The leak line: inference (acquisition, the test ranker) sees only
@@ -45,12 +45,9 @@ def acquire(tb, y, warm, budget, smart=True):
     label(both, best, rest, pool.pop(), y)     # last = best, or random
   return both, best, rest
 
-# -- test-set rankers: (tb, both, best, rest) -> a key over test rows --
-def byDist(tb, both, best, rest):
-  "No model: nearer best's centroid than rest's."
-  bm, rm = mids(best), mids(rest)
-  return lambda r: distx(both, r, bm) - distx(both, r, rm)
-
+# -- test-set rankers: (tb, both, best, rest) -> a key over test rows.
+# None of the live rankers reads best/rest, but the slot stays: the
+# centroid variants in dist_sweep.py plug in through the same socket.
 def byKnn(tb, both, best, rest):
   "No model: the d2h of the nearest labelled row."
   xy = [(x, tb.disty(x)) for x in both.rows]   # label ys once, not per row
@@ -120,7 +117,7 @@ def byRand(tb, both, best, rest):
   "Floor: ignore the model, rank the holdout at random."
   return lambda r: random.random()
 
-RANKERS = {"dist": byDist, "knn": byKnn, "b1": byTrees(1, False),
+RANKERS = {"knn": byKnn, "b1": byTrees(1, False),
            "b30": byTrees(30, True), "lgbm": byModel(lgbm),
            "tabicl": byModel(tabicl, True), "rand": byRand}
 
@@ -148,7 +145,7 @@ def xval(rows, m=5, n=2):
       yield ([r for j, r in enumerate(u) if j % n != kf],
              [r for j, r in enumerate(u) if j % n == kf])
 
-# Which arms to run this pass. ARMS=dist,knn,b1,b30,rand under pypy
+# Which arms to run this pass. ARMS=knn,b1,b30,rand under pypy
 # (fast, no numpy); ARMS=lgbm,tabicl under CPython. ACQS="a" skips the
 # random-acquisition twin. The fold shuffles are the same Mersenne
 # Twister everywhere, so separate passes align exactly.
