@@ -17,11 +17,16 @@ This figure used to be hand-written TikZ with its numbers typed in, and
 they went stale twice: the line count said 245 when the file held 247,
 and it still said balsa.yue after the learner was ported to Python.
 
-LOC rule: non-blank, not a # comment, and not inside a module or function
-docstring -- the Python analogue of the "non-blank, non-comment" rule the
-Yue count used.  LightGBM's number is from its own repo at 7810ece, src/
-plus include/LightGBM, C++ only, no cuda; there is no checkout here to
-recount, so it stays a constant.
+LOC rule: non-blank and not a # comment -- the same rule the Yue count
+used, and the rule Table 2 states.  Docstrings are NOT stripped: balsa.py's
+is the Options help the program prints for -h, so it is doing a job, and
+stripping it would cut 14 lines here and 9 in the rig for no good reason.
+Raw wc -l would instead ADD 104 lines of blanks and comments, which would
+flatter us against a LightGBM number counted the other way.
+
+LightGBM's number is from its own repo at 7810ece, src/ plus
+include/LightGBM, C++ only, no cuda; there is no checkout here to recount,
+so it stays a constant.
 
 usage: python3 fig1.py > fig1.tex
 """
