@@ -134,11 +134,11 @@ def main():
     for s_ in tx.spines.values(): s_.set_visible(False)
     mono = dict(family="monospace", fontsize=FS["mono"],
                 bbox=dict(fc="#fcfcfa", ec="none", pad=1))
-    # two significant figures, but one decimal count per column: 2sf on
-    # its own prints 0.07 beside 0.075, which reads as a ragged column
-    def col(vals):
-        d = max((len(f"{v:.2g}".partition(".")[2]) for v in vals), default=0)
-        return [f"{v:.{d}f}" for v in vals]
+    # one precision for the whole table, set by the score: whole AUC
+    # points, two decimals for a ratio.  Ragged columns of significant
+    # figures (0.07 beside 0.075) are harder to read than rounded ones.
+    DP = 0 if mode == "cls" else 2
+    col = lambda vals: [f"{v:.{DP}f}" for v in vals]
     _m, _s = {}, {}
     for a in ORDER:
         ok = [s_ for s_ in sets if mu[(s_, a)] == mu[(s_, a)]]
