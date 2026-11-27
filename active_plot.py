@@ -31,7 +31,7 @@ sets = list(dict.fromkeys(s for s, _ in F))
 mu = {k: st.fmean(v) for k, v in F.items()}
 grand = {a: st.fmean([mu[(s, a)] for s in sets if (s, a) in mu])
          for a in {a for _, a in F}}
-pivot = "a.dist"                                   # sort key
+pivot = "a.b30"                                    # sort key
 order = sorted(sets, key=lambda s: mu.get((s, pivot), 0))
 xs = np.arange(len(order))
 
@@ -57,7 +57,7 @@ bx.set_ylabel("# sets", fontsize=10); bx.set_xlim(0, 39)
 for p in (ax, bx):
   for s_ in ("top", "right"): p.spines[s_].set_visible(False)
 
-fig.suptitle("62 optimize sets, acquire only, sorted by dist", fontsize=14)
+fig.suptitle("62 optimize sets, acquire only, sorted by b30", fontsize=14)
 fig.set_facecolor("#fcfcfa")
 for a in fig.axes: a.set_facecolor("#fcfcfa")
 plt.savefig(sys.argv[2], dpi=200, bbox_inches="tight")
