@@ -134,7 +134,7 @@ def panel(x, y, tag, title, big, small, unit="", note=None):
         dx = sum(S * (u / bv) ** .5 + .06 for _, u, _ in small[:k])
         o.append(f"    \\fill[{c}] ({dx:.3f},0) rectangle "
                  f"++({side:.3f},{tall:.3f});")
-        y = H * .52 - .62 * k
+        y = H * .66 - .46 * k
         o.append(f"    \\node[anchor=west,text=white,inner sep=1pt,align=left,"
                  f"text width={S - .70:.2f}cm,font=\\scriptsize] (l{tag}{k})"
                  f" at (.62,{y:.2f}) {{{nm}}};")
