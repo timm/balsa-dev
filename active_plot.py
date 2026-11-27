@@ -35,8 +35,10 @@ sets = list(dict.fromkeys(s for s, _ in F))
 mu = {k: st.fmean(v) for k, v in F.items()}
 grand = {a: st.fmean([mu[(s, a)] for s in sets if (s, a) in mu])
          for a in {a for _, a in F}}
-best = max(grand, key=grand.get)                 # strongest arm, any panel
-order = sorted(sets, key=lambda s: mu.get((s, best), 0))
+best = max(grand, key=grand.get)                 # strongest arm (legend)
+allmu = {s: st.fmean([mu[(s, a)] for a in grand if (s, a) in mu])
+         for s in sets}                           # each set's mean-of-all
+order = sorted(sets, key=allmu.get)               # sort by set difficulty
 xs = np.arange(len(order))
 
 fig = plt.figure(figsize=(14.3, 6.2))
@@ -67,8 +69,9 @@ for col, (aq, title) in enumerate(ACQ):
   for p in (ax, bx):
     for s_ in ("top", "right"): p.spines[s_].set_visible(False)
 
-fig.suptitle("%d optimize sets, sorted by the best arm (%s = %.1f)"
-             % (len(order), best, grand[best]), fontsize=14, y=.98)
+fig.suptitle("%d optimize sets, sorted by mean win over all arms "
+             "(best arm %s = %.1f)" % (len(order), best, grand[best]),
+             fontsize=14, y=.98)
 fig.set_facecolor("#fcfcfa")
 for a in fig.axes: a.set_facecolor("#fcfcfa")
 plt.savefig(sys.argv[2], dpi=200)
