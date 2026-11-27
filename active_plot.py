@@ -85,35 +85,36 @@ ax.grid(axis="y", color="#eee")
 ax.set_ylabel("win (100 = optimum)\nmean over 5x2 folds", fontsize=12)
 ax.set_xlabel("optimize set (sorted)", fontsize=11)
 
-# -- right: b30 & tabicl acquire, only where they beat random (r.b30) ---
+# -- right: b30 & tabicl acquire minus random, gaps where tied ----------
 bx = fig.add_subplot(gs[1])
 gap = {s: mu.get((s, "a.b30"), 0) - mu.get((s, "r.b30"), 0) for s in sets}
 order2 = sorted(sets, key=gap.get)
 x2 = np.arange(len(order2))
-def diffline(arm):                                 # win, masked where tied
+def deltaline(arm):                                # a.arm - r.b30, nan if tied
   out = []
   for s in order2:
     k, rk = (s, arm), (s, "r.b30")
     if k in F and rk in F and not same(F[k], F[rk]):
-      out.append(mu[k])
+      out.append(mu[k] - mu[rk])
     else:
       out.append(np.nan)
   return out
+bx.axhline(0, color="#999", lw=1)
 for arm, c, m, lab in (("a.b30", "#d62728", "s", "b30"),
                        ("a.tabicl", "#7b3fa0", "D", "tabicl")):
   n = sum(1 for s in order2 if (s, arm) in F and (s, "r.b30") in F
           and not same(F[(s, arm)], F[(s, "r.b30")]))
-  bx.plot(x2, diffline(arm), color=c, marker=m, ms=4, lw=1.4, alpha=.9,
-          label="%-7s %4.1f (%d differ)" % (lab, grand[arm], n))
-bx.set_ylim(0, 112); bx.set_xlim(-1, len(order2))
-bx.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
-bx.set_title("acquire win, shown only where it differs from random",
+  bx.plot(x2, deltaline(arm), color=c, marker=m, ms=4, lw=1.4, alpha=.9,
+          label="%-7s %+4.1f (%d differ)" % (
+          lab, grand[arm] - grand["r.b30"], n))
+bx.set_xlim(-1, len(order2))
+bx.set_title("acquire minus random, drawn only where it differs",
              fontsize=12)
-bx.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .12),
-          framealpha=.9, title="learner mean")
+bx.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .06),
+          framealpha=.9, title="learner  mean")
 bx.grid(axis="y", color="#eee")
 bx.set_xlabel("optimize set (sorted by b30 acquire - random)", fontsize=11)
-bx.set_yticklabels([])
+bx.set_ylabel("win difference (acquire - random)", fontsize=12)
 
 for p in (ax, bx):
   for s_ in ("top", "right"): p.spines[s_].set_visible(False)
