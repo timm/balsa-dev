@@ -3,7 +3,6 @@
 balsa: lightweight ensemble trees for classification, regression
 (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 
-
 Options:
   seed=1234567891   random number seed (Park-Miller)
   prudence=0.01     mean gaps under this are never 'different'
@@ -22,13 +21,11 @@ from os.path import expanduser
 isa = isinstance
 
 def say(x):
-  if hasattr(x, "__dict__"): x = say(vars(x))
-  elif isa(x, float): x = ("%.2f" % x).rstrip("0").rstrip(".")
-  elif isa(x, (list, tuple)): x = "[" + ", ".join(map(say, x)) + "]"
-  elif isa(x, dict):
-    x = "{" + " ".join(f":{k} {say(v)}" for k, v in x.items()) + "}"
-  elif hasattr(x, "__slots__"):
-    x = say({k: getattr(x, k) for k in x.__slots__ if hasattr(x, k)})
+  if hasattr(x, "__dict__"):   x = vars(x)
+  if isa(x, float):            x = ("%.2f" % x).rstrip("0").rstrip(".")
+  elif isa(x, (list, tuple)):  x = "[%s]" % ", ".join(map(say, x))
+  elif hasattr(x, "__slots__"): x = {k:getattr(x,k) for k in x.__slots__}
+  if isa(x, dict): x = "{%s}" % " ".join(f":{k} {say(x[k])}" for k in x)
   return str(x)
 
 class Box:
