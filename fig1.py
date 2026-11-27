@@ -134,9 +134,9 @@ def panel(x, y, tag, title, big, small, unit="", note=None):
         dx = sum(S * (u / bv) ** .5 + .06 for _, u, _ in small[:k])
         o.append(f"    \\fill[{c}] ({dx:.3f},0) rectangle "
                  f"++({side:.3f},{tall:.3f});")
-        y = H * .66 - .46 * k
+        y = H * .62 - .38 * k
         o.append(f"    \\node[anchor=west,text=white,inner sep=1pt,align=left,"
-                 f"text width={S - .70:.2f}cm,font=\\scriptsize] (l{tag}{k})"
+                 f"text width={S - .35:.2f}cm,font=\\scriptsize] (l{tag}{k})"
                  f" at (.62,{y:.2f}) {{{nm}}};")
         o.append(f"    \\draw[->,white,line width=.4pt,shorten >=2.5pt]"
                  f" (l{tag}{k}.west) to[out=180,in=60]"
@@ -179,19 +179,18 @@ def main():
     \\definecolor{{tabiclC}}{{HTML}}{{000000}}""")
     print(panel(0, 0, "a", "lines of code",
                 ("LightGBM", Lgbm, "lgbmC"),
-                [(f"this learner\\\\{learner}", learner, "balsaC"),
-                 (f"this optimizer\\\\{opt}", opt, "balsaC!75!white"),
-                 (f"this harness\\\\{harness}", harness,
-                  "balsaC!45!white")]))
+                [(f"learner, {learner}", learner, "balsaC"),
+                 (f"optimizer, {opt}", opt, "balsaC!75!white"),
+                 (f"harness, {harness}", harness, "balsaC!45!white")]))
     print(panel(S + Gap, 0, "b", "secs, classification",
                 ("TabICL", ct, "tabiclC"),
-                [(f"this learner\\\\{cb:,.0f}s", cb, "balsaC")], unit="s"))
+                [(f"this learner, {cb:,.0f}s", cb, "balsaC")], unit="s"))
     print(panel(2 * (S + Gap), 0, "c", "secs, regression",
                 ("TabICL", rt, "tabiclC"),
-                [(f"this learner\\\\{rb:,.0f}s", rb, "balsaC")], unit="s"))
+                [(f"this learner, {rb:,.0f}s", rb, "balsaC")], unit="s"))
     print(panel(3 * (S + Gap), 0, "d", "secs, optimization",
                 ("TabICL", at, "tabiclC"),
-                [(f"this optimizer\\\\{ab:,.0f}s", ab, "balsaC")],
+                [(f"this optimizer, {ab:,.0f}s", ab, "balsaC")],
                 unit="s"))
     print(f"""  \\end{{tikzpicture}}
   \\caption{{Area $\\propto$ size: every box is the same shape, so one
