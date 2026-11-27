@@ -22,11 +22,11 @@ def thing(s):
   return {"True": True, "False": False}.get(s, s.strip())
 
 def say(x):
-  if isa(x, float): x = ("%.2f" % x).rstrip("0").rstrip(".")
+  if hasattr(x, "__dict__"): x = say(vars(x))
+  elif isa(x, float): x = ("%.2f" % x).rstrip("0").rstrip(".")
   elif isa(x, (list, tuple)): x = "[" + ", ".join(map(say, x)) + "]"
   elif isa(x, dict):
     x = "{" + " ".join(f":{k} {say(v)}" for k, v in x.items()) + "}"
-  elif hasattr(x, "__dict__"): x = say(vars(x))
   elif hasattr(x, "__slots__"):
     x = say({k: getattr(x, k) for k in x.__slots__ if hasattr(x, k)})
   return str(x)
