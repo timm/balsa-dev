@@ -66,7 +66,7 @@ grand = {a: st.fmean([mu[(s, a)] for s in sets if (s, a) in mu])
          for a in {a for _, a in F}}
 
 fig = plt.figure(figsize=(20, 4.8))
-gs = fig.add_gridspec(1, 3, width_ratios=[.8, 2.6, 1.1], wspace=.26)
+gs = fig.add_gridspec(1, 2, width_ratios=[.8, 2.6], wspace=.26)
 
 # -- secs bars at far left; win lines centre; delta right ---------------
 hx = fig.add_subplot(gs[0])                        # runtime bars
@@ -84,7 +84,8 @@ for ln, c, m in bymean:
           ls=(0, (4, 2)), alpha=.7)                # sd curve, low on chart
   totsec[ln] = sum(v for s in sets if (s, a) in S for v in S[(s, a)])
 # runtime: one horizontal bar per learner, total secs, log scale
-bars = [(ln, c, totsec[ln]) for ln, c, _ in bymean if totsec.get(ln)]
+bars = sorted(((ln, c, totsec[ln]) for ln, c, _ in bymean
+               if totsec.get(ln)), key=lambda b: b[2])
 hx.bar(range(len(bars)), [t for _, _, t in bars],
        color=[c for _, c, _ in bars], width=.7)
 for i, (ln, c, t) in enumerate(bars):
@@ -110,30 +111,7 @@ hx.set_yscale("log")
 hx.set_title("total secs over all\nfolds (log, 1 thread)", fontsize=10)
 hx.grid(axis="y", color="#eee")
 
-# -- right: 1nn & tabicl minus random test pick, sorted by 1nn ----------
-BASE = "a.rand"                                    # select test rows at random
-bx = fig.add_subplot(gs[2])
-gap = {s: mu.get((s, "a.knn"), 0) - mu.get((s, BASE), 0) for s in sets}
-o = sorted(sets, key=gap.get)
-x = np.arange(len(o))
-bx.axhline(0, color="#999", lw=1)
-for arm, c, m, lab in (("a.knn", "#7b3fa0", "P", "1nn"),
-                       ("a.tabicl", "#000000", "D", "tabicl")):
-  n = sum(1 for s in o if (s, arm) in F and (s, BASE) in F
-          and not same(F[(s, arm)], F[(s, BASE)]))
-  bx.plot(x, [mu.get((s, arm), np.nan) - mu.get((s, BASE), np.nan)
-              for s in o], color=c, marker=m, ms=4, lw=1.4, alpha=.9,
-          label="%-7s %+3.0f  %2d/%d differ" % (
-            lab, grand[arm] - grand[BASE], n, len(o)))
-bx.set_xlim(-1, len(o))
-bx.set_title("minus random test pick, sorted by 1nn", fontsize=12)
-bx.legend(fontsize=10, loc="upper left", framealpha=.9,
-          prop={"family": "monospace", "size": 10})
-bx.grid(axis="y", color="#eee")
-bx.set_xlabel("set (sorted by 1nn gap)", fontsize=10)
-bx.set_ylabel("win vs random test pick", fontsize=11)
-
-for p in (ax, hx, bx):
+for p in (ax, hx):
   for s_ in ("top", "right"): p.spines[s_].set_visible(False)
 fig.set_facecolor("#fcfcfa")
 for a in fig.axes: a.set_facecolor("#fcfcfa")
