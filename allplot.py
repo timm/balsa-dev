@@ -203,28 +203,33 @@ def main():
                   fontsize=FS["lab"])
     for s_ in ("top", "right"): ax.spines[s_].set_visible(False)
 
-    # legend: name, its solid line (the mean), its dashed line (the sd)
-    tx = ax.inset_axes((.02, .05, .4, .4))
-    LEGEND_IN = (1.70, .20 * len(ORDER) + .03)
-    tx.set_xlim(0, 22); tx.set_ylim(0, len(ORDER) + .6)
+    # A horizontal strip above the plot, not a block inside it: the
+    # curves fill the frame corner to corner, so any inset legend sits on
+    # top of data.  Across the top it covers nothing and reads in one
+    # pass: name, its solid line, then its dashed sd line.
+    tx = ax.inset_axes((0, 1.005, 1, .115))
+    tx.set_xlim(0, len(ORDER)); tx.set_ylim(0, 1)
     tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
     for s_ in tx.spines.values(): s_.set_visible(False)
-    mono = dict(family="monospace", fontsize=FS["mono"] - 3,
-                bbox=dict(fc="#fcfcfa", ec="none", pad=1))
+    mono = dict(family="monospace", fontsize=FS["mono"] - 2)
     for k, a in enumerate(ORDER):
         c, m = INK[a]
-        y = len(ORDER) - .4 - k
-        tx.text(0, y, a, ha="left", va="center", **mono)
-        tx.plot([11.0, 14.2], [y, y], color=c, lw=2.0)
-        tx.plot(12.6, y, m, color=c, ms=5)
-        tx.text(15.8, y, "sd", ha="left", va="center", **mono)
-        tx.plot([18.6, 21.6], [y, y], color=c, lw=1.8, ls="--")
+        tx.text(k + .02, .5, a, ha="left", va="center", **mono)
+        # fixed columns, set by the longest name (9 characters), so the
+        # swatches line up instead of chasing each label's width
+        x0 = k + .42
+        tx.plot([x0, x0 + .12], [.5, .5], color=c, lw=2.0)
+        tx.plot(x0 + .06, .5, m, color=c, ms=5)
+        tx.text(x0 + .18, .5, "sd", ha="left", va="center", **mono)
+        tx.plot([x0 + .32, x0 + .44], [.5, .5], color=c, lw=1.8, ls="--")
 
     bt = sorted((secs[a], a, INK[a][0]) for a in ORDER if secs.get(a))
     bx.bar(range(len(bt)), [b[0] for b in bt], color=[b[2] for b in bt],
            width=.84)
     bx.set_yscale("log")
-    bx.set_ylim(min(b[0] for b in bt) / 2, max(b[0] for b in bt) * 14)
+    # rotated labels need headroom above the tallest bar, and this is
+    # a log axis, so the room has to be bought in decades
+    bx.set_ylim(min(b[0] for b in bt) / 3, max(b[0] for b in bt) * 90)
     for i, b in enumerate(bt):
         bx.text(i, b[0] * 1.35, f"{b[0]:,.0f}s" if b[0] >= 100
                 else f"{b[0]:.1f}s", ha="center", va="bottom",
@@ -276,11 +281,6 @@ def main():
     tick = min(t.get_window_extent(rend).x0 for t in ax.get_yticklabels())
     ax.yaxis.set_label_coords(ax.transAxes.inverted().transform(
         (max(bars + 8 + w / 2, tick + 7 - w / 2), 0))[0], .5)
-    _bb = ax.get_position()
-    tx.set_axes_locator(None)
-    tx.set_position([_bb.x0 + .006, _bb.y0 + .02,
-                     LEGEND_IN[0] / fig.get_figwidth(),
-                     LEGEND_IN[1] / fig.get_figheight()])
     plt.savefig(out, dpi=200, bbox_inches="tight", pad_inches=.02)
     plt.savefig(out.rsplit(".", 1)[0] + ".pdf",
                 bbox_inches="tight", pad_inches=.02)
