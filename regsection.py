@@ -111,6 +111,10 @@ def main():
     src_ = open("balsa.py").read()
     cap  = int(re.search(r"\bcap=(\d+)", src_).group(1))
     rcap = int(re.search(r"\brcap=(\d+)", src_).group(1))
+    cls_ = open(os.path.expanduser(
+      "~/gh/jssprimer/clsvar.tex")).read()
+    m_ = re.search(r"all sets & \d+ & (\d+) & (\d+)", cls_)
+    dCls, mCls = m_.group(1), m_.group(2)
     loc = sum(1 for l in open("balsa.py") if not re.match(r"^\s*(#.*)?$", l))
 
     out = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -143,6 +147,7 @@ def main():
         sec_tab=f"{secs.get('TabICL', 0):,.0f}",
         costx=f"{secs.get('TabICL', 0) / max(secs.get('lgbm', 1), 1):,.0f}",
         loc=loc, cap=cap, caphalf=cap // 2, rcap=rcap,
+        dCls=dCls, mCls=mCls,
         bcx=f"{bcm['balsa30'] / bcm['lgbm']:.0f}" if bcm else "??",
         bc_lgbm=f"{bcm['lgbm']:.3f}" if bcm else "??",
         bc_b30=f"{bcm['balsa30']:.2f}" if bcm else "??",
