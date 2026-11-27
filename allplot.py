@@ -167,7 +167,7 @@ def main():
     sets = sorted(F, key=key)
     xs = np.arange(len(sets))
 
-    fig = plt.figure(figsize=(14.3, 4.1))
+    fig = plt.figure(figsize=(14.3, 3.9))
     gs = fig.add_gridspec(1, 5, wspace=0,
                           width_ratios=[1.15 * len(ORDER), 2.3, 20, 1.2, 3.6])
     bx, ax = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
