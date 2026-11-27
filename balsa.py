@@ -20,17 +20,19 @@ from os.path import expanduser
 
 isa = isinstance
 
+# root all things -------------------------------------------------------
 def say(x):
-  if isa(x, float):            x = ("%.2f" % x).rstrip("0").rstrip(".")
+  if   isa(x, float):          x = ("%.2f" % x).rstrip("0").rstrip(".")
   elif isa(x, (list, tuple)):  x = "[%s]" % ", ".join(map(say, x))
   elif hasattr(x,"__slots__"): x = {k:getattr(x,k) for k in x.__slots__}
-  if isa(x, dict): x = "{%s}" % " ".join(f":{k} {say(x[k])}" for k in x)
+  if   isa(x, dict):  x = "{%s}"%" ".join(f":{k} {say(x[k])}" for k in x)
   return str(x)
 
 class Box:
   def __init__(i, **d) : i.__dict__.update(**d)
   def __repr__(i)      : type(i).__name__ + say(vars(i))
 
+# config ----------------------------------------------------------------
 def thing(s):
   for f in (int, float):
     try: return f(s)
@@ -39,6 +41,7 @@ def thing(s):
 
 the = Box(**{k: thing(v) for k,v in re.findall(r"(\w+)=(\S+)",__doc__)})
 
+# csv ------------------------------------------------------------------
 # CSV rows. Headers start uppercase for numbers. Suffixes !, +, -, and X
 # mark the class, goals to maximize or minimize, and columns to skip.
 class Row(list):
@@ -49,6 +52,7 @@ def csv(file):
     return [Row(thing(v) for v in line.split(","))
             for s in f if (line := s.replace("\r", "").strip())]
 
+# Column ----------------------------------------------------------------
 # Column and target summaries. Known labels are 0..n-1; "?" is -1,
 # so "unknown" is always label < 0.
 class Column(Box):
@@ -74,6 +78,7 @@ class Column(Box):
 def Col(txt="N", at=0):
   return (Num if "A" <= txt[:1] <= "Z" else Sym)(txt, at)
 
+# Sym ----------------------------------------------------------------
 class Sym(Column):
   def __init__(i, txt, at):
     super().__init__(txt, at)
@@ -103,6 +108,10 @@ class Sym(Column):
     return bin, yfold(total, bin, -1, rest)
 
   def matches(i, label, cut): return label == cut
+
+# Num ----------------------------------------------------------------
+def bisect(t, v, le=False):
+  return (bisect_right if le else bisect_left)(t, v)
 
 class Num(Column):
   def __init__(i, txt="N", at=0):
@@ -147,6 +156,7 @@ class Num(Column):
 
   def matches(i, label, cut): return label <= cut
 
+# Targets -------------------------------------------------------------
 class Ys(Box):
   def __init__(i, nk): i.nk, i.n, i.has = nk, 0, [0] * nk
 
@@ -168,6 +178,7 @@ class Ys(Box):
     u.n = i.n + inc * b.n
     return u
 
+# xxxxx y -------------------------------------------------------------
 def adds(vs, col=None):
   col = Num() if col is None else col
   for v in vs: col.add(v)
@@ -178,22 +189,7 @@ def yfold(ys, other, inc=1, u=None):
 
 def tolabel(col, v): return -1 if v == "?" else col.label(v)
 
-# Tables. Each row keeps its original cells and a list of labels.
-class Cols(Box):
-  def __init__(i, names):
-    i.names, i.x, i.y, i.klass = names, [], [], None
-    i.all = [Col(txt, j) for j, txt in enumerate(names)]
-    for col in i.all:
-      suffix = col.txt[-1:]
-      if suffix == "X": continue
-      (i.y if suffix in ("+", "-", "!") else i.x).append(col)
-      if suffix == "!": i.klass = col
-
-  def add(i, row):
-    row = row if isa(row, Row) else Row(row)
-    for col in i.all: col.add(row[col.at])
-    return row
-
+# Tables -------------------------------------------------------------
 class Tbl(Box):
   def __init__(i, rows):
     i.cols = Cols(rows[0])
@@ -220,6 +216,22 @@ class Tbl(Box):
         n += 1
     return sqrt(d / max(n, 1))
 
+class Cols(Box):
+  def __init__(i, names):
+    i.names, i.x, i.y, i.klass = names, [], [], None
+    i.all = [Col(txt, j) for j, txt in enumerate(names)]
+    for col in i.all:
+      suffix = col.txt[-1:]
+      if suffix == "X": continue
+      (i.y if suffix in ("+", "-", "!") else i.x).append(col)
+      if suffix == "!": i.klass = col
+
+  def add(i, row):
+    row = row if isa(row, Row) else Row(row)
+    for col in i.all: col.add(row[col.at])
+    return row
+
+# Tree -------------------------------------------------------------
 # Split search and trees. Numeric cuts use a threshold, symbolic cuts
 # use equality, and unknowns go left.
 def xpect(left, right):
@@ -252,7 +264,7 @@ class Tree(Box):
     while i.yes: i = i.yes if i.goes_left(row) else i.no
     return i
 
-# Sampling. The Park-Miller generator makes the samples repeatable.
+# Sampling -------------------------------------------------------------
 _seed = the.seed
 
 def srand(n):
@@ -286,7 +298,7 @@ def capped(rows, y, n, nk=None):
     if counts[label] <= n: kept.append(row)
   return kept
 
-# Forests. Votes are pairs of the true label and class probabilities.
+# Forests -------------------------------------------------------------
 class Forest(list):
   def __init__(i, tb, rows, y, mk=None):
     if mk is None: mk = lambda: Ys(tb.nk)
@@ -315,10 +327,7 @@ class Forest(list):
     if not i: return nan
     return sum(node.leaf_of(row).ys.mid() for node in i) / len(i)
 
-# Scoring. Average class AUCs by their positive counts.
-def bisect(t, v, le=False):
-  return (bisect_right if le else bisect_left)(t, v)
-
+# Scoring  -------------------------------------------------------------
 def auc(pos, neg):
   if not pos or not neg: return None
   neg.sort()
