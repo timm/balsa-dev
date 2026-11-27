@@ -32,9 +32,9 @@ sd = {k: spread(v) for k, v in F.items()}
 grand = {a: st.fmean([mu[(s, a)] for s in sets if (s, a) in mu])
          for a in {a for _, a in F}}
 
-fig = plt.figure(figsize=(9, 6.4))
-gs = fig.add_gridspec(2, 1, height_ratios=[3, 1], hspace=.45)
-ax = fig.add_subplot(gs[0]); hx = fig.add_subplot(gs[1])
+fig = plt.figure(figsize=(11, 4.8))
+gs = fig.add_gridspec(1, 2, width_ratios=[.55, 2.6], wspace=.3)
+hx = fig.add_subplot(gs[0]); ax = fig.add_subplot(gs[1])
 order = sorted(sets, key=lambda s: mu.get((s, "a.knn"), 0))
 xs = np.arange(len(order))
 bymean = sorted(LEARNERS, key=lambda t: -grand.get("a." + t[0], 0))
@@ -49,16 +49,17 @@ for ln, c, m in bymean:
           ls=(0, (4, 2)), alpha=.7)
   totsec[ln] = sum(v for s in sets if (s, a) in S for v in S[(s, a)])
 bars = [(ln, c, totsec[ln]) for ln, c, _ in bymean if totsec.get(ln)]
-hx.bar(range(len(bars)), [t for _, _, t in bars],
-       color=[c for _, c, _ in bars], width=.6)
+hx.barh(range(len(bars)), [t for _, _, t in bars],
+        color=[c for _, c, _ in bars], height=.6)
 for i, (ln, c, t) in enumerate(bars):
-  hx.text(i, t, "{:,}s".format(round(t)) if t >= 1 else "%.1fs" % t,
-          ha="center", va="bottom", fontsize=12, fontweight="bold")
-hx.set_xticks(range(len(bars)))
-hx.set_xticklabels([{"knn": "1nn"}.get(b[0], b[0]) for b in bars])
-hx.set_yscale("log")
-hx.set_title("total secs over all folds (log, 1 thread)", fontsize=10)
-hx.grid(axis="y", color="#eee"); hx.margins(y=.25)
+  hx.text(t, i, " {:,}s".format(round(t)), ha="left", va="center",
+          fontsize=10, fontweight="bold")
+hx.set_yticks(range(len(bars)))
+hx.set_yticklabels([{"knn": "1nn"}.get(b[0], b[0]) for b in bars])
+hx.invert_yaxis()
+hx.set_xscale("log")
+hx.set_title("total secs over all\nfolds (log, 1 thread)", fontsize=10)
+hx.grid(axis="x", color="#eee"); hx.margins(x=.6)
 ax.set_ylim(0, 112); ax.set_xlim(-1, len(order))
 ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
 ax.set_title("acquire, three balsa rankers (mean + dashed fold sd), sorted by 1nn",

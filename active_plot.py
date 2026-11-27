@@ -65,13 +65,12 @@ sd = {k: spread(v) for k, v in F.items()}
 grand = {a: st.fmean([mu[(s, a)] for s in sets if (s, a) in mu])
          for a in {a for _, a in F}}
 
-fig = plt.figure(figsize=(20, 6.4))
-gs = fig.add_gridspec(1, 2, width_ratios=[2.6, 1], wspace=.18)
-lgs = gs[0].subgridspec(2, 1, height_ratios=[3, 1], hspace=.5)
+fig = plt.figure(figsize=(20, 4.8))
+gs = fig.add_gridspec(1, 3, width_ratios=[.8, 2.6, 1.1], wspace=.26)
 
-# -- left: five acquire learners, sorted by tabicl, legend by mean ------
-ax = fig.add_subplot(lgs[0])
-hx = fig.add_subplot(lgs[1])                       # runtime histogram
+# -- secs bars at far left; win lines centre; delta right ---------------
+hx = fig.add_subplot(gs[0])                        # runtime bars
+ax = fig.add_subplot(gs[1])
 order = sorted(sets, key=lambda s: mu.get((s, "a.knn"), 0))
 xs = np.arange(len(order))
 bymean = sorted(LEARNERS, key=lambda t: -grand.get("a." + t[0], 0))
@@ -84,16 +83,17 @@ for ln, c, m in bymean:
   ax.plot(xs, [sd.get((s, a), 0) for s in order], color=c, lw=1,
           ls=(0, (4, 2)), alpha=.7)                # sd curve, low on chart
   totsec[ln] = sum(v for s in sets if (s, a) in S for v in S[(s, a)])
-# runtime: one bar per learner, total secs over all folds, log scale
+# runtime: one horizontal bar per learner, total secs, log scale
 bars = [(ln, c, totsec[ln]) for ln, c, _ in bymean if totsec.get(ln)]
-hx.bar(range(len(bars)), [t for _, _, t in bars],
-       color=[c for _, c, _ in bars], width=.7)
+hx.barh(range(len(bars)), [t for _, _, t in bars],
+        color=[c for _, c, _ in bars], height=.7)
 for i, (ln, c, t) in enumerate(bars):
-  hx.text(i, t, "{:,}s".format(round(t)) if t >= 1 else "%.1fs" % t,
-          ha="center", va="bottom", fontsize=11, fontweight="bold")
-hx.set_xticks(range(len(bars)))
-hx.set_xticklabels([NAME.get(b[0], b[0]) for b in bars],
-                                                    fontsize=8)
+  hx.text(t, i, " {:,}s".format(round(t)), ha="left", va="center",
+          fontsize=10, fontweight="bold")
+hx.set_yticks(range(len(bars)))
+hx.set_yticklabels([NAME.get(b[0], b[0]) for b in bars], fontsize=9)
+hx.invert_yaxis()                                  # best learner on top
+hx.margins(x=.6)
 ax.set_ylim(0, 112); ax.set_xlim(-1, len(order))
 ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
 ax.set_title("acquire, five learners (mean + dashed fold sd), sorted by 1nn",
@@ -104,14 +104,13 @@ ax.legend(fontsize=10, loc="lower right", bbox_to_anchor=(.995, .12),
 ax.grid(axis="y", color="#eee")
 ax.set_ylabel("win (100 = optimum)\nmean over 5x2 folds", fontsize=12)
 ax.set_xlabel("optimize set (sorted)", fontsize=11)
-hx.set_yscale("log")
-hx.set_title("total secs over all folds (log, 1 thread)", fontsize=10)
-hx.grid(axis="y", color="#eee")
-hx.margins(y=.25)
+hx.set_xscale("log")
+hx.set_title("total secs over all\nfolds (log, 1 thread)", fontsize=10)
+hx.grid(axis="x", color="#eee")
 
 # -- right: 1nn & tabicl minus random test pick, sorted by 1nn ----------
 BASE = "a.rand"                                    # select test rows at random
-bx = fig.add_subplot(gs[1])
+bx = fig.add_subplot(gs[2])
 gap = {s: mu.get((s, "a.knn"), 0) - mu.get((s, BASE), 0) for s in sets}
 o = sorted(sets, key=gap.get)
 x = np.arange(len(o))
