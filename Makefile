@@ -72,7 +72,7 @@ clstex: ## regenerate the paper's classification variance table
 	echo "wrote $(Paper)/clsvar.tex"
 
 fig1: ## regenerate the paper's opening figure (LOC + the two runtimes)
-	python3 -B fig1.py > $(Paper)/fig1.tex
+	python3 -B fig1.py $(Paper)/loccounts.tex > $(Paper)/fig1.tex
 	echo "wrote $(Paper)/fig1.tex"
 
 reg: regfigs allfigs actfig regtex clstex acttex fig1 ## every generated number in the paper, recomputed
