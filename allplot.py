@@ -203,21 +203,22 @@ def main():
                   fontsize=FS["lab"])
     for s_ in ("top", "right"): ax.spines[s_].set_visible(False)
 
-    # A horizontal strip above the plot, not a block inside it: the
+    # A horizontal strip under the plot, not a block inside it: the
     # curves fill the frame corner to corner, so any inset legend sits on
-    # top of data.  Across the top it covers nothing and reads in one
+    # top of data.  Below the axis it covers nothing and reads in one
     # pass: name, its solid line, then its dashed sd line.
-    tx = ax.inset_axes((0, 1.005, 1, .115))
+    tx = ax.inset_axes((0, -.34, 1, .13))
     tx.set_xlim(0, len(ORDER)); tx.set_ylim(0, 1)
     tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
     for s_ in tx.spines.values(): s_.set_visible(False)
-    mono = dict(family="monospace", fontsize=FS["mono"] - 2)
+    mono = dict(family="monospace",
+                fontsize=FS["mono"] - (2 if len(ORDER) < 5 else 4))
     for k, a in enumerate(ORDER):
         c, m = INK[a]
-        tx.text(k + .02, .5, a, ha="left", va="center", **mono)
+        tx.text(k + .015, .5, a, ha="left", va="center", **mono)
         # fixed columns, set by the longest name (9 characters), so the
         # swatches line up instead of chasing each label's width
-        x0 = k + .42
+        x0 = k + .46
         tx.plot([x0, x0 + .12], [.5, .5], color=c, lw=2.0)
         tx.plot(x0 + .06, .5, m, color=c, ms=5)
         tx.text(x0 + .18, .5, "sd", ha="left", va="center", **mono)
