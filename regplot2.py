@@ -90,7 +90,7 @@ def main():
         for line in open(tt):
             if line.startswith("#secs"): secs["tabicl"] = float(line.split()[-1])
 
-    fig = plt.figure(figsize=(14.3, 6.6))
+    fig = plt.figure(figsize=(14.3, 5.2))
     gs = fig.add_gridspec(1, 3, width_ratios=[3.4, 3.6, 20], wspace=0)
     bx, ax = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
 
@@ -108,20 +108,18 @@ def main():
                                    if mu[(s, a)] == mu[(s, a)]]):
                 H.append((lab, c, m, st.fmean([mu[(s, a)] for s in ok]),
                           st.fmean([sd[(s, a)] for s in ok]), len(ok)))
-        ax.text(xs.mean(), 1.83, g, ha="center", va="bottom", fontsize=FS["head"])
+        ax.text(xs.mean(), 1.47, g, ha="center", va="bottom", fontsize=FS["head"])
         ticks += list(xs); labs += [f.split("/")[-1] for f in fs]
         x0 += len(fs) + 3
         if gi < len(G) - 1: ax.axvline(x0 - 2, color="#555", lw=1)
 
     ax.axhline(1.0, color="#999", lw=1.4, ls=(0, (6, 4)))
-    ax.text(x0 - 1.6, 1.02, "predict the mean", ha="right", va="bottom",
-            fontsize=FS["tick"] - 1, color="#666")
     ax.set_xticks(ticks)
     ax.set_xticklabels(labs, rotation=60, ha="right", rotation_mode="anchor",
                        fontsize=10)
-    ax.set_ylim(0, 1.8); ax.set_xlim(-.9, x0 - 2.1)
-    ax.set_yticks([0, .25, .5, .75, 1, 1.25, 1.5])
-    ax.set_yticks([.125, .375, .625, .875, 1.125, 1.375], minor=True)
+    ax.set_ylim(0, 1.45); ax.set_xlim(-.9, x0 - 2.1)
+    ax.set_yticks([0, .25, .5, .75, 1, 1.25])
+    ax.set_yticks([.125, .375, .625, .875, 1.125], minor=True)
     ax.tick_params(axis="y", which="minor", length=0)
     ax.grid(axis="y", which="major", color="#ddd")
     ax.grid(axis="y", which="minor", color="#b0b0b0", ls=(0, (4, 4)), lw=1)
@@ -134,7 +132,18 @@ def main():
     # points while the panel is only as wide as its share of the sets, so the
     # layout has to earn its width: one swatch, not two.  The sd column says
     # it is the dashed series by underlining its heading in dashes.
-    gbig = max(range(len(G)), key=lambda i: len(G[i][1]))
+    peak = lambda i: max((mu[(s_, a)] for s_ in G[i][1]
+                          for a, *_ in ARMS if mu[(s_, a)] == mu[(s_, a)]),
+                         default=9)
+    wide_enough = [i for i in range(len(G)) if len(G[i][1]) >= 8]
+    gbig = min(wide_enough or range(len(G)), key=peak)
+    # the baseline label takes whichever end the legend did not
+    if gbig == 0:
+        ax.text(x0 - 1.6, 1.03, "predict the mean", ha="right",
+                va="bottom", fontsize=FS["tick"] - 1, color="#666")
+    else:
+        ax.text(-0.4, 1.03, "predict the mean", ha="left",
+                va="bottom", fontsize=FS["tick"] - 1, color="#666")
     x0s = 0                              # left edge of widest panel
     for g, fs in G[:gbig]: x0s += len(fs) + 1
     left = (x0s + .9) / (x0 - 1.2)
