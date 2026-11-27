@@ -44,6 +44,17 @@ allfigs: ## the two overview figures: whole corpus, one axis, no groups
 	python3 -B allplot.py reg $(Paper)/ens-all-reg.png \
 	  runs/reg56.csv runs/sereg.csv
 
+Active := runs/active.txt runs/active-knn.txt runs/active-tabicl.txt \
+          runs/active-secs-balsa.txt runs/active-secs-heavy.txt
+
+actfig: ## the optimizer figure, in the same layout as Figs 2 and 3
+	python3 -B allplot.py act $(Paper)/ens-active.png $(Active)
+
+acttex: ## the optimizer study's variance table, for the back of the paper
+	python3 -B actvar.py runs/active.txt runs/active-knn.txt \
+	  runs/active-tabicl.txt > $(Paper)/actvar.tex
+	echo "wrote $(Paper)/actvar.tex"
+
 regfigs: ## redraw the two regression figures into the paper
 	$(Reg)/regression python3 -B regplot2.py runs/reg56.csv \
 	  $(Paper)/ens-balsa-reg-noxse.png
@@ -64,7 +75,7 @@ fig1: ## regenerate the paper's opening figure (LOC + the two runtimes)
 	python3 -B fig1.py > $(Paper)/fig1.tex
 	echo "wrote $(Paper)/fig1.tex"
 
-reg: regfigs allfigs regtex clstex fig1 ## every generated number in the paper, recomputed
+reg: regfigs allfigs actfig regtex clstex acttex fig1 ## every generated number in the paper, recomputed
 
 sh: $(Tmp)/bashrc $(Tmp)/nvim.lua ## bash with our prompt; vi = clean nvim
 	bash --rcfile $(Tmp)/bashrc -i

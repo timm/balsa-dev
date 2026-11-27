@@ -3,9 +3,10 @@
 
 Three area-proportional panels, side by side and bottom aligned:
 
-    (a) lines of code      this code      against LightGBM's C++ core
-    (b) secs, classification   balsa(30), lgbm   against TabICL
-    (c) secs, regression       balsa(30), lgbm   against TabICL
+    (a) lines of code          this code    against LightGBM's C++ core
+    (b) secs, classification   balsa(30)    against TabICL
+    (c) secs, regression       balsa(30)    against TabICL
+    (d) secs, optimization     balsa(30)    against TabICL
 
 Area, not side, carries the number: side = S*sqrt(value/biggest).  In (b)
 and (c) the two cheap learners land on the same speck -- 34s against 36s,
@@ -34,9 +35,10 @@ import os, re, sys
 
 Here = os.path.dirname(os.path.abspath(__file__))
 Lgbm = 36328
-S    = 2.50          # cm, the WIDTH of each panel's biggest box
-Tall = 1.50          # ... and its height, as a multiple of that width
-Gap  = 0.40          # cm between panels
+S    = 3.00          # cm, the WIDTH of each panel's biggest box
+Tall = 1.00          # ... and its height, as a multiple of that width
+Gap  = 0.55          # cm between panels, left to right
+VGap = 0.95          # ... and between the two rows
 
 
 def loc(path):
@@ -61,6 +63,19 @@ def secs(*paths):
     return out
 
 
+def act_secs(*paths):
+    "treatment -> seconds, from the active-learning tables' %secs lines."
+    out = {}
+    for p in paths:
+        p = os.path.join(Here, p)
+        if not os.path.exists(p): continue
+        for l in open(p):
+            if l.startswith("%secs"):
+                _, _s, a, *v = l.split()
+                out[a] = out.get(a, 0) + sum(float(x) for x in v)
+    return out
+
+
 def tabicl(*paths):
     t = 0.0
     for p in paths:
@@ -71,7 +86,7 @@ def tabicl(*paths):
     return t
 
 
-def panel(x, tag, title, big, small, unit="", note=None):
+def panel(x, y, tag, title, big, small, unit="", note=None):
     """One panel: the biggest box, then each smaller one nested in its
     bottom-left corner, with a leader line out to its label.
 
@@ -80,7 +95,7 @@ def panel(x, tag, title, big, small, unit="", note=None):
     biggest is drawn at sqrt(r) of both its width and its height."""
     H = S * Tall
     bn, bv, bc = big
-    o = [f"  \\begin{{scope}}[xshift={x:.2f}cm]",
+    o = [f"  \\begin{{scope}}[xshift={x:.2f}cm,yshift={y:.2f}cm]",
          f"    \\node[anchor=south west,font=\\scriptsize\\bfseries]"
          f" at (0,{H + .06:.2f}) {{{tag}. {title}}};",
          f"    \\filldraw[fill={bc},draw={bc}] (0,0) rectangle ({S},{H:.2f});",
@@ -113,6 +128,8 @@ def main():
     reg = secs("runs/reg56.txt", "runs/sereg.txt")
     ct  = cls.get("tabicl", 0)
     rt  = tabicl("runs/reg56-tabicl.txt", "runs/sereg-tabicl.txt")
+    act = act_secs("runs/active-secs-balsa.txt", "runs/active-secs-heavy.txt")
+    ab, at = act.get("a.b30", 0), act.get("a.tabicl", 0)
     cb, cl = cls.get("n30", 0), cls.get("lgbm", 0)
     rb, rl = reg.get("balsa(30)", 0), reg.get("lgbm", 0)
 
@@ -123,36 +140,37 @@ def main():
 \\newcommand{{\\HarnessLOC}}{{{harness}}}
 \\newcommand{{\\TotalLOC}}{{{learner + harness}}}
 % Area $\\propto$ value; side = S*sqrt(value/biggest).
-\\begin{{figure}}[t]
+\\begin{{figure*}}[p]
   \\centering
   \\begin{{tikzpicture}}[x=1cm,y=1cm,font=\\scriptsize]
     % Exact series colours, the same ink as the lines in Figs 2-5.
     \\definecolor{{lgbmC}}{{HTML}}{{2A6FDB}}
     \\definecolor{{balsaC}}{{HTML}}{{E8613C}}
     \\definecolor{{tabiclC}}{{HTML}}{{000000}}""")
-    print(panel(0, "a", "lines of code",
+    print(panel(0, 0, "a", "lines of code",
                 ("LightGBM", Lgbm, "lgbmC"),
                 [(f"this learner\\\\{learner}", learner, "balsaC"),
                  (f"this harness\\\\{harness}", harness, "balsaC!60!white")]))
-    print(panel(S + Gap, "b", "secs, classification",
+    print(panel(S + Gap, 0, "b", "secs, classification",
                 ("TabICL", ct, "tabiclC"),
                 [(f"this learner\\\\{cb:,.0f}s", cb, "balsaC")], unit="s"))
-    print(panel(2 * (S + Gap), "c", "secs, regression",
+    print(panel(2 * (S + Gap), 0, "c", "secs, regression",
                 ("TabICL", rt, "tabiclC"),
                 [(f"this learner\\\\{rb:,.0f}s", rb, "balsaC")], unit="s"))
+    print(panel(3 * (S + Gap), 0, "d", "secs, optimization",
+                ("TabICL", at, "tabiclC"),
+                [(f"this optimizer\\\\{ab:,.0f}s", ab, "balsaC")],
+                unit="s"))
     print(f"""  \\end{{tikzpicture}}
-  \\caption{{Area $\\propto$ size: every box here is the same shape, so a
-  box holding a tenth of another is drawn at $\\sqrt{{1/10}}$ of its width
-  and of its height. (a) lines of code: LightGBM's C++ core against the
-  learner of \\S\\ref{{sec:code}} and the harness that runs it, counted from
-  the source. (b) and (c) total run time, one thread each, summed over the
-  folds of Figures~\\ref{{fig:se}}--\\ref{{fig:nose}} and
-  \\ref{{fig:regnose}}--\\ref{{fig:regse}}: TabICL costs
-  {ct / max(cl, 1):,.0f} times LightGBM on classification and
-  {rt / max(rl, 1):,.0f} times on regression, and on both our learner and
-  LightGBM are too close to tell apart at this scale.}}
+  \\caption{{Area $\\propto$ size: every box is the same shape, so one
+  holding a tenth of another is drawn at $\\sqrt{{1/10}}$ of its side.
+  (a) lines of code, counted from the source. (b)--(d) total run time,
+  one thread each: TabICL costs {ct / max(cl, 1):,.0f}, {rt / max(rl, 1):,.0f}
+  and {at / max(ab, 1):,.0f} times LightGBM on the three studies. On all
+  three, our code and LightGBM are too close to tell apart at this scale,
+  so only ours is drawn.}}
   \\label{{fig:loc}}
-\\end{{figure}}""", file=sys.stdout)
+\\end{{figure*}}""", file=sys.stdout)
 
     print(f"% learner {learner}  harness {harness}  lgbm {Lgbm}\n"
           f"% cls: balsa(30) {cb:.1f}  lgbm {cl:.1f}  tabicl {ct:,.1f}\n"

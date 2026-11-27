@@ -19,9 +19,13 @@ Two modes, because the two corpora are scored differently:
   reg   rel = MAE/MAE(predict the mean), where SMALL is good, so the
         axis is inverted and higher still means better.  Reads the csvs
         written by reg2csv.py.
+  act   active learning: the win score of the row the optimizer chose,
+        where 100 is the best row in the table.  Higher is better.
+        Reads the %folds and %secs lines of runs/active*.txt.
 
 usage: allplot.py cls OUT.png runs/nose39-yue.txt runs/se61-yue.txt
        allplot.py reg OUT.png runs/reg56.csv runs/sereg.csv
+       allplot.py act OUT.png runs/active*.txt
 """
 import csv, os, sys, statistics as st
 import matplotlib; matplotlib.use("Agg")
@@ -30,8 +34,13 @@ import numpy as np
 
 # label, colour, marker -- the same ink as every other figure here
 INK = {"balsa(1)":  ("#2ca02c", "^"), "lgbm(100)": ("#2a6fdb", "o"),
-       "balsa(30)": ("#e8613c", "s"), "TabICL":    ("#000000", "D")}
+       "balsa(30)": ("#e8613c", "s"), "TabICL":    ("#000000", "D"),
+       "random":    ("#8a8f98", "v"), "1nn": ("#7b3fa0", "P")}
 ORDER = ["balsa(1)", "lgbm(100)", "balsa(30)", "TabICL"]
+# `random` -- the same budget spent with no model -- is the floor these
+# are judged against, and sec:active reports it; it is kept out of the
+# figure, where six lines were two too many to follow.
+ACTORDER = ["1nn", "balsa(1)", "lgbm(100)", "balsa(30)", "TabICL"]
 FS = dict(tick=14, lab=15, mono=13, bar=15)
 
 
@@ -88,6 +97,24 @@ def read_cls(paths):
     return F, secs
 
 
+def read_act(paths):
+    """The acquire-only arms of the active-learning run.  Its tables carry
+    their own per-fold seconds, so the runtime bars here are measured on
+    exactly the folds the curves are drawn from."""
+    key = {"a.b1": "balsa(1)", "a.b30": "balsa(30)", "a.lgbm": "lgbm(100)",
+           "a.tabicl": "TabICL", "a.knn": "1nn"}
+    F, secs = {}, dict.fromkeys(ACTORDER, 0.0)
+    for p in paths:
+        for l in open(p):
+            if l.startswith("%folds"):
+                _, s_, a, *v = l.split()
+                if a in key: F.setdefault(s_, {})[key[a]] = [float(x) for x in v]
+            elif l.startswith("%secs"):
+                _, s_, a, *v = l.split()
+                if a in key: secs[key[a]] += sum(float(x) for x in v)
+    return F, secs
+
+
 def read_reg(paths):
     key = {"balsa1": "balsa(1)", "balsa30": "balsa(30)",
            "lgbm": "lgbm(100)", "tabicl": "TabICL"}
@@ -113,7 +140,13 @@ def read_reg(paths):
 
 def main():
     mode, out, paths = sys.argv[1], sys.argv[2], sys.argv[3:]
-    F, secs = (read_cls if mode == "cls" else read_reg)(paths)
+    F, secs = {"cls": read_cls, "reg": read_reg, "act": read_act}[mode](paths)
+    global ORDER, VARARMS
+    if mode == "act":
+        ORDER = ACTORDER
+        # `random` is the budget spent without a model: it is the baseline
+        # the others are judged against, not a learner being compared
+        VARARMS = ("1nn", "lgbm(100)", "balsa(30)", "TabICL")
     nan = float("nan")
     mu = {(s, a): (st.fmean(F[s][a]) if a in F[s] else nan)
           for s in F for a in ORDER}
@@ -123,8 +156,9 @@ def main():
     # others are read against it.  If that treatment missed a set (TabICL
     # is capped by rows in regression), those sets sort last, among
     # themselves by the fallback -- a NaN key would order nothing.
-    SORT, FALL = os.getenv("SORTBY", "balsa(30)"), "lgbm(100)"
-    hi = mode == "cls"                     # in AUC, bigger is better
+    SORT = os.getenv("SORTBY", "1nn" if mode == "act" else "balsa(30)")
+    FALL = "lgbm(100)"
+    hi = mode != "reg"                     # only rel is small-is-good
     def key(s):
         v = mu[(s, SORT)]
         if v == v: return (0, -v if hi else v)
@@ -134,8 +168,8 @@ def main():
     xs = np.arange(len(sets))
 
     fig = plt.figure(figsize=(14.3, 3.75))
-    gs = fig.add_gridspec(1, 5, width_ratios=[3.4, 2.3, 20, 1.2, 3.6],
-                          wspace=0)
+    gs = fig.add_gridspec(1, 5, wspace=0,
+                          width_ratios=[1.15 * len(ORDER), 2.3, 20, 1.2, 3.6])
     bx, ax = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
     vx = fig.add_subplot(gs[4])
 
@@ -146,10 +180,11 @@ def main():
         ax.plot(xs, [sd[(s, a)] for s in sets], color=c, ls="--", lw=1.4,
                 marker=m, ms=ms * .6)
 
-    if mode == "cls":
+    if mode in ("cls", "act"):
         ax.set_ylim(0, 100); ax.set_yticks(range(0, 101, 20))
         ax.set_yticks(range(10, 100, 20), minor=True)
-        ax.set_ylabel("AUC", fontsize=FS["lab"])
+        ax.set_ylabel("AUC" if mode == "cls" else "win",
+                      fontsize=FS["lab"])
     else:
         ax.set_ylim(1.45, 0)                  # inverted: up is still better
         ax.set_yticks([0, .25, .5, .75, 1, 1.25])
@@ -170,44 +205,30 @@ def main():
 
     # legend: name, its solid line (the mean), its dashed line (the sd)
     tx = ax.inset_axes((.02, .05, .4, .4))
-    LEGEND_IN = (3.20, 1.05)
-    tx.set_xlim(0, 30); tx.set_ylim(0, 4.6)
+    LEGEND_IN = (1.70, .20 * len(ORDER) + .03)
+    tx.set_xlim(0, 22); tx.set_ylim(0, len(ORDER) + .6)
     tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
     for s_ in tx.spines.values(): s_.set_visible(False)
-    mono = dict(family="monospace", fontsize=FS["mono"],
+    mono = dict(family="monospace", fontsize=FS["mono"] - 3,
                 bbox=dict(fc="#fcfcfa", ec="none", pad=1))
-    # one precision for the whole table, set by the score: whole AUC
-    # points, two decimals for a ratio.  Ragged columns of significant
-    # figures (0.07 beside 0.075) are harder to read than rounded ones.
-    DP = 0 if mode == "cls" else 2
-    col = lambda vals: [f"{v:.{DP}f}" for v in vals]
-    _m, _s = {}, {}
-    for a in ORDER:
-        ok = [s_ for s_ in sets if mu[(s_, a)] == mu[(s_, a)]]
-        _m[a] = st.fmean([mu[(s_, a)] for s_ in ok])
-        _s[a] = st.fmean([sd[(s_, a)] for s_ in ok])
-    _mt = dict(zip(ORDER, col([_m[a] for a in ORDER])))
-    _st = dict(zip(ORDER, col([_s[a] for a in ORDER])))
     for k, a in enumerate(ORDER):
         c, m = INK[a]
-        y = 3.6 - 1.0 * k
+        y = len(ORDER) - .4 - k
         tx.text(0, y, a, ha="left", va="center", **mono)
-        tx.plot([10.4, 13.6], [y, y], color=c, lw=2.2)
-        tx.plot(12.0, y, m, color=c, ms=6)
-        tx.text(18.2, y, _mt[a], ha="right", va="center", **mono)
-        tx.text(19.8, y, "sd", ha="left", va="center", **mono)
-        tx.plot([23.0, 26.0], [y, y], color=c, lw=2, ls="--")
-        tx.text(30.0, y, _st[a], ha="right", va="center", **mono)
+        tx.plot([11.0, 14.2], [y, y], color=c, lw=2.0)
+        tx.plot(12.6, y, m, color=c, ms=5)
+        tx.text(15.8, y, "sd", ha="left", va="center", **mono)
+        tx.plot([18.6, 21.6], [y, y], color=c, lw=1.8, ls="--")
 
     bt = sorted((secs[a], a, INK[a][0]) for a in ORDER if secs.get(a))
     bx.bar(range(len(bt)), [b[0] for b in bt], color=[b[2] for b in bt],
            width=.84)
     bx.set_yscale("log")
-    bx.set_ylim(min(b[0] for b in bt) / 2, max(b[0] for b in bt) * 4)
+    bx.set_ylim(min(b[0] for b in bt) / 2, max(b[0] for b in bt) * 14)
     for i, b in enumerate(bt):
-        bx.text(i, b[0] * 1.25, f"{b[0]:,.0f}s" if b[0] >= 10
+        bx.text(i, b[0] * 1.35, f"{b[0]:,.0f}s" if b[0] >= 100
                 else f"{b[0]:.1f}s", ha="center", va="bottom",
-                weight="bold", fontsize=FS["bar"] - 1)
+                rotation=90, weight="bold", fontsize=FS["bar"] - 4)
     bx.set_xticks(range(len(bt)))
     # four names side by side in a narrow panel collide; stand them up
     bx.set_xticklabels([b[1] for b in bt], rotation=90, ha="center",
