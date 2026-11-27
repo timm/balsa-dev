@@ -21,7 +21,6 @@ from os.path import expanduser
 isa = isinstance
 
 def say(x):
-  if hasattr(x, "__dict__"):   return repr(x)
   if isa(x, float):            x = ("%.2f" % x).rstrip("0").rstrip(".")
   elif isa(x, (list, tuple)):  x = "[%s]" % ", ".join(map(say, x))
   elif hasattr(x,"__slots__"): x = {k:getattr(x,k) for k in x.__slots__}
