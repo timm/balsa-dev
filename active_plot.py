@@ -88,8 +88,8 @@ bars = [(ln, c, totsec[ln]) for ln, c, _ in bymean if totsec.get(ln)]
 hx.bar(range(len(bars)), [t for _, _, t in bars],
        color=[c for _, c, _ in bars], width=.7)
 for i, (ln, c, t) in enumerate(bars):
-  hx.text(i, t, "%ds" % round(t) if t >= 1 else "%.1fs" % t, ha="center",
-          va="bottom", fontsize=8, fontweight="bold")
+  hx.text(i, t, "{:,}s".format(round(t)) if t >= 1 else "%.1fs" % t,
+          ha="center", va="bottom", fontsize=11, fontweight="bold")
 hx.set_xticks(range(len(bars))); hx.set_xticklabels([b[0] for b in bars],
                                                     fontsize=8)
 ax.set_ylim(0, 112); ax.set_xlim(-1, len(order))

@@ -51,8 +51,8 @@ bars = [(ln, c, totsec[ln]) for ln, c, _ in bymean if totsec.get(ln)]
 hx.bar(range(len(bars)), [t for _, _, t in bars],
        color=[c for _, c, _ in bars], width=.6)
 for i, (ln, c, t) in enumerate(bars):
-  hx.text(i, t, "%ds" % round(t) if t >= 1 else "%.1fs" % t, ha="center",
-          va="bottom", fontsize=9, fontweight="bold")
+  hx.text(i, t, "{:,}s".format(round(t)) if t >= 1 else "%.1fs" % t,
+          ha="center", va="bottom", fontsize=12, fontweight="bold")
 hx.set_xticks(range(len(bars))); hx.set_xticklabels([b[0] for b in bars])
 hx.set_yscale("log")
 hx.set_title("total secs over all folds (log, 1 thread)", fontsize=10)
