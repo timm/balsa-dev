@@ -30,18 +30,18 @@ def label(both, best, rest, row, y):
   while len(best.rows) > int(len(both.rows) ** .5):
     best.add(rest.add(max(best.rows, key=y)), -1)
 
-def acquire(tb, y, warm, budget):
-  "Label budget rows of a capped pool, chasing the best centroid."
+def acquire(tb, y, warm, budget, smart=True):
+  "Label budget pool rows: smart chases the best centroid; else random."
   pool = shuffle(tb.rows)[:the.pool]
   head = [tb.cols.names]
   both, best, rest = Tbl(head), Tbl(head), Tbl(head)
   for _ in range(warm):
     label(both, best, rest, pool.pop(), y)
   while len(both.rows) < budget and pool:
-    bm, rm = mids(best), mids(rest)
-    *pool, row = sorted(pool,
-                   key=lambda r: distx(both, r, rm) - distx(both, r, bm))
-    label(both, best, rest, row, y)
+    if smart:
+      bm, rm = mids(best), mids(rest)
+      pool.sort(key=lambda r: distx(both, r, rm) - distx(both, r, bm))
+    label(both, best, rest, pool.pop(), y)     # last = best, or random
   return both, best, rest
 
 # -- test-set rankers: (tb, both, best, rest) -> a key over test rows --
@@ -73,10 +73,10 @@ def scorer(tb, y):
   lo, mu = min(ys), sum(ys) / len(ys)
   return lambda row: 100 * (1 - (y(row) - lo) / (mu - lo + 1e-32))
 
-def optimize(tb, train, test, rank):
+def optimize(tb, train, test, rank, smart=True):
   "Acquire on train, rank test, check the top C, grade the best."
   y = lambda r: tb.disty(r)
-  both, best, rest = acquire(tb, y, the.warm, the.budget - the.check)
+  both, best, rest = acquire(tb, y, the.warm, the.budget - the.check, smart)
   checked = sorted(test, key=rank(tb, both, best, rest))[:the.check]
   return scorer(tb, y)(min(checked, key=y))
 
@@ -89,19 +89,26 @@ def xval(rows, m=5, n=2):
              [r for j, r in enumerate(u) if j % n == kf])
 
 def run(sets):
-  arms = list(RANKERS) + ["rand"]
+  arms = list(RANKERS) + ["rAcq", "rand"]
   print("#%-28s %s" % ("data", " ".join("%7s" % a for a in arms)))
   tot = {a: [] for a in arms}
   for f in sets:
     root = os.getenv("MOOTOPT", "~/gits/moot/optimize")
     tb = Tbl(csv("%s/%s.csv" % (root, f)))
+    y, win = (lambda r: tb.disty(r)), None
+    win = scorer(tb, y)
     got = {a: [] for a in arms}
-    for train, test in xval(tb.rows):
+    random.seed(the.seed)
+    folds = list(xval(tb.rows))                 # fixed splits per set
+    for fi, (train, test) in enumerate(folds):
+      def go(fn):                               # same pool for every arm
+        random.seed(the.seed + fi); return fn()
       for a, rk in RANKERS.items():
-        got[a].append(optimize(tb, train, test, rk))
-      y = lambda r: tb.disty(r)
-      win = scorer(tb, y)
-      got["rand"].append(win(min(shuffle(test)[:the.check], key=y)))
+        got[a].append(go(lambda: optimize(tb, train, test, rk)))
+      got["rAcq"].append(
+        go(lambda: optimize(tb, train, test, byDist, smart=False)))
+      got["rand"].append(
+        go(lambda: win(min(shuffle(test)[:the.check], key=y))))
     print("%-29s %s" % (f.split("/")[-1],
           " ".join("%7.1f" % (sum(got[a]) / len(got[a])) for a in arms)))
     for a in arms: tot[a].append(sum(got[a]) / len(got[a]))
