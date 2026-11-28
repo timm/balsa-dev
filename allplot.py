@@ -243,9 +243,14 @@ def main():
     # column stops follow the longest name: "acq:lgbm(100)" is half
     # again as wide as "lgbm(100)" and ran straight into its own swatch
     NW = 3.3 * max(len(n) for n, *_ in tv)
-    X1, X2 = NW + 4, NW + 36          # solid swatch, and the mean
-    X3, X4 = NW + 42, NW + 88         # dashed swatch, and secs/unit
-    vx.set_xlim(0, X4 + 4); vx.set_ylim(-1.9, len(tv) + 1.15)
+    X1, X2 = NW + 9, NW + 40          # solid swatch, and the mean
+    X3, X4 = NW + 46, NW + 100         # dashed swatch, and secs/unit
+    # one row spacing for all three panels.  A padding fixed in axis
+    # units gave each panel a different span, so four rows sat further
+    # apart than six in the same height of paper.  Fix the SPAN instead
+    # and hang the rows from the top of it.
+    SPAN, TOP = 9.05, len(tv) + 1.15
+    vx.set_xlim(0, X4 + 4); vx.set_ylim(TOP - SPAN, TOP)
     vx.set_xticks([]); vx.set_yticks([])
     mono2 = dict(family="monospace", fontsize=FS["mono"] - 1)
     hd = dict(family="monospace", fontsize=FS["mono"] - 3, color="#555")
@@ -261,7 +266,9 @@ def main():
     for k, (n, v, sv, c) in enumerate(tv):
         y = len(tv) - 1 - k
         d = (base - v if mode == "reg" else v - base) * PT
-        cell = "--" if d <= 0 else ("<1" if c / d < 1 else f"{c/d:,.0f}")
+        # the worst treatment is what the others are priced against,
+        # so it has no price of its own
+        cell = "baseline" if d <= 0 else ("<1" if c / d < 1 else f"{c/d:,.0f}")
         col, mk = INK[n]
         vx.text(0, y, n, ha="left", va="center", color=col, **mono2)
         vx.plot([X1, X1 + 10], [y, y], color=col, lw=2.0)
