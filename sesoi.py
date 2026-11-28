@@ -92,7 +92,12 @@ block header is the floor at which TabICL
 stops leading on most sets. It is just the median difference: half the
 sets lie above it by construction, so one number answers {\em how much
 would a reader have to stop caring about before this method stops
-winning?} Three AUC points is a lot to wave away; one win point is not.
+winning?} Whether three AUC points is worth buying depends on what it
+is set against, and this paper supplies the scale: {\tt enuf(30)}
+differs from LightGBM by $0.2$ points, TabICL beats {\tt enuf(30)} by
+$3.3$, and going from one tree to thirty was worth $10.7$. TabICL's
+edge is thus about a third of what our own ensembling already bought,
+and the optimizer's break-even of one win point is smaller still.
 (The floor at which ties outnumber wins sits within a hair of it ---
 1.70, 2.11 and 0.27 sd --- because so few sets go the other way.)
 Compare the cost of buying those wins: Figure~\ref{fig:loc}(b)--(d).}
