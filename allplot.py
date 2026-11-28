@@ -40,12 +40,19 @@ import numpy as np
 INK = {"enuf(1)":  ("#2ca02c", "^"), "lgbm(100)": ("#2a6fdb", "o"),
        "enuf(30)": ("#e8613c", "s"), "TabICL":    ("#000000", "D"),
        "random":    ("#8a8f98", "v"), "1nn": ("#7b3fa0", "P"),
-       "acquire+1nn": ("#e8613c", "s"), "random+1nn": ("#8a8f98", "v")}
+       "acquire+1nn": ("#e8613c", "s"), "random+1nn": ("#8a8f98", "v"),
+       "acq:enuf(1)":   ("#2ca02c", "^"), "acq:lgbm(100)": ("#2a6fdb", "o"),
+       "acq:enuf(30)":  ("#e8613c", "s"), "acq:1nn":       ("#7b3fa0", "P"),
+       "acq:TabICL":    ("#000000", "D"), "rand:1nn":      ("#8a8f98", "v")}
 ORDER = ["enuf(1)", "lgbm(100)", "enuf(30)", "TabICL"]
 # `random` -- the same budget spent with no model -- is the floor these
 # are judged against, and sec:active reports it; it is kept out of the
 # figure, where six lines were two too many to follow.
-ACTORDER = ["1nn", "enuf(1)", "lgbm(100)", "enuf(30)", "TabICL"]
+# the optimizer study names its treatments by how the 45 training rows
+# were chosen as well as by what ranked the test set, because the first
+# half of that pair turns out to matter less than anyone expects
+ACTORDER = ["acq:lgbm(100)", "acq:enuf(1)", "acq:enuf(30)", "acq:1nn",
+            "acq:TabICL", "rand:1nn"]
 ABLORDER = ["random+1nn", "acquire+1nn"]
 FS = dict(tick=14, lab=15, mono=13, bar=15)
 
@@ -80,8 +87,9 @@ def read_act(paths, abl=False):
     their own per-fold seconds, so the runtime bars here are measured on
     exactly the folds the curves are drawn from."""
     key = ({"a.knn": "acquire+1nn", "r.knn": "random+1nn"} if abl else
-           {"a.b1": "enuf(1)", "a.b30": "enuf(30)", "a.lgbm": "lgbm(100)",
-            "a.tabicl": "TabICL", "a.knn": "1nn"})
+           {"a.b1": "acq:enuf(1)", "a.b30": "acq:enuf(30)",
+            "a.lgbm": "acq:lgbm(100)", "a.tabicl": "acq:TabICL",
+            "a.knn": "acq:1nn", "r.knn": "rand:1nn"})
     F, secs = {}, dict.fromkeys(ABLORDER if abl else ACTORDER, 0.0)
     for p in paths:
         for l in open(p):
@@ -132,7 +140,7 @@ def main():
         ORDER = ACTORDER
         # `random` is the budget spent without a model: it is the baseline
         # the others are judged against, not a learner being compared
-        VARARMS = ("1nn", "lgbm(100)", "enuf(30)", "TabICL")
+        VARARMS = ("acq:1nn", "acq:lgbm(100)", "acq:enuf(30)", "acq:TabICL")
     nan = float("nan")
     mu = {(s, a): (st.fmean(F[s][a]) if a in F[s] else nan)
           for s in F for a in ORDER}
@@ -143,7 +151,7 @@ def main():
     # is capped by rows in regression), those sets sort last, among
     # themselves by the fallback -- a NaN key would order nothing.
     SORT = os.getenv("SORTBY", "acquire+1nn" if mode == "abl" else
-                     "1nn" if mode == "act" else "enuf(30)")
+                     "acq:1nn" if mode == "act" else "enuf(30)")
     FALL = "lgbm(100)"
     hi = mode != "reg"                     # only rel is small-is-good
     def key(s):
@@ -156,7 +164,7 @@ def main():
 
     fig = plt.figure(figsize=(14.3, 3.9))
     gs = fig.add_gridspec(1, 5, wspace=0,
-                          width_ratios=[.72 * len(ORDER), 2.3, 20, 1.0, 9.0])
+                          width_ratios=[.72 * len(ORDER), 2.3, 20, 1.0, 10.5])
     bx, ax = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
     vx = fig.add_subplot(gs[4])
 
@@ -235,14 +243,19 @@ def main():
     DP = 2 if mode == "reg" else 0
     # a wider y range with the rows unchanged pulls them together:
     # the text is fixed in points, the axis is not
-    vx.set_xlim(0, 108); vx.set_ylim(-1.9, len(tv) + .55)
+    # column stops follow the longest name: "acq:lgbm(100)" is half
+    # again as wide as "lgbm(100)" and ran straight into its own swatch
+    NW = 3.3 * max(len(n) for n, *_ in tv)
+    X1, X2 = NW + 4, NW + 36          # solid swatch, and the mean
+    X3, X4 = NW + 42, NW + 88         # dashed swatch, and secs/unit
+    vx.set_xlim(0, X4 + 4); vx.set_ylim(-1.9, len(tv) + .55)
     vx.set_xticks([]); vx.set_yticks([])
     mono2 = dict(family="monospace", fontsize=FS["mono"] - 1)
     hd = dict(family="monospace", fontsize=FS["mono"] - 3, color="#555")
     UNIT = {"cls": "AUC", "reg": "err"}.get(mode, "win")
-    vx.text(56, len(tv) - .55, "mean", ha="right", va="center", **hd)
-    vx.text(69, len(tv) - .55, "sd", ha="center", va="center", **hd)
-    vx.text(104, len(tv) - .55, f"secs/{UNIT}", ha="right", va="center", **hd)
+    vx.text(X2, len(tv) - .55, "mean", ha="right", va="center", **hd)
+    vx.text(X3 + 5, len(tv) - .55, "sd", ha="center", va="center", **hd)
+    vx.text(X4, len(tv) - .55, f"secs/{UNIT}", ha="right", va="center", **hd)
     prev = None
     for k, (n, v, sv, c) in enumerate(tv):
         y = len(tv) - 1 - k
@@ -257,11 +270,11 @@ def main():
         if n not in dom: prev = (v, c)
         col, mk = INK[n]
         vx.text(0, y, n, ha="left", va="center", color=col, **mono2)
-        vx.plot([30, 40], [y, y], color=col, lw=2.0)
-        vx.plot(35, y, mk, color=col, ms=5)
-        vx.text(56, y, f"{v:.{DP}f}", ha="right", va="center", **mono2)
-        vx.plot([64, 74], [y, y], color=col, lw=1.8, ls="--")
-        vx.text(104, y, cell, ha="right", va="center",
+        vx.plot([X1, X1 + 10], [y, y], color=col, lw=2.0)
+        vx.plot(X1 + 5, y, mk, color=col, ms=5)
+        vx.text(X2, y, f"{v:.{DP}f}", ha="right", va="center", **mono2)
+        vx.plot([X3, X3 + 10], [y, y], color=col, lw=1.8, ls="--")
+        vx.text(X4, y, cell, ha="right", va="center",
                 weight="bold" if n in dom else "normal", **mono2)
     vx.set_title(f"solid = mean, dashed = sd\n({len(common)} sets all ran)",
                  fontsize=FS["lab"] - 4)
