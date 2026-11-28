@@ -89,9 +89,10 @@ each study the treatments are sorted by score, worst first, so each row
 is a step up from the one above and the question is what that step
 costs. A treatment is {\em dominated} when something else scores at
 least as well in no more time --- no budget buys it, and it is skipped
-when stepping. {\em gain} is the score the step adds, {\em of all} is
-that as a share of the whole distance from worst to best, {\em +secs}
-is the extra run time it takes, and the last column divides the two.
+when stepping. {\em gain} is the score the step adds, {\em +secs} is
+the extra run time it takes, and the last column divides the two. {\em
+Mean score} is over all that study's data sets, each itself a mean over
+its ten 5x2 folds.
 The ceiling is not assumed: an oracle allowed to pick the best
 treatment {\em per data set} beats TabICL by only $0.1$, $1.3$ and
 $0.3$ points, so the bottom row of each block is close to all this
@@ -101,9 +102,9 @@ in Figure~\ref{fig:loc}.}
 \centering
 {\scriptsize
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{lrrrrrr}
+\begin{tabular}{lrrrrr}
 \toprule
-treatment & score & secs & gain & of all & +secs & secs/point \\
+treatment & mean score & secs & gain & +secs & secs/point \\
 \midrule""")
     for name, unit, rows in (cls(), reg(), act()):
         rows = sorted(rows, key=lambda r: r[1])          # worst score first
@@ -116,24 +117,24 @@ treatment & score & secs & gain & of all & +secs & secs/point \\
         # start, and counting it would make the shares sum to under 100
         first = next(sc for n, sc, c in rows if n not in dom)
         span = rows[-1][1] - first
-        print(f"\\multicolumn{{7}}{{l}}{{\\em {name}}}, one point $=$ one"
+        print(f"\\multicolumn{{6}}{{l}}{{\\em {name}}}, one point $=$ one"
               f" {unit}; {span:.1f} points on the frontier \\\\")
         prev = None
         for n, sc, c in rows:
             if n in dom:
                 print(f"\\quad {n} & {sc:.1f} & {c:,.0f} &"
-                      f" \\multicolumn{{4}}{{l}}{{\\em dominated}} \\\\")
+                      f" \\multicolumn{{3}}{{l}}{{\\em dominated}} \\\\")
                 continue
             if prev is None:
-                cells = "--- & --- & --- & ---"
+                cells = "--- & --- & ---"
             else:
                 d, dc = sc - prev[0], c - prev[1]
                 v = dc / d
-                cells = (f"{d:+.1f} & {100*d/span:.0f}\\% & {dc:,.0f} &"
+                cells = (f"{d:+.1f} & {dc:,.0f} &"
                          f" {'$<1$' if v < 1 else f'{v:,.0f}'}")
             print(f"\\quad {n} & {sc:.1f} & {c:,.0f} & {cells} \\\\")
             prev = (sc, c)
-        if name != "optimization": print(r"\cmidrule{1-7}")
+        if name != "optimization": print(r"\cmidrule{1-6}")
     print(r"""\bottomrule
 \end{tabular}
 }
