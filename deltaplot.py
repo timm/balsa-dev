@@ -71,7 +71,9 @@ def main():
     tied = [r[1] for r in rows]
     xs = np.arange(len(d))
 
-    fig, ax = plt.subplots(figsize=(14.3, 3.9))
+    fig = plt.figure(figsize=(14.3, 3.9))
+    gs = fig.add_gridspec(1, 3, width_ratios=[20, 1, 7], wspace=0)
+    ax, kx = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
     # a full-height band on every set the test cannot separate: the eye
     # reads the grey as a column, not as a marker it has to compare
     gx = [x for x, t in zip(xs, tied) if t]
@@ -80,12 +82,20 @@ def main():
         ax.axvspan(x - .5, x + .5, color="#dfe2e6", lw=0, zorder=0)
     ax.axhline(0, color="#444", lw=1.4, zorder=2)
     ax.plot(xs, d, color="#8a8f98", lw=1.6, zorder=3)
-    ax.plot(cx, [v for v, t in zip(d, tied) if not t], "o",
-            color="#e8613c", ms=5, zorder=4)
-    ax.plot([], [], "s", color="#dfe2e6", ms=9,
-            label=f"no difference the test can see  ({len(gx)} sets)")
-    ax.plot([], [], "o", color="#e8613c", ms=5,
-            label=f"a difference it can  ({len(cx)} sets)")
+    ax.plot(xs, d, "o", color="#e8613c", ms=5, zorder=4)
+    # the key sits off the plot: a grey swatch inside it was invisible,
+    # landing on the grey bands it was there to explain
+    kx.set_xlim(0, 10); kx.set_ylim(0, 10)
+    kx.set_xticks([]); kx.set_yticks([])
+    kx.set_facecolor("#fcfcfa")
+    for s_ in kx.spines.values(): s_.set_visible(False)
+    kx.add_patch(plt.Rectangle((.3, 6.4), 1.5, 1.0, color="#dfe2e6", lw=0))
+    kx.text(2.3, 6.9, f"no difference the test\ncan see  ({len(gx)} sets)",
+            ha="left", va="center", fontsize=FS["mono"])
+    kx.plot(1.05, 4.6, "o", color="#e8613c", ms=6)
+    kx.text(2.3, 4.6, f"one data set\n({len(d)} in all, {len(cx)} of them\n"
+            "outside a grey band)", ha="left", va="center",
+            fontsize=FS["mono"])
     ax.set_xlim(-1, len(d)); ax.set_xticks([])
     ax.set_xlabel(f"{len(d)} data sets, ordered by the difference",
                   fontsize=FS["lab"])
@@ -94,8 +104,6 @@ def main():
     ax.tick_params(axis="y", labelsize=FS["tick"])
     ax.grid(axis="y", color="#ddd")
     for s_ in ("top", "right"): ax.spines[s_].set_visible(False)
-    lg = ax.legend(loc="upper left", frameon=False, fontsize=FS["mono"],
-                   handletextpad=.4)
     fig.set_facecolor("#fcfcfa"); ax.set_facecolor("#fcfcfa")
     plt.tight_layout()
     plt.savefig(out, dpi=200, bbox_inches="tight", pad_inches=.02)

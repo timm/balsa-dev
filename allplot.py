@@ -237,9 +237,6 @@ def main():
            st.fmean([sd[(s_, a)] for s_ in common]), secs.get(a, 0))
           for a in ORDER if secs.get(a)]
     tv.sort(key=lambda r: -r[1] if mode == "reg" else r[1])
-    dom = {n for n, v, _s, c in tv
-           if any((v2 >= v if mode != "reg" else v2 <= v) and c2 <= c
-                  and (v2, c2) != (v, c) for _, v2, _s2, c2 in tv)}
     DP = 2 if mode == "reg" else 0
     # a wider y range with the rows unchanged pulls them together:
     # the text is fixed in points, the axis is not
@@ -256,26 +253,22 @@ def main():
     vx.text(X2, len(tv) - .55, "mean", ha="right", va="center", **hd)
     vx.text(X3 + 5, len(tv) - .55, "sd", ha="center", va="center", **hd)
     vx.text(X4, len(tv) - .55, f"secs/{UNIT}", ha="right", va="center", **hd)
-    prev = None
+    # every row priced the same way: its total seconds over the points it
+    # gains on the worst treatment here.  Stepping from the row above
+    # instead would go negative wherever a cheaper treatment scores
+    # better, which happens, and a negative price reads as a mistake.
+    base = tv[0][1]
     for k, (n, v, sv, c) in enumerate(tv):
         y = len(tv) - 1 - k
-        if n in dom:
-            cell = "NO"
-        elif prev is None:
-            cell = "--"
-        else:
-            d = (v - prev[0]) * (-1 if mode == "reg" else 1) * PT
-            dc = c - prev[1]
-            cell = "<1" if dc / d < 1 else f"{dc/d:,.0f}"
-        if n not in dom: prev = (v, c)
+        d = (base - v if mode == "reg" else v - base) * PT
+        cell = "--" if d <= 0 else ("<1" if c / d < 1 else f"{c/d:,.0f}")
         col, mk = INK[n]
         vx.text(0, y, n, ha="left", va="center", color=col, **mono2)
         vx.plot([X1, X1 + 10], [y, y], color=col, lw=2.0)
         vx.plot(X1 + 5, y, mk, color=col, ms=5)
         vx.text(X2, y, f"{v:.{DP}f}", ha="right", va="center", **mono2)
         vx.plot([X3, X3 + 10], [y, y], color=col, lw=1.8, ls="--")
-        vx.text(X4, y, cell, ha="right", va="center",
-                weight="bold" if n in dom else "normal", **mono2)
+        vx.text(X4, y, cell, ha="right", va="center", **mono2)
     vx.set_title(f"solid = mean, dashed = sd\n({len(common)} sets all ran)",
                  fontsize=FS["lab"] - 4)
     vx.set_facecolor("#fcfcfa")
@@ -299,8 +292,7 @@ def main():
         print(f"{a:10s} mean {st.fmean(v):6.2f}  ({len(v)} sets)"
               f"  {secs.get(a, 0):,.0f}s")
     for n, v, sv, c in tv:
-        print(f"  {n:12s} {v:6.2f} {c:9,.0f}s"
-              f"{'   DOMINATED' if n in dom else ''}")
+        print(f"  {n:14s} {v:6.2f} {c:9,.0f}s")
 
 
 if __name__ == "__main__": main()
