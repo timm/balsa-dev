@@ -90,9 +90,11 @@ is a step up from the one above and the question is what that step
 costs. A treatment is {\em dominated} when something else scores at
 least as well in no more time --- no budget buys it, and it is skipped
 when stepping. {\em gain} is the score the step adds, {\em +secs} is
-the extra run time it takes, and the last column divides the two. {\em
-Mean score} is over all that study's data sets, each itself a mean over
-its ten 5x2 folds.
+the extra run time it takes, and the last column divides the two. {\em Mean score} is over all
+that study's data sets, each itself a mean over its ten 5x2 folds, and
+all three are on the same 0--100 scale where higher is better: AUC for
+classification, $100(1-\mathit{rel})$ for regression, and the win score
+of \S\ref{sec:active} for optimization.
 The ceiling is not assumed: an oracle allowed to pick the best
 treatment {\em per data set} beats TabICL by only $0.1$, $1.3$ and
 $0.3$ points, so the bottom row of each block is close to all this
@@ -112,13 +114,7 @@ treatment & mean score & secs & gain & +secs & secs/point \\
         dom = {n for n, sc, c in rows
                if any(s2 >= sc and c2 <= c and (s2, c2) != (sc, c)
                       for _, s2, c2 in rows)}
-        # measured over the frontier only: if the worst-scoring treatment
-        # is dominated, no step ever buys the stretch below the frontier's
-        # start, and counting it would make the shares sum to under 100
-        first = next(sc for n, sc, c in rows if n not in dom)
-        span = rows[-1][1] - first
-        print(f"\\multicolumn{{6}}{{l}}{{\\em {name}}}, one point $=$ one"
-              f" {unit}; {span:.1f} points on the frontier \\\\")
+        print(f"\\multicolumn{{6}}{{l}}{{\\em {name}}} \\\\")
         prev = None
         for n, sc, c in rows:
             if n in dom:
