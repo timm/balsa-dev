@@ -102,7 +102,7 @@ bx.set_xticks(range(len(bt)))
 # four arm names side by side in a narrow panel collide; stand them up
 bx.set_xticklabels([b[1] for b in bt],rotation=90,ha="center",
                    va="top",fontsize=FS["bar"]-1)
-bx.set_title("total secs, log scale\n(summed over folds,\n1 thread each)",fontsize=FS["head"]-5)
+bx.set_title("total secs, log scale\n(all folds, 1 thread)",fontsize=FS["head"]-5)
 bx.set_yticks([]); bx.set_facecolor("#fcfcfa"); bx.set_xlim(-.55,len(bt)-.45)
 for s_ in ("top","right","left"): bx.spines[s_].set_visible(False)
 

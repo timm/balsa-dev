@@ -183,7 +183,7 @@ def main():
         bx.set_xticks(range(len(bt)))
         bx.set_xticklabels([b[1] for b in bt], rotation=90, va="top",
                            fontsize=FS["bar"] - 1)
-        bx.set_title("total secs, log scale\n(summed over folds,\n1 thread each)",
+        bx.set_title("total secs, log scale\n(all folds, 1 thread)",
                      fontsize=FS["head"] - 5)
     else:
         bx.text(.5, .5, "timings:\nsee the\nwhole-corpus\nfigure",

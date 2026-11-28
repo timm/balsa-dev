@@ -43,7 +43,7 @@ INK = {"tree(1)":  ("#2ca02c", "^"), "lgbm(100)": ("#2a6fdb", "o"),
        "acquire+1nn": ("#e8613c", "s"), "random+1nn": ("#8a8f98", "v"),
        "acq:tree(1)":   ("#2ca02c", "^"), "acq:lgbm(100)": ("#2a6fdb", "o"),
        "acq:tree(30)":  ("#e8613c", "s"), "acq:1nn":       ("#7b3fa0", "P"),
-       "acq:TabICL":    ("#000000", "D"), "rand:1nn":      ("#8a8f98", "v")}
+       "acq:TabICL":    ("#000000", "D"), "rand:1nn":      ("#17a9b8", "v")}
 ORDER = ["tree(1)", "lgbm(100)", "tree(30)", "TabICL"]
 # `random` -- the same budget spent with no model -- is the floor these
 # are judged against, and sec:active reports it; it is kept out of the
@@ -217,7 +217,7 @@ def main():
     # titles go INSIDE their panels: as titles they sat above the axes
     # and shortened every panel in the row, leaving a band of background
     # over the curves
-    bx.text(.5, .985, "total secs, log scale\n(all folds, 1 thread each)",
+    bx.text(.5, .985, "total secs, log scale\n(all folds, 1 thread)",
             transform=bx.transAxes, ha="center", va="top",
             fontsize=FS["lab"] - 5)
     bx.set_yticks([]); bx.set_facecolor("#fcfcfa")
