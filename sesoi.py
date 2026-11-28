@@ -12,9 +12,15 @@ This sweeps it.  For each study, the per-set difference between TabICL
 and the method this paper recommends is counted three ways: TabICL ahead
 by more than the floor, inside the floor (a tie), or behind by more than
 it.  The floor is given in each study's own units and, so the three can
-be read on one scale, as a multiple of that study's own median fold sd.
-A difference smaller than the noise of one's own measurement is not a
-difference anybody should buy.
+be read on one scale, as a multiple of that study's median fold noise.
+
+That noise is the spread of the per-fold DIFFERENCE, not the spread of
+either arm on its own.  The comparison is paired -- both arms see the
+same folds, so their errors move together -- and the difference is what
+is being thresholded.  The distinction is not academic: on the optimizer
+study the paired spread is 4.4 win points where one arm alone reads 3.2,
+so using one arm would have flattered TabICL by 39% exactly where it
+deserved the least slack.
 
 usage: python3 sesoi.py > sesoi.tex
 """
@@ -38,7 +44,9 @@ def classification():
                 _, s, a, *v = l.split()
                 F.setdefault(s, {})[a] = [float(x) for x in v]
     d = [st.fmean(F[s]["tabicl"]) - st.fmean(F[s]["n30"]) for s in F]
-    return d, st.median([spread(F[s]["n30"]) for s in F]), "AUC points", 2
+    sd = st.median([spread([x - y for x, y in zip(F[s]["tabicl"], F[s]["n30"])])
+                    for s in F])
+    return d, sd, "AUC points", 2
 
 
 def regression():
@@ -48,7 +56,8 @@ def regression():
     ok = [s for s in D if all(r.get("rel_tabicl", "") != "" for r in D[s])]
     d = [st.fmean([float(r["rel_enuf30"]) for r in D[s]])
          - st.fmean([float(r["rel_tabicl"]) for r in D[s]]) for s in ok]
-    sd = st.median([spread([float(r["rel_enuf30"]) for r in D[s]]) for s in ok])
+    sd = st.median([spread([float(r["rel_enuf30"]) - float(r["rel_tabicl"])
+                            for r in D[s]]) for s in ok])
     return d, sd, "rel", 3
 
 
@@ -61,7 +70,9 @@ def optimization():
                 G.setdefault(s, {})[a] = [float(x) for x in v]
     ok = [s for s in G if "a.tabicl" in G[s] and "a.knn" in G[s]]
     d = [st.fmean(G[s]["a.tabicl"]) - st.fmean(G[s]["a.knn"]) for s in ok]
-    return d, st.median([spread(G[s]["a.knn"]) for s in ok]), "win points", 2
+    sd = st.median([spread([x - y for x, y in
+                            zip(G[s]["a.tabicl"], G[s]["a.knn"])]) for s in ok])
+    return d, sd, "win points", 2
 
 
 def main():
@@ -73,7 +84,7 @@ enuf(30)}, or {\tt 1nn} for optimization), counted against a {\em
 smallest effect size of interest}: TabICL {\em ahead} by more than the
 floor, {\em tied} inside it, or {\em behind} by more than it. The floor
 is given in each study's own units and as a multiple of that study's
-median fold sd, so the three can be read on one scale --- a difference
+median paired fold sd, so the three can be read on one scale --- a difference
 smaller than the noise of one's own measurement is not one to pay for.
 The first row of each block is the rig's current {\tt prudence} of 0.01,
 which is effectively no floor at all. Compare the cost of buying those
@@ -91,8 +102,10 @@ floor & in units & {\em ahead} & {\em tied} & {\em behind} \\
                           ("optimization", optimization, "62 sets")):
         d, sd, units, dp = fn()
         n = len(d)
-        print(f"\\multicolumn{{5}}{{l}}{{\\em {nm}, {n} sets, "
-              f"{units}; median fold sd {sd:.{dp}f}}} \\\\")
+        med = st.median(d)
+        print(f"\\multicolumn{{5}}{{l}}{{\\em {nm}}}, {n} sets, {units};"
+              f" median $\\Delta$ {med:+.{dp}f}, paired sd {sd:.{dp}f},"
+              f" so $\\Delta$/sd $= {med/sd:+.2f}$ \\\\")
         for k in KS:
             S = PRU if k == 0 else k * sd
             tag = r"{\tt prudence}" if k == 0 else f"${k:g}\\times$sd"
