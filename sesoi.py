@@ -87,8 +87,15 @@ is given in each study's own units and as a multiple of that study's
 median paired fold sd, so the three can be read on one scale --- a difference
 smaller than the noise of one's own measurement is not one to pay for.
 The first row of each block is the rig's current {\tt prudence} of 0.01,
-which is effectively no floor at all. Compare the cost of buying those
-wins: Figure~\ref{fig:loc}(b)--(d).}
+which is effectively no floor at all. The {\em break-even} in each
+block header is the floor at which TabICL
+stops leading on most sets. It is just the median difference: half the
+sets lie above it by construction, so one number answers {\em how much
+would a reader have to stop caring about before this method stops
+winning?} Three AUC points is a lot to wave away; one win point is not.
+(The floor at which ties outnumber wins sits within a hair of it ---
+1.70, 2.11 and 0.27 sd --- because so few sets go the other way.)
+Compare the cost of buying those wins: Figure~\ref{fig:loc}(b)--(d).}
 \label{tab:sesoi}
 \centering
 {\scriptsize
@@ -104,8 +111,8 @@ floor & in units & {\em ahead} & {\em tied} & {\em behind} \\
         n = len(d)
         med = st.median(d)
         print(f"\\multicolumn{{5}}{{l}}{{\\em {nm}}}, {n} sets, {units};"
-              f" median $\\Delta$ {med:+.{dp}f}, paired sd {sd:.{dp}f},"
-              f" so $\\Delta$/sd $= {med/sd:+.2f}$ \\\\")
+              f" paired sd {sd:.{dp}f}; {{\\bf break-even}}"
+              f" {med:+.{dp}f} $= {med/sd:.2f}$ sd \\\\")
         for k in KS:
             S = PRU if k == 0 else k * sd
             tag = r"{\tt prudence}" if k == 0 else f"${k:g}\\times$sd"
