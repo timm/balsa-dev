@@ -156,7 +156,7 @@ def main():
 
     fig = plt.figure(figsize=(14.3, 3.9))
     gs = fig.add_gridspec(1, 5, wspace=0,
-                          width_ratios=[.72 * len(ORDER), 2.3, 20, 1.0, 6.2])
+                          width_ratios=[.72 * len(ORDER), 2.3, 20, 1.0, 9.0])
     bx, ax = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
     vx = fig.add_subplot(gs[4])
 
@@ -190,39 +190,6 @@ def main():
                   fontsize=FS["lab"])
     for s_ in ("top", "right"): ax.spines[s_].set_visible(False)
 
-    # Back inside the plot, bottom left, lifted clear of the x axis.
-    # Underneath the frame it was legible but far from the lines it
-    # names; in here the eye goes straight from swatch to curve.
-    tx = ax.inset_axes((.02, .05, .4, .4))
-    LEGEND_IN = (2.15, .20 * len(ORDER) + .03)
-    tx.set_xlim(0, 28); tx.set_ylim(0, len(ORDER) + .6)
-    tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
-    for s_ in tx.spines.values(): s_.set_visible(False)
-    mono = dict(family="monospace", fontsize=FS["mono"] - 3,
-                bbox=dict(fc="#fcfcfa", ec="none", pad=1))
-    # The mean is worth carrying here -- it is the one number a reader
-    # wants per treatment.  The sd is not: it is the dashed line, which
-    # the eye can already see, and a second column of digits crowds the
-    # names.  One precision for the column, set by the score.
-    DP = 2 if mode == "reg" else 0
-    avg, num = {}, {}
-    for a in ORDER:
-        ok = [s_ for s_ in sets if mu[(s_, a)] == mu[(s_, a)]]
-        num[a] = st.fmean([mu[(s_, a)] for s_ in ok])
-        avg[a] = f"{num[a]:.{DP}f}"
-    # best first, which in reg means smallest: the legend then reads as a
-    # ranking rather than as whatever order the treatments were declared
-    rank = sorted(ORDER, key=lambda a: -num[a] if mode != "reg" else num[a])
-    for k, a in enumerate(rank):
-        c, m = INK[a]
-        y = len(ORDER) - .4 - k
-        tx.text(0, y, a, ha="left", va="center", **mono)
-        tx.plot([11.0, 14.2], [y, y], color=c, lw=2.0)
-        tx.plot(12.6, y, m, color=c, ms=5)
-        tx.text(19.4, y, avg[a], ha="right", va="center", **mono)
-        tx.text(20.8, y, "sd", ha="left", va="center", **mono)
-        tx.plot([24.6, 27.6], [y, y], color=c, lw=1.8, ls="--")
-
     bt = sorted((secs[a], a, INK[a][0]) for a in ORDER if secs.get(a))
     bx.bar(range(len(bt)), [b[0] for b in bt], color=[b[2] for b in bt],
            width=.84)
@@ -244,36 +211,56 @@ def main():
     bx.set_xlim(-.55, len(bt) - .45)
     for s_ in ("top", "right", "left"): bx.spines[s_].set_visible(False)
 
-    # right: what the next step up costs.  Treatments in score order,
-    # each priced by the extra seconds over the one below it; NO marks a
-    # treatment nothing would buy, because something else already scores
-    # at least as well in no more time.
-    tv = [(a, st.fmean([mu[(s_, a)] for s_ in sets
-                        if mu[(s_, a)] == mu[(s_, a)]]), secs.get(a, 0))
+    # right: the whole key, so nothing sits on top of the curves.
+    # name, its solid line and mean, its dashed sd line, and what the
+    # step up to it costs.  NO marks a treatment nothing would buy:
+    # something else already scores as well in no more time.
+    #
+    # A "point" here is the table's point, not the raw unit: for reg the
+    # score is a ratio, and one point is 0.01 of it.  Without the x100
+    # this panel priced a whole unit of rel and read 100 times the table.
+    PT = 100 if mode == "reg" else 1
+    # averaged over the sets EVERY treatment ran, not over each one's own
+    # set list.  TabICL is capped by rows, so scoring it on 69 sets and
+    # the rest on 79 made this panel disagree with Table 7 by a third.
+    common = [s_ for s_ in sets
+              if all(mu[(s_, a)] == mu[(s_, a)] for a in ORDER)]
+    tv = [(a, st.fmean([mu[(s_, a)] for s_ in common]),
+           st.fmean([sd[(s_, a)] for s_ in common]), secs.get(a, 0))
           for a in ORDER if secs.get(a)]
     tv.sort(key=lambda r: -r[1] if mode == "reg" else r[1])
-    dom = {n for n, v, c in tv
+    dom = {n for n, v, _s, c in tv
            if any((v2 >= v if mode != "reg" else v2 <= v) and c2 <= c
-                  and (v2, c2) != (v, c) for _, v2, c2 in tv)}
-    vx.set_xlim(0, 10.6); vx.set_ylim(-.6, len(tv) - .4)
+                  and (v2, c2) != (v, c) for _, v2, _s2, c2 in tv)}
+    DP = 2 if mode == "reg" else 0
+    vx.set_xlim(0, 108); vx.set_ylim(-.9, len(tv) - .2)
     vx.set_xticks([]); vx.set_yticks([])
-    vx.set_title("cost of the step up\n(secs per extra point)",
-                 fontsize=FS["lab"] - 4)
     mono2 = dict(family="monospace", fontsize=FS["mono"] - 1)
+    hd = dict(family="monospace", fontsize=FS["mono"] - 3, color="#555")
+    vx.text(56, len(tv) - .55, "mean", ha="right", va="center", **hd)
+    vx.text(104, len(tv) - .55, "secs/pt", ha="right", va="center", **hd)
     prev = None
-    for k, (n, v, c) in enumerate(tv):
+    for k, (n, v, sv, c) in enumerate(tv):
         y = len(tv) - 1 - k
         if n in dom:
             cell = "NO"
         elif prev is None:
             cell = "--"
         else:
-            d, dc = (v - prev[0]) * (-1 if mode == "reg" else 1), c - prev[1]
+            d = (v - prev[0]) * (-1 if mode == "reg" else 1) * PT
+            dc = c - prev[1]
             cell = "<1" if dc / d < 1 else f"{dc/d:,.0f}"
         if n not in dom: prev = (v, c)
-        vx.text(0, y, n, ha="left", va="center", color=INK[n][0], **mono2)
-        vx.text(10.4, y, cell, ha="right", va="center",
+        col, mk = INK[n]
+        vx.text(0, y, n, ha="left", va="center", color=col, **mono2)
+        vx.plot([30, 40], [y, y], color=col, lw=2.0)
+        vx.plot(35, y, mk, color=col, ms=5)
+        vx.text(56, y, f"{v:.{DP}f}", ha="right", va="center", **mono2)
+        vx.plot([64, 74], [y, y], color=col, lw=1.8, ls="--")
+        vx.text(104, y, cell, ha="right", va="center",
                 weight="bold" if n in dom else "normal", **mono2)
+    vx.set_title(f"solid = mean, dashed = sd\n({len(common)} sets all ran)",
+                 fontsize=FS["lab"] - 4)
     vx.set_facecolor("#fcfcfa")
     for s_ in vx.spines.values(): s_.set_visible(False)
 
@@ -287,17 +274,6 @@ def main():
     tick = min(t.get_window_extent(rend).x0 for t in ax.get_yticklabels())
     ax.yaxis.set_label_coords(ax.transAxes.inverted().transform(
         (max(bars + 8 + w / 2, tick + 7 - w / 2), 0))[0], .5)
-    # inset_axes keeps a locator that ignores set_position; drop it, then
-    # the numbers below are figure fractions.  Lifted a little off the
-    # axis floor so the box does not sit on the x spine.
-    _bb = ax.get_position()
-    _lh = LEGEND_IN[1] / fig.get_figheight()
-    tx.set_axes_locator(None)
-    # In reg the axis is inverted, so the lazy-learner line at 1.0 sits
-    # LOW on screen; clear it rather than straddle it.
-    _y0 = .35 if mode == "reg" else .20
-    tx.set_position([_bb.x0 + .006, _bb.y0 + _y0 * _bb.height,
-                     LEGEND_IN[0] / fig.get_figwidth(), _lh])
     plt.savefig(out, dpi=200, bbox_inches="tight", pad_inches=.02)
     plt.savefig(out.rsplit(".", 1)[0] + ".pdf",
                 bbox_inches="tight", pad_inches=.02)
@@ -305,7 +281,7 @@ def main():
         v = [mu[(s, a)] for s in sets if mu[(s, a)] == mu[(s, a)]]
         print(f"{a:10s} mean {st.fmean(v):6.2f}  ({len(v)} sets)"
               f"  {secs.get(a, 0):,.0f}s")
-    for n, v, c in tv:
+    for n, v, sv, c in tv:
         print(f"  {n:12s} {v:6.2f} {c:9,.0f}s"
               f"{'   DOMINATED' if n in dom else ''}")
 

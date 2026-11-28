@@ -72,15 +72,19 @@ def main():
     xs = np.arange(len(d))
 
     fig, ax = plt.subplots(figsize=(14.3, 3.9))
-    ax.axhline(0, color="#444", lw=1.4)
-    ax.plot(xs, d, color="#c9ccd1", lw=1.6, zorder=1)
+    # a full-height band on every set the test cannot separate: the eye
+    # reads the grey as a column, not as a marker it has to compare
     gx = [x for x, t in zip(xs, tied) if t]
-    gy = [v for v, t in zip(d, tied) if t]
     cx = [x for x, t in zip(xs, tied) if not t]
-    cy = [v for v, t in zip(d, tied) if not t]
-    ax.plot(gx, gy, "o", color="#b6bac0", ms=5, zorder=2,
+    for x in gx:
+        ax.axvspan(x - .5, x + .5, color="#dfe2e6", lw=0, zorder=0)
+    ax.axhline(0, color="#444", lw=1.4, zorder=2)
+    ax.plot(xs, d, color="#8a8f98", lw=1.6, zorder=3)
+    ax.plot(cx, [v for v, t in zip(d, tied) if not t], "o",
+            color="#e8613c", ms=5, zorder=4)
+    ax.plot([], [], "s", color="#dfe2e6", ms=9,
             label=f"no difference the test can see  ({len(gx)} sets)")
-    ax.plot(cx, cy, "o", color="#e8613c", ms=5, zorder=3,
+    ax.plot([], [], "o", color="#e8613c", ms=5,
             label=f"a difference it can  ({len(cx)} sets)")
     ax.set_xlim(-1, len(d)); ax.set_xticks([])
     ax.set_xlabel(f"{len(d)} data sets, ordered by the difference",
