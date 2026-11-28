@@ -218,11 +218,15 @@ def main():
     # the eye can already see, and a second column of digits crowds the
     # names.  One precision for the column, set by the score.
     DP = 2 if mode == "reg" else 0
-    avg = {}
+    avg, num = {}, {}
     for a in ORDER:
         ok = [s_ for s_ in sets if mu[(s_, a)] == mu[(s_, a)]]
-        avg[a] = f"{st.fmean([mu[(s_, a)] for s_ in ok]):.{DP}f}"
-    for k, a in enumerate(ORDER):
+        num[a] = st.fmean([mu[(s_, a)] for s_ in ok])
+        avg[a] = f"{num[a]:.{DP}f}"
+    # best first, which in reg means smallest: the legend then reads as a
+    # ranking rather than as whatever order the treatments were declared
+    rank = sorted(ORDER, key=lambda a: -num[a] if mode != "reg" else num[a])
+    for k, a in enumerate(rank):
         c, m = INK[a]
         y = len(ORDER) - .4 - k
         tx.text(0, y, a, ha="left", va="center", **mono)
