@@ -96,16 +96,13 @@ def main():
     for s_ in ("top", "right"): ax.spines[s_].set_visible(False)
     lg = ax.legend(loc="upper left", frameon=False, fontsize=FS["mono"],
                    handletextpad=.4)
-    med = st.median(d)
-    ax.annotate(f"median {med:+.2f}", (len(d) * .5, med), (len(d) * .5, med),
-                ha="center", va="bottom", fontsize=FS["mono"], color="#444")
     fig.set_facecolor("#fcfcfa"); ax.set_facecolor("#fcfcfa")
     plt.tight_layout()
     plt.savefig(out, dpi=200, bbox_inches="tight", pad_inches=.02)
     plt.savefig(out.rsplit(".", 1)[0] + ".pdf",
                 bbox_inches="tight", pad_inches=.02)
     print(f"{len(d)} sets: {len(gx)} tied, {len(cx)} separated;"
-          f" median {med:+.2f}, mean {st.fmean(d):+.2f}")
+          f" median {st.median(d):+.2f}, mean {st.fmean(d):+.2f}")
     print(f"  {A} ahead on {sum(1 for v in d if v>0)},"
           f" {B} ahead on {sum(1 for v in d if v<0)}")
 
