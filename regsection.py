@@ -53,21 +53,6 @@ def main():
     mu_all, win_all, _ = regtab.block(D, sorted(D), regtab.ARMS)
     mu3, _, _ = regtab.block(D, sorted(D), regtab.ARMS[:3])
 
-    # ---- the variance table -----------------------------------------
-    # The decomposition needs a complete data-set x learner x fold grid,
-    # so every row covers only the sets TabICL finished.
-    def vrow(lab, g):
-        d, m, f, o = regvar.split(D, sorted(g), regvar.FOUR)
-        return (f"{tex(lab)} & {len(g)} & {d:.0f}"
-                f" & {m:.0f} & {f:.0f} & {o:.0f} & {d / m:.0f} \\\\")
-    var = []
-    for name, g in G:
-        g4 = sorted(s for s in g if s in ran)
-        if len(g4) >= 2: var.append(vrow(name, g4))
-    var.append(r"\cmidrule{1-7}")
-    var.append(vrow("all sets", sorted(ran)))
-    dA, mA, fA, oA = regvar.split(D, sorted(ran), regvar.FOUR)
-
     # ---- numbers the prose quotes ------------------------------------
     big = sorted(s for s in D if N[s] >= 1000)
     sml = sorted(s for s in D if N[s] < 1000)
@@ -120,7 +105,7 @@ def main():
     KW = dict(
         nA=len(A), nB=len(B), nAll=len(D), nRan=len(ran), nSkip=len(skip),
         skip=", ".join("{\\tt %s}" % tex(s.split("/")[-1]) for s in skip),
-        table="\n".join(body), var="\n".join(var),
+        table="\n".join(body),
         mu_b1=f"{mu_all['b1']:.2f}", mu_lgbm=f"{mu_all['lgbm']:.2f}",
         mu_b30=f"{mu_all['b30']:.2f}", mu_tab=f"{mu_all['TabICL']:.2f}",
         w_b1=win_all["b1"], w_lgbm=win_all["lgbm"],
@@ -135,8 +120,7 @@ def main():
         flatmed=f"{flatmed:,.0f}", restmed=f"{restmed:,.0f}",
         nCfg=len(cfg), cfg_b1=f"{m_cfg['b1']:.2f}",
         cfg_b30=f"{m_cfg['b30']:.2f}",
-        dA=f"{dA:.0f}", mA=f"{mA:.0f}", fA=f"{fA:.0f}", oA=f"{oA:.0f}",
-        ratioA=f"{dA / mA:.0f}",
+        
         sec_b30=f"{secs.get('enuf(30)', 0):,.0f}",
         sec_lgbm=f"{secs.get('lgbm', 0):,.0f}",
         sec_tab=f"{secs.get('TabICL', 0):,.0f}",

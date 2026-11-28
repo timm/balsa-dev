@@ -63,6 +63,9 @@ acttex: ## the optimizer study's variance table, for the back of the paper
 	  runs/active-tabicl.txt > $(Paper)/actvar.tex
 	echo "wrote $(Paper)/actvar.tex"
 
+ablfig: ## the acquisition ablation: smart acquire vs random select
+	python3 -B allplot.py abl $(Paper)/ens-active-abl.png $(Active)
+
 regfigs: ## redraw the two regression figures into the paper
 	$(Reg)/regression python3 -B regplot2.py runs/reg56.csv \
 	  $(Paper)/ens-enuf-reg-noxse.png
@@ -83,7 +86,7 @@ fig1: ## regenerate the paper's opening figure (LOC + the two runtimes)
 	python3 -B fig1.py $(Paper)/loccounts.tex > $(Paper)/fig1.tex
 	echo "wrote $(Paper)/fig1.tex"
 
-reg: regfigs allfigs actfig regtex clstex acttex pricetex fig1 ## every generated number in the paper, recomputed
+reg: regfigs allfigs actfig ablfig regtex pricetex fig1 ## every generated number in the paper, recomputed
 
 sh: $(Tmp)/bashrc $(Tmp)/nvim.lua ## bash with our prompt; vi = clean nvim
 	bash --rcfile $(Tmp)/bashrc -i

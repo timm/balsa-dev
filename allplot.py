@@ -19,6 +19,10 @@ Two modes, because the two corpora are scored differently:
   reg   rel = MAE/MAE(predict the mean), where SMALL is good, so the
         axis is inverted and higher still means better.  Reads the csvs
         written by reg2csv.py.
+  abl   the acquisition ablation: smart acquire against random select,
+        with the ranker held fixed at 1nn and the same budget.  The one
+        comparison that asks whether the "active" in active learning is
+        doing any work.
   act   active learning: the win score of the row the optimizer chose,
         where 100 is the best row in the table.  Higher is better.
         Reads the %folds and %secs lines of runs/active*.txt.
@@ -35,41 +39,15 @@ import numpy as np
 # label, colour, marker -- the same ink as every other figure here
 INK = {"enuf(1)":  ("#2ca02c", "^"), "lgbm(100)": ("#2a6fdb", "o"),
        "enuf(30)": ("#e8613c", "s"), "TabICL":    ("#000000", "D"),
-       "random":    ("#8a8f98", "v"), "1nn": ("#7b3fa0", "P")}
+       "random":    ("#8a8f98", "v"), "1nn": ("#7b3fa0", "P"),
+       "acquire+1nn": ("#e8613c", "s"), "random+1nn": ("#8a8f98", "v")}
 ORDER = ["enuf(1)", "lgbm(100)", "enuf(30)", "TabICL"]
 # `random` -- the same budget spent with no model -- is the floor these
 # are judged against, and sec:active reports it; it is kept out of the
 # figure, where six lines were two too many to follow.
 ACTORDER = ["1nn", "enuf(1)", "lgbm(100)", "enuf(30)", "TabICL"]
+ABLORDER = ["random+1nn", "acquire+1nn"]
 FS = dict(tick=14, lab=15, mono=13, bar=15)
-
-
-# The variance split of the paper's Table 7, over the three learners a
-# reader is choosing between.  enuf(1) is left out for the reason that
-# table gives: a deliberately crippled single tree would inflate the
-# learner share with a gap nobody is weighing.
-VARARMS = ("lgbm(100)", "enuf(30)", "TabICL")
-PARTS   = [("data", "#3d4a5c"), ("learner", "#e8613c"),
-           ("fold", "#9aa3ad"), ("other", "#d6dae0")]
-
-
-def split(F, sets, arms):
-    """eta-squared for data set, learner, fold and interaction, as four
-    percentages that sum to 100.  Needs a full set x learner x fold grid,
-    so `sets` must be the ones every arm actually ran."""
-    I, J = len(sets), len(arms)
-    R = len(F[sets[0]][arms[0]])
-    y = [v for s in sets for a in arms for v in F[s][a]]
-    hat = st.fmean(y)
-    row  = {s: st.fmean([v for a in arms for v in F[s][a]]) for s in sets}
-    col  = {a: st.fmean([v for s in sets for v in F[s][a]]) for a in arms}
-    cell = {(s, a): st.fmean(F[s][a]) for s in sets for a in arms}
-    tot  = sum((v - hat) ** 2 for v in y)
-    d = 100 * J * R * sum((row[s] - hat) ** 2 for s in sets) / tot
-    m = 100 * I * R * sum((col[a] - hat) ** 2 for a in arms) / tot
-    f = 100 * sum((v - cell[(s, a)]) ** 2
-                  for s in sets for a in arms for v in F[s][a]) / tot
-    return d, m, f, 100 - d - m - f
 
 
 def spread(v):
@@ -97,13 +75,14 @@ def read_cls(paths):
     return F, secs
 
 
-def read_act(paths):
+def read_act(paths, abl=False):
     """The acquire-only arms of the active-learning run.  Its tables carry
     their own per-fold seconds, so the runtime bars here are measured on
     exactly the folds the curves are drawn from."""
-    key = {"a.b1": "enuf(1)", "a.b30": "enuf(30)", "a.lgbm": "lgbm(100)",
-           "a.tabicl": "TabICL", "a.knn": "1nn"}
-    F, secs = {}, dict.fromkeys(ACTORDER, 0.0)
+    key = ({"a.knn": "acquire+1nn", "r.knn": "random+1nn"} if abl else
+           {"a.b1": "enuf(1)", "a.b30": "enuf(30)", "a.lgbm": "lgbm(100)",
+            "a.tabicl": "TabICL", "a.knn": "1nn"})
+    F, secs = {}, dict.fromkeys(ABLORDER if abl else ACTORDER, 0.0)
     for p in paths:
         for l in open(p):
             if l.startswith("%folds"):
@@ -140,9 +119,16 @@ def read_reg(paths):
 
 def main():
     mode, out, paths = sys.argv[1], sys.argv[2], sys.argv[3:]
-    F, secs = {"cls": read_cls, "reg": read_reg, "act": read_act}[mode](paths)
+    if mode == "abl":
+        F, secs = read_act(paths, abl=True)
+    else:
+        F, secs = {"cls": read_cls, "reg": read_reg,
+                   "act": read_act}[mode](paths)
     global ORDER, VARARMS
-    if mode == "act":
+    if mode == "abl":
+        ORDER = ABLORDER
+        VARARMS = tuple(ABLORDER)
+    elif mode == "act":
         ORDER = ACTORDER
         # `random` is the budget spent without a model: it is the baseline
         # the others are judged against, not a learner being compared
@@ -156,7 +142,8 @@ def main():
     # others are read against it.  If that treatment missed a set (TabICL
     # is capped by rows in regression), those sets sort last, among
     # themselves by the fallback -- a NaN key would order nothing.
-    SORT = os.getenv("SORTBY", "1nn" if mode == "act" else "enuf(30)")
+    SORT = os.getenv("SORTBY", "acquire+1nn" if mode == "abl" else
+                     "1nn" if mode == "act" else "enuf(30)")
     FALL = "lgbm(100)"
     hi = mode != "reg"                     # only rel is small-is-good
     def key(s):
@@ -169,7 +156,7 @@ def main():
 
     fig = plt.figure(figsize=(14.3, 3.9))
     gs = fig.add_gridspec(1, 5, wspace=0,
-                          width_ratios=[1.15 * len(ORDER), 2.3, 20, 1.2, 3.6])
+                          width_ratios=[.72 * len(ORDER), 2.3, 20, 1.0, 6.2])
     bx, ax = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
     vx = fig.add_subplot(gs[4])
 
@@ -180,7 +167,7 @@ def main():
         ax.plot(xs, [sd[(s, a)] for s in sets], color=c, ls="--", lw=1.4,
                 marker=m, ms=ms * .6)
 
-    if mode in ("cls", "act"):
+    if mode in ("cls", "act", "abl"):
         ax.set_ylim(0, 100); ax.set_yticks(range(0, 101, 20))
         ax.set_yticks(range(10, 100, 20), minor=True)
         ax.set_ylabel("AUC" if mode == "cls" else "win",
@@ -246,7 +233,7 @@ def main():
     for i, b in enumerate(bt):
         bx.text(i, b[0] * 1.35, f"{b[0]:,.0f}s" if b[0] >= 100
                 else f"{b[0]:.1f}s", ha="center", va="bottom",
-                rotation=90, weight="bold", fontsize=FS["bar"] - 4)
+                rotation=90, weight="bold", fontsize=FS["bar"] - 6)
     bx.set_xticks(range(len(bt)))
     # four names side by side in a narrow panel collide; stand them up
     bx.set_xticklabels([b[1] for b in bt], rotation=90, ha="center",
@@ -257,30 +244,36 @@ def main():
     bx.set_xlim(-.55, len(bt) - .45)
     for s_ in ("top", "right", "left"): bx.spines[s_].set_visible(False)
 
-    # right: where the variance in these curves actually comes from
-    full = [s for s in sets if all(a in F[s] for a in VARARMS)]
-    parts = split(F, sorted(full), VARARMS)
-    # four upright bars, laid out like the runtime panel on the left:
-    # not a stack, because the point is that one of these is twenty times
-    # another, and a height beside a height says that at a glance.
-    # tallest first, which puts `learner` last: the ordering is itself
-    # the finding, so let the chart state it rather than hide it in the
-    # middle of a fixed order.
-    bars = sorted(zip(PARTS, parts), key=lambda t: -t[1])
-    xsv = range(len(bars))
-    vx.bar(list(xsv), [v for _, v in bars],
-           color=[c for (_, c), _ in bars], width=.7)
-    for x, (_p, v) in zip(xsv, bars):
-        vx.text(x, v + 2.5, f"{v:.0f}", ha="center", va="bottom",
-                weight="bold", fontsize=FS["bar"] - 3)
-    vx.set_ylim(0, 112); vx.set_xlim(-.6, len(PARTS) - .4)
-    vx.set_yticks([])
-    vx.set_xticks(list(xsv))
-    vx.set_xticklabels([nm for (nm, _c), _v in bars], rotation=90,
-                       ha="center",
-                       va="top", fontsize=FS["bar"] - 4)
-    vx.set_title(f"what moves the score, %\n({len(full)} sets, "
-                 f"{len(VARARMS)} learners)", fontsize=FS["lab"] - 4)
+    # right: what the next step up costs.  Treatments in score order,
+    # each priced by the extra seconds over the one below it; NO marks a
+    # treatment nothing would buy, because something else already scores
+    # at least as well in no more time.
+    tv = [(a, st.fmean([mu[(s_, a)] for s_ in sets
+                        if mu[(s_, a)] == mu[(s_, a)]]), secs.get(a, 0))
+          for a in ORDER if secs.get(a)]
+    tv.sort(key=lambda r: -r[1] if mode == "reg" else r[1])
+    dom = {n for n, v, c in tv
+           if any((v2 >= v if mode != "reg" else v2 <= v) and c2 <= c
+                  and (v2, c2) != (v, c) for _, v2, c2 in tv)}
+    vx.set_xlim(0, 10.6); vx.set_ylim(-.6, len(tv) - .4)
+    vx.set_xticks([]); vx.set_yticks([])
+    vx.set_title("cost of the step up\n(secs per extra point)",
+                 fontsize=FS["lab"] - 4)
+    mono2 = dict(family="monospace", fontsize=FS["mono"] - 1)
+    prev = None
+    for k, (n, v, c) in enumerate(tv):
+        y = len(tv) - 1 - k
+        if n in dom:
+            cell = "NO"
+        elif prev is None:
+            cell = "--"
+        else:
+            d, dc = (v - prev[0]) * (-1 if mode == "reg" else 1), c - prev[1]
+            cell = "<1" if dc / d < 1 else f"{dc/d:,.0f}"
+        if n not in dom: prev = (v, c)
+        vx.text(0, y, n, ha="left", va="center", color=INK[n][0], **mono2)
+        vx.text(10.4, y, cell, ha="right", va="center",
+                weight="bold" if n in dom else "normal", **mono2)
     vx.set_facecolor("#fcfcfa")
     for s_ in vx.spines.values(): s_.set_visible(False)
 
@@ -312,8 +305,9 @@ def main():
         v = [mu[(s, a)] for s in sets if mu[(s, a)] == mu[(s, a)]]
         print(f"{a:10s} mean {st.fmean(v):6.2f}  ({len(v)} sets)"
               f"  {secs.get(a, 0):,.0f}s")
-    print("variance over %d sets: data %.0f  learner %.0f  fold %.0f"
-          "  other %.0f" % (len(full), *parts))
+    for n, v, c in tv:
+        print(f"  {n:12s} {v:6.2f} {c:9,.0f}s"
+              f"{'   DOMINATED' if n in dom else ''}")
 
 
 if __name__ == "__main__": main()
