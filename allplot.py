@@ -170,7 +170,7 @@ def main():
 
     for a in ORDER:
         c, m = INK[a]
-        ms = 5 if len(sets) < 80 else 3.5
+        ms = 3.4 if len(sets) < 80 else 2.4
         ax.plot(xs, [mu[(s, a)] for s in sets], color=c, marker=m, lw=1.8, ms=ms)
         ax.plot(xs, [sd[(s, a)] for s in sets], color=c, ls="--", lw=1.4,
                 marker=m, ms=ms * .6)
