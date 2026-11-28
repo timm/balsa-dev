@@ -7,7 +7,7 @@ cannot distinguish share a rank.  Rank 1 is best.
 usage: pypy3 active_stats.py runs/*.txt"""
 # (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 import sys
-from enuf_eg import rank, median
+from tree_eg import rank, median
 
 F = {}
 for path in sys.argv[1:]:

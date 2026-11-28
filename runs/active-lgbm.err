@@ -1,17 +1,17 @@
 Traceback (most recent call last):
-  File "/Users/timm/gh/enuf-dev/active.py", line 157, in <module>
+  File "/Users/timm/gh/tree-dev/active.py", line 157, in <module>
     run(expand(sys.argv[1:]) or ["misc/auto93", "config/SS-A"])
     ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/timm/gh/enuf-dev/active.py", line 139, in run
+  File "/Users/timm/gh/tree-dev/active.py", line 139, in run
     optimize(tb, train, test, RANKERS[rn], smart))
     ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/timm/gh/enuf-dev/active.py", line 109, in optimize
+  File "/Users/timm/gh/tree-dev/active.py", line 109, in optimize
     checked = sorted(test, key=key)[:the.check]
               ~~~~~~^^^^^^^^^^^^^^^
-  File "/Users/timm/gh/enuf-dev/active.py", line 83, in key
+  File "/Users/timm/gh/tree-dev/active.py", line 83, in key
     pred.update(zip(map(id, key.test), m.predict(X(key.test))))
                                                  ~^^^^^^^^^^
-  File "/Users/timm/gh/enuf-dev/active.py", line 73, in X
+  File "/Users/timm/gh/tree-dev/active.py", line 73, in X
     return np.array([[r[c.at] if (isinstance(c, Num) or r[c.at] == "?")
            ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
                       else (c.labels.index(r[c.at]) if r[c.at] in c.labels

@@ -1,6 +1,6 @@
 # TODO
 
-Found during the balsa -> enuf rename (2026-11-27), left alone so that
+Found during the balsa -> tree rename (2026-11-27), left alone so that
 commit stayed a pure rename.
 
 - [ ] **xcolor option clash in the paper.** `~/gh/jssclose` has
@@ -12,7 +12,7 @@ commit stayed a pure rename.
   lines" to "293 lines" (the learner has grown) and reorder the
   ten-set list (`fried` moves before `mv`). Re-run `make regtex` and
   check the diff.
-- [ ] **enuf(30) seconds disagree.** main.tex (line ~387) says
-  enuf(30) runs the 39 general sets in 32 s, but the nose figure
-  (`ens-enuf-nose.pdf`) shows 17 s and `fig1.py` prints 33.6 s. Pick
+- [ ] **tree(30) seconds disagree.** main.tex (line ~387) says
+  tree(30) runs the 39 general sets in 32 s, but the nose figure
+  (`ens-tree-nose.pdf`) shows 17 s and `fig1.py` prints 33.6 s. Pick
   one measure, then fix the text or the figure.

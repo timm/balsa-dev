@@ -6,7 +6,7 @@ no F and no p), over the acquire arms a reader would consider:
 knn, b30, lgbm, tabicl.  dist is retired, b1 is the crippled single
 tree, rand is the floor; none of them is a choice anyone defends.
 
-usage: python3 active_var.py runs/active-secs-enuf.txt \\
+usage: python3 active_var.py runs/active-secs-tree.txt \\
            runs/active-secs-heavy.txt runs/active-knn.txt
 """
 import sys, statistics as st

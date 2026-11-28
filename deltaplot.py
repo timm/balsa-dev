@@ -24,7 +24,7 @@ import numpy as np
 PRUDENCE, CLIFF, KSCRIT = 0.01, 0.195, 1.36
 FS = dict(tick=14, lab=15, mono=13)
 NICE = {"a.knn": "acquire, then 1nn", "r.knn": "random, then 1nn",
-        "a.b30": "acquire, then enuf(30)", "r.b30": "random, then enuf(30)",
+        "a.b30": "acquire, then tree(30)", "r.b30": "random, then tree(30)",
         "a.tabicl": "acquire, then TabICL", "a.rand": "random rows, random pick"}
 
 

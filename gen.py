@@ -1,5 +1,5 @@
 # vim: set ts=2 sw=2 sts=2 et cc=75:
-"""Draw the folds. These runners make the dat files that enuf_eg.py
+"""Draw the folds. These runners make the dat files that tree_eg.py
 later replays; the paper's numbers come from the replay, not here, so
 this file is outside the "learner plus rig" line count. Each dat line
 is data|scores|secs|test row ids, and the ids are what make it
@@ -11,8 +11,8 @@ usage: pypy3 gen.py            classification, 39 sets    > nose.dat
 """
 # (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 import sys, time
-from enuf import the, srand, shuffle, csv, Tbl, Col, Forest, aucs
-from enuf_eg import mootdir, goalcol, mae, kl_at
+from tree import the, srand, shuffle, csv, Tbl, Col, Forest, aucs
+from tree_eg import mootdir, goalcol, mae, kl_at
 
 def xval(rows, fn, m=5, n=2):
   for _ in range(m):

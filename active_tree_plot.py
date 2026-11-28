@@ -1,10 +1,10 @@
 #!/usr/bin/env python3 -B
-"""active_enuf_plot: the LHS-style panel for the three enuf-family
+"""active_tree_plot: the LHS-style panel for the three tree-family
 rankers only -- dist (centroid), b1 (one tree), b30 (forest) -- on the
 optimize sets.  Means sorted by b30, each banded by a dashed fold-sd
 curve, legend by mean, with total runtime as labelled log bars below.
 
-usage: python3 active_enuf_plot.py runs/active-secs-enuf.txt ens-active-enuf.png
+usage: python3 active_tree_plot.py runs/active-secs-tree.txt ens-active-tree.png
 """
 import sys, statistics as st
 import matplotlib; matplotlib.use("Agg")
@@ -61,7 +61,7 @@ hx.set_title("total secs over all\nfolds (log, 1 thread)", fontsize=10)
 hx.grid(axis="y", color="#eee"); hx.margins(y=.3)
 ax.set_ylim(0, 112); ax.set_xlim(-1, len(order))
 ax.axhline(100, color="#999", lw=1, ls=(0, (6, 4)))
-ax.set_title("acquire, three enuf rankers (mean + dashed fold sd), sorted by 1nn",
+ax.set_title("acquire, three tree rankers (mean + dashed fold sd), sorted by 1nn",
              fontsize=12)
 ax.legend(fontsize=11, loc="lower right", bbox_to_anchor=(.995, .12),
           framealpha=.9, title="ranker mean",

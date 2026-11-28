@@ -1,4 +1,4 @@
-data,fold,mae_enuf1,mae_enuf30,mae_mean,mae_lgbm,rel_enuf1,rel_enuf30,rel_lgbm,rel_tabicl
+data,fold,mae_tree1,mae_tree30,mae_mean,mae_lgbm,rel_tree1,rel_tree30,rel_lgbm,rel_tabicl
 binary_config/billing10k,0,4.887,3.221,7.33,0.28587,0.6670,0.4390,0.0390,
 binary_config/billing10k,1,4.548,4.04,7.531,0.30124,0.6040,0.5360,0.0400,
 binary_config/billing10k,2,4.272,3.905,7.469,0.321167,0.5720,0.5230,0.0430,

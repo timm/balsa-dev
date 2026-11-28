@@ -62,8 +62,8 @@ def main():
     m_cfg, _, _ = regtab.block(D, cfg, regtab.ARMS[:3])
     gain = 100 * (1 - mu3["b30"] / mu3["b1"])
     beat = sum(1 for s in D
-               if st.fmean(regtab.vals(D, s, "enuf30"))
-               < st.fmean(regtab.vals(D, s, "enuf1")))
+               if st.fmean(regtab.vals(D, s, "tree30"))
+               < st.fmean(regtab.vals(D, s, "tree1")))
     dud = [s for s in D if st.fmean(regtab.vals(D, s, "lgbm")) >= 1.0]
     flat = len(dud)
     flatmed = st.median([N[s] for s in dud])
@@ -89,18 +89,18 @@ def main():
         for r in csv.DictReader(open("runs/binconf.csv")):
             bc[r["data"]].append(r)
     bcm = {a: st.fmean([v for s in bc for v in regtab.vals(bc, s, a)])
-           for a in ("enuf30", "lgbm")} if bc else {}
+           for a in ("tree30", "lgbm")} if bc else {}
 
     # the learner's own line count, counted from the source, never typed
     import re
-    src_ = open("enuf.py").read()
+    src_ = open("tree.py").read()
     cap  = int(re.search(r"\bcap=(\d+)", src_).group(1))
     rcap = int(re.search(r"\brcap=(\d+)", src_).group(1))
     cls_ = open(os.path.expanduser(
       "~/gh/jssclose/clsvar.tex")).read()
     m_ = re.search(r"all sets & \d+ & (\d+) & (\d+)", cls_)
     dCls, mCls = m_.group(1), m_.group(2)
-    loc = sum(1 for l in open("enuf.py") if not re.match(r"^\s*(#.*)?$", l))
+    loc = sum(1 for l in open("tree.py") if not re.match(r"^\s*(#.*)?$", l))
 
     KW = dict(
         nA=len(A), nB=len(B), nAll=len(D), nRan=len(ran), nSkip=len(skip),
@@ -121,15 +121,15 @@ def main():
         nCfg=len(cfg), cfg_b1=f"{m_cfg['b1']:.2f}",
         cfg_b30=f"{m_cfg['b30']:.2f}",
         
-        sec_b30=f"{secs.get('enuf(30)', 0):,.0f}",
+        sec_b30=f"{secs.get('tree(30)', 0):,.0f}",
         sec_lgbm=f"{secs.get('lgbm', 0):,.0f}",
         sec_tab=f"{secs.get('TabICL', 0):,.0f}",
         costx=f"{secs.get('TabICL', 0) / max(secs.get('lgbm', 1), 1):,.0f}",
         loc=loc, cap=cap, caphalf=cap // 2, rcap=rcap,
         dCls=dCls, mCls=mCls,
-        bcx=f"{bcm['enuf30'] / bcm['lgbm']:.0f}" if bcm else "??",
+        bcx=f"{bcm['tree30'] / bcm['lgbm']:.0f}" if bcm else "??",
         bc_lgbm=f"{bcm['lgbm']:.3f}" if bcm else "??",
-        bc_b30=f"{bcm['enuf30']:.2f}" if bcm else "??",
+        bc_b30=f"{bcm['tree30']:.2f}" if bcm else "??",
     )
     Here = os.path.dirname(os.path.abspath(__file__))
     out = open(os.path.join(Here, "regsection.tmpl")).read()

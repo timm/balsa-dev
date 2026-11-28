@@ -3,14 +3,14 @@
 folds. Every number in a figure or table comes from one of the three
 replay modes below; gen.py drew those folds in the first place.
 
-usage: pypy3 enuf_eg.py --replay    F.dat   classification AUCs
-       pypy3 enuf_eg.py --regreplay F.dat   regression MAE
-       pypy3 enuf_eg.py --optreplay F.dat   optimize: label best 5
+usage: pypy3 tree_eg.py --replay    F.dat   classification AUCs
+       pypy3 tree_eg.py --regreplay F.dat   regression MAE
+       pypy3 tree_eg.py --optreplay F.dat   optimize: label best 5
 """
 # (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 import os, sys, time
 from math import sqrt
-from enuf import the, srand, shuffle, bisect, csv, Tbl, Col, Forest, aucs
+from tree import the, srand, shuffle, bisect, csv, Tbl, Col, Forest, aucs
 
 kl_at   = lambda tb: tb.cols.klass.at
 mae     = lambda want, got: (sum(abs(w - g) for w, g in zip(want, got))

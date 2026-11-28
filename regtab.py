@@ -4,7 +4,7 @@
 Scores are rel = MAE / MAE(predict the mean), so 1.0 is no better than
 the mean and SMALLER IS BETTER -- the opposite of AUC.  rank() therefore
 walks the treatments in ASCENDING median.  Everything else is the rig's
-own rule, ported from enuf_eg.yue so the paper's two tables pool by one
+own rule, ported from tree_eg.yue so the paper's two tables pool by one
 rule: two treatments are the same when their mean rel values are within
 `prudence`, or when Cliff's delta over the fold values is at most 0.195
 and a KS test is at most its 0.05 critical value.
@@ -19,7 +19,7 @@ usage: python3 regtab.py runs/reg56.csv runs/sereg.csv
 import csv, os, sys, math, bisect as B, statistics as S, collections
 
 CLIFF, KS, PRU = 0.195, 1.36, 0.01
-ARMS = [("b1", "enuf1"), ("lgbm", "lgbm"), ("b30", "enuf30"),
+ARMS = [("b1", "tree1"), ("lgbm", "lgbm"), ("b30", "tree30"),
         ("TabICL", "tabicl")]
 
 

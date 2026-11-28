@@ -1,5 +1,5 @@
 #!/usr/bin/env python3 -B
-"""lgbm_opt: add LightGBM to enuf_eg --opt's table, on the same
+"""lgbm_opt: add LightGBM to tree_eg --opt's table, on the same
 5x2 folds.  Reads opt.dat (data|scores|secs|test row ids), refits
 LGBMRegressor on each fold's train d2h, sorts that fold's test rows
 by predicted d2h, LABELS THE BEST 5, and keeps the winner.
@@ -8,7 +8,7 @@ Score = 100 * (1 - (got - lo) / (mu - lo)), where lo and mu are the
 min and mean d2h of the WHOLE table: 100 = found the table's
 optimum, 0 = no better than an average row.
 
-d2h here must match enuf.yue's disty digit-for-digit or the arms
+d2h here must match tree.yue's disty digit-for-digit or the arms
 are not comparable: a goal column's name ends - (minimize, heaven
 0) or + (maximize, heaven 1); each value is a logistic z-score
 (1.7, clipped at 3 sd) against that column's mu/sd over every row;
@@ -37,7 +37,7 @@ def load(f):
 
   def col(i):
     if head[i][0].isupper(): return nums(i)
-    seen = {}                           # first-seen order, like enuf
+    seen = {}                           # first-seen order, like tree
     out = []
     for r in rows:
       v = r[i]
@@ -65,7 +65,7 @@ def load(f):
 
 def main():
   lines = open(sys.argv[1]).readlines()
-  T = ["enuf(1)", "enuf(30)", "random", "lgbm"]
+  T = ["tree(1)", "tree(30)", "random", "lgbm"]
   folds = {}
   for line in lines[1:]:
     f, a, s, t = line.strip().split("|")
@@ -81,7 +81,7 @@ def main():
     d = {t: [] for t in T}
     for a, s, test in fs:
       for t, v in zip(T[:3], a): d[t].append(v)
-      secs["enuf(1)"] += s[0]; secs["enuf(30)"] += s[1]
+      secs["tree(1)"] += s[0]; secs["tree(30)"] += s[1]
       tset  = set(test)
       train = [i for i in range(len(d2h)) if i not in tset]
       t0 = time.time()

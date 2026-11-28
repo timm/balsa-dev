@@ -74,7 +74,7 @@ def paint(path):
   print("</pre>")
 
 cols, paths = sys.argv[1], sys.argv[2:]
-print('<meta charset=utf-8><title>enuf</title>'
+print('<meta charset=utf-8><title>tree</title>'
       '<meta name=viewport content="width=device-width,initial-scale=1">'
       '<link rel=stylesheet href="https://fonts.googleapis.com/css2'
       '?family=JetBrains+Mono:wght@400&display=swap">'

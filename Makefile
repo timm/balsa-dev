@@ -1,13 +1,13 @@
-# enuf-dev: the mess. Rigs, results, the lisp twin, charts.
-# The learner is enuf.py (run it with pypy3); the lua/yue line
-# is in attic/. The shippable repo is ../enuf; see: make package
+# tree-dev: the mess. Rigs, results, the lisp twin, charts.
+# The learner is tree.py (run it with pypy3); the lua/yue line
+# is in attic/. The shippable repo is ../tree; see: make package
 # Long payloads live at the end as comment blocks #<name> ... ;
 # make greps its own source to build them (see mark). Inside a
 # block, {Tmp} and {Here} are filled in by sed at extraction time.
 SHELL := bash
 .SILENT:
 
-Tmp  ?= $(HOME)/tmp/enuf-dev
+Tmp  ?= $(HOME)/tmp/tree-dev
 Here := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 help: ## show this help
@@ -21,19 +21,19 @@ push: ## git add this dir, commit (msg="..."), push
 run: ## 5x2 classification over the 39 sets (pypy3) -> a dat
 	pypy3 gen.py
 
-docs: ## render enuf.py + enuf_eg.py 3-col into ../enuf/docs
-	mkdir -p $(HOME)/gh/enuf/docs
-	python3 hi.py 3 enuf.py enuf_eg.py > $(HOME)/gh/enuf/docs/index.html
+docs: ## render tree.py + tree_eg.py 3-col into ../tree/docs
+	mkdir -p $(HOME)/gh/tree/docs
+	python3 hi.py 3 tree.py tree_eg.py > $(HOME)/gh/tree/docs/index.html
 
 html: docs ## render the docs, then open them in the browser
-	open $(HOME)/gh/enuf/docs/index.html
+	open $(HOME)/gh/tree/docs/index.html
 
-package: docs ## copy the learner into ../enuf
-	cp enuf.py $(HOME)/gh/enuf/
-	cd $(HOME)/gh/enuf && \
-	  echo "enuf.py  $$(shasum -a1 enuf.py | cut -c1-12)  $$(wc -l < enuf.py) lines" && \
+package: docs ## copy the learner into ../tree
+	cp tree.py $(HOME)/gh/tree/
+	cd $(HOME)/gh/tree && \
+	  echo "tree.py  $$(shasum -a1 tree.py | cut -c1-12)  $$(wc -l < tree.py) lines" && \
 	  git status --short
-	echo "now: cd ~/gh/enuf && git commit -am ... && git push"
+	echo "now: cd ~/gh/tree && git commit -am ... && git push"
 
 Paper := $(HOME)/gh/jssclose
 Reg   := MOOTREG=$(HOME)/gits/moot
@@ -45,7 +45,7 @@ allfigs: ## the two overview figures: whole corpus, one axis, no groups
 	  runs/reg56.csv runs/sereg.csv
 
 Active := runs/active.txt runs/active-knn.txt runs/active-tabicl.txt \
-          runs/active-secs-enuf.txt runs/active-secs-heavy.txt
+          runs/active-secs-tree.txt runs/active-secs-heavy.txt
 
 actfig: ## the optimizer figure, in the same layout as Figs 2 and 3
 	python3 -B allplot.py act $(Paper)/ens-active.png $(Active)
@@ -68,9 +68,9 @@ ablfig: ## the acquisition ablation: smart acquire vs random select
 
 regfigs: ## redraw the two regression figures into the paper
 	$(Reg)/regression python3 -B regplot2.py runs/reg56.csv \
-	  $(Paper)/ens-enuf-reg-noxse.png
+	  $(Paper)/ens-tree-reg-noxse.png
 	$(Reg)/optimize   python3 -B regplot2.py runs/sereg.csv \
-	  $(Paper)/ens-enuf-reg-se.png
+	  $(Paper)/ens-tree-reg-se.png
 
 regtex: ## regenerate the paper's regression section from runs/
 	python3 -B regsection.py runs/reg56.csv runs/sereg.csv \
@@ -161,9 +161,9 @@ PY   = $(HOME)/.venvs/tabicl/bin/python
 
 optfigs: ## redraw the three optimization figures from runs/opt.csv
 	MOOTOPT=$(HOME)/gits/moot/optimize $(PY) -B optplot.py \
-	  runs/opt.csv ens-enuf-opt.png
+	  runs/opt.csv ens-tree-opt.png
 	MOOTOPT=$(HOME)/gits/moot/optimize FOLDERS=$(SE) $(PY) -B optplot.py \
-	  runs/opt.csv ens-enuf-opt-se.png
+	  runs/opt.csv ens-tree-opt-se.png
 	MOOTOPT=$(HOME)/gits/moot/optimize FOLDERS=$(NOSE) \
 	  TITLE="24 non-SE sets" $(PY) -B optplot.py \
-	  runs/opt.csv ens-enuf-opt-noxse.png
+	  runs/opt.csv ens-tree-opt-noxse.png

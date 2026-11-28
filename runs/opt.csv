@@ -1,4 +1,4 @@
-data,fold,score_enuf1,score_enuf30,score_random,score_lgbm
+data,fold,score_tree1,score_tree30,score_random,score_lgbm
 behavior_data/player_statistics_cleaned_final,0,88.89,88.89,92.65,88.89
 behavior_data/player_statistics_cleaned_final,1,100.00,94.27,50.83,94.27
 behavior_data/player_statistics_cleaned_final,2,89.90,89.90,65.67,89.90

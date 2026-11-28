@@ -3,7 +3,7 @@
 are in proportion to the line counts.
 
 The Lisp count is taken from the files, not typed in, so the figure cannot
-drift from the code the way the old hard-coded 346 did.  It counts enuf.yue, the
+drift from the code the way the old hard-coded 346 did.  It counts tree.yue, the
 learner printed in the paper: learner and rig together, non-blank and
 non-comment.
 
@@ -18,7 +18,7 @@ import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 Here = os.path.dirname(os.path.abspath(__file__))
-Lib  = ("enuf.yue",)        # the learner; the rigs are a separate file
+Lib  = ("tree.yue",)        # the learner; the rigs are a separate file
 Lgbm = 36328
 
 

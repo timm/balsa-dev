@@ -1,8 +1,8 @@
 #!/usr/bin/env python3 -B
-"""tabicl_reg: add TabICL regression to enuf_eg --reg's table, on the
-same 5x2 folds as enuf and LightGBM.
+"""tabicl_reg: add TabICL regression to tree_eg --reg's table, on the
+same 5x2 folds as tree and LightGBM.
 
-Reads a .dat from `enuf_eg --reg` (data|mae1 mae30 maeMean|secs|test
+Reads a .dat from `tree_eg --reg` (data|mae1 mae30 maeMean|secs|test
 row ids), refits TabICLRegressor per fold on the complement of the
 recorded test rows, and reports RELATIVE mae: mae / guess-the-mean mae,
 so 1.0 is no better than predicting the mean and smaller is better.

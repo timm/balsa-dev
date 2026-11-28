@@ -37,22 +37,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # label, colour, marker -- the same ink as every other figure here
-INK = {"enuf(1)":  ("#2ca02c", "^"), "lgbm(100)": ("#2a6fdb", "o"),
-       "enuf(30)": ("#e8613c", "s"), "TabICL":    ("#000000", "D"),
+INK = {"tree(1)":  ("#2ca02c", "^"), "lgbm(100)": ("#2a6fdb", "o"),
+       "tree(30)": ("#e8613c", "s"), "TabICL":    ("#000000", "D"),
        "random":    ("#8a8f98", "v"), "1nn": ("#7b3fa0", "P"),
        "acquire+1nn": ("#e8613c", "s"), "random+1nn": ("#8a8f98", "v"),
-       "acq:enuf(1)":   ("#2ca02c", "^"), "acq:lgbm(100)": ("#2a6fdb", "o"),
-       "acq:enuf(30)":  ("#e8613c", "s"), "acq:1nn":       ("#7b3fa0", "P"),
+       "acq:tree(1)":   ("#2ca02c", "^"), "acq:lgbm(100)": ("#2a6fdb", "o"),
+       "acq:tree(30)":  ("#e8613c", "s"), "acq:1nn":       ("#7b3fa0", "P"),
        "acq:TabICL":    ("#000000", "D"), "rand:1nn":      ("#8a8f98", "v")}
-ORDER = ["enuf(1)", "lgbm(100)", "enuf(30)", "TabICL"]
+ORDER = ["tree(1)", "lgbm(100)", "tree(30)", "TabICL"]
 # `random` -- the same budget spent with no model -- is the floor these
 # are judged against, and sec:active reports it; it is kept out of the
 # figure, where six lines were two too many to follow.
 # the optimizer study names its treatments by how the 45 training rows
 # were chosen as well as by what ranked the test set, because the first
 # half of that pair turns out to matter less than anyone expects
-ACTORDER = ["acq:lgbm(100)", "acq:enuf(1)", "acq:enuf(30)", "acq:1nn",
-            "acq:TabICL", "rand:1nn"]
+ACTORDER = ["acq:lgbm(100)", "acq:tree(30)", "acq:1nn", "acq:TabICL",
+            "rand:1nn"]
 ABLORDER = ["random+1nn", "acquire+1nn"]
 FS = dict(tick=14, lab=15, mono=13, bar=15)
 
@@ -66,7 +66,7 @@ def spread(v):
 
 def read_cls(paths):
     "set -> treatment -> folds, plus total seconds per treatment."
-    key = {"1:q16": "enuf(1)", "n30": "enuf(30)",
+    key = {"1:q16": "tree(1)", "n30": "tree(30)",
            "lgbm": "lgbm(100)", "tabicl": "TabICL"}
     F, secs = {}, dict.fromkeys(ORDER, 0.0)
     for p in paths:
@@ -87,9 +87,9 @@ def read_act(paths, abl=False):
     their own per-fold seconds, so the runtime bars here are measured on
     exactly the folds the curves are drawn from."""
     key = ({"a.knn": "acquire+1nn", "r.knn": "random+1nn"} if abl else
-           {"a.b1": "acq:enuf(1)", "a.b30": "acq:enuf(30)",
-            "a.lgbm": "acq:lgbm(100)", "a.tabicl": "acq:TabICL",
-            "a.knn": "acq:1nn", "r.knn": "rand:1nn"})
+           {"a.b30": "acq:tree(30)", "a.lgbm": "acq:lgbm(100)",
+            "a.tabicl": "acq:TabICL", "a.knn": "acq:1nn",
+            "r.knn": "rand:1nn"})
     F, secs = {}, dict.fromkeys(ABLORDER if abl else ACTORDER, 0.0)
     for p in paths:
         for l in open(p):
@@ -103,7 +103,7 @@ def read_act(paths, abl=False):
 
 
 def read_reg(paths):
-    key = {"enuf1": "enuf(1)", "enuf30": "enuf(30)",
+    key = {"tree1": "tree(1)", "tree30": "tree(30)",
            "lgbm": "lgbm(100)", "tabicl": "TabICL"}
     F, secs = {}, dict.fromkeys(ORDER, 0.0)
     for p in paths:
@@ -140,7 +140,7 @@ def main():
         ORDER = ACTORDER
         # `random` is the budget spent without a model: it is the baseline
         # the others are judged against, not a learner being compared
-        VARARMS = ("acq:1nn", "acq:lgbm(100)", "acq:enuf(30)", "acq:TabICL")
+        VARARMS = ("acq:1nn", "acq:lgbm(100)", "acq:tree(30)", "acq:TabICL")
     nan = float("nan")
     mu = {(s, a): (st.fmean(F[s][a]) if a in F[s] else nan)
           for s in F for a in ORDER}
@@ -151,7 +151,7 @@ def main():
     # is capped by rows in regression), those sets sort last, among
     # themselves by the fallback -- a NaN key would order nothing.
     SORT = os.getenv("SORTBY", "acquire+1nn" if mode == "abl" else
-                     "acq:1nn" if mode == "act" else "enuf(30)")
+                     "acq:1nn" if mode == "act" else "tree(30)")
     FALL = "lgbm(100)"
     hi = mode != "reg"                     # only rel is small-is-good
     def key(s):
@@ -164,7 +164,7 @@ def main():
 
     fig = plt.figure(figsize=(14.3, 3.5))
     gs = fig.add_gridspec(1, 5, wspace=0,
-                          width_ratios=[.72 * len(ORDER), 2.3, 20, 1.0, 10.5])
+                          width_ratios=[.55 * len(ORDER), 3.1, 20, 0.5, 10.5])
     bx, ax = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
     vx = fig.add_subplot(gs[4])
 
@@ -217,7 +217,7 @@ def main():
     # titles go INSIDE their panels: as titles they sat above the axes
     # and shortened every panel in the row, leaving a band of background
     # over the curves
-    bx.text(.5, .985, "total secs, log scale\n(summed over folds, 1 thread each)",
+    bx.text(.5, .985, "total secs, log scale\n(all folds, 1 thread each)",
             transform=bx.transAxes, ha="center", va="top",
             fontsize=FS["lab"] - 5)
     bx.set_yticks([]); bx.set_facecolor("#fcfcfa")
@@ -255,7 +255,7 @@ def main():
     # apart than six in the same height of paper.  Fix the SPAN instead
     # and hang the rows from the top of it.
     SPAN, TOP = 9.05, len(tv) + 2.05
-    vx.set_xlim(0, X4 + 4); vx.set_ylim(TOP - SPAN, TOP)
+    vx.set_xlim(0, X4 + 1.5); vx.set_ylim(TOP - SPAN, TOP)
     vx.set_xticks([]); vx.set_yticks([])
     mono2 = dict(family="monospace", fontsize=FS["mono"] - 1)
     hd = dict(family="monospace", fontsize=FS["mono"] - 3, color="#555")
