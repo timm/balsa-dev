@@ -50,6 +50,10 @@ Active := runs/active.txt runs/active-knn.txt runs/active-tabicl.txt \
 actfig: ## the optimizer figure, in the same layout as Figs 2 and 3
 	python3 -B allplot.py act $(Paper)/ens-active.png $(Active)
 
+pricetex: ## the price-per-point table
+	python3 -B price.py > $(Paper)/price.tex
+	echo "wrote $(Paper)/price.tex"
+
 sesoitex: ## the SESOI sweep table: what survives a rising floor
 	python3 -B sesoi.py > $(Paper)/sesoi.tex
 	echo "wrote $(Paper)/sesoi.tex"
@@ -79,7 +83,7 @@ fig1: ## regenerate the paper's opening figure (LOC + the two runtimes)
 	python3 -B fig1.py $(Paper)/loccounts.tex > $(Paper)/fig1.tex
 	echo "wrote $(Paper)/fig1.tex"
 
-reg: regfigs allfigs actfig regtex clstex acttex sesoitex fig1 ## every generated number in the paper, recomputed
+reg: regfigs allfigs actfig regtex clstex acttex sesoitex pricetex fig1 ## every generated number in the paper, recomputed
 
 sh: $(Tmp)/bashrc $(Tmp)/nvim.lua ## bash with our prompt; vi = clean nvim
 	bash --rcfile $(Tmp)/bashrc -i
