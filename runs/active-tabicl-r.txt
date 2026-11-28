@@ -1,0 +1,2 @@
+%folds behavior_data/player_statistics_cleaned_final r.tabicl 77.9 100.0 80.8 89.9 94.3 100.0 94.3 100.0 94.3 89.9
+%secs behavior_data/player_statistics_cleaned_final r.tabicl 1.7060 0.5601 0.5539 0.5640 0.5552 0.5593 0.5732 0.5649 0.5590 0.5679
