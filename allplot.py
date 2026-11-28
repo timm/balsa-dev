@@ -162,7 +162,7 @@ def main():
     sets = sorted(F, key=key)
     xs = np.arange(len(sets))
 
-    fig = plt.figure(figsize=(14.3, 3.9))
+    fig = plt.figure(figsize=(14.3, 3.5))
     gs = fig.add_gridspec(1, 5, wspace=0,
                           width_ratios=[.72 * len(ORDER), 2.3, 20, 1.0, 10.5])
     bx, ax = fig.add_subplot(gs[0]), fig.add_subplot(gs[2])
@@ -204,17 +204,22 @@ def main():
     bx.set_yscale("log")
     # rotated labels need headroom above the tallest bar, and this is
     # a log axis, so the room has to be bought in decades
-    bx.set_ylim(min(b[0] for b in bt) / 3, max(b[0] for b in bt) * 90)
+    bx.set_ylim(min(b[0] for b in bt) / 3, max(b[0] for b in bt) * 260)
     for i, b in enumerate(bt):
         bx.text(i, b[0] * 1.35, f"{b[0]:,.0f}s" if b[0] >= 100
                 else f"{b[0]:.1f}s", ha="center", va="bottom",
                 rotation=90, weight="bold", fontsize=FS["bar"] - 6)
-    bx.set_xticks(range(len(bt)))
-    # four names side by side in a narrow panel collide; stand them up
-    bx.set_xticklabels([b[1] for b in bt], rotation=90, ha="center",
-                       va="top", fontsize=FS["bar"] - 4)
-    bx.set_title("total secs, log scale\n(summed over folds,\n1 thread each)",
-                 fontsize=FS["lab"] - 4)
+    # No names under the bars.  Rotated, they hung below the axes and
+    # every panel in the row shrank to make room -- the curves paid
+    # for a second copy of a list the key already gives, in the same
+    # colours.
+    bx.set_xticks([])
+    # titles go INSIDE their panels: as titles they sat above the axes
+    # and shortened every panel in the row, leaving a band of background
+    # over the curves
+    bx.text(.5, .985, "total secs, log scale\n(summed over folds, 1 thread each)",
+            transform=bx.transAxes, ha="center", va="top",
+            fontsize=FS["lab"] - 5)
     bx.set_yticks([]); bx.set_facecolor("#fcfcfa")
     bx.set_xlim(-.55, len(bt) - .45)
     for s_ in ("top", "right", "left"): bx.spines[s_].set_visible(False)
@@ -249,7 +254,7 @@ def main():
     # units gave each panel a different span, so four rows sat further
     # apart than six in the same height of paper.  Fix the SPAN instead
     # and hang the rows from the top of it.
-    SPAN, TOP = 9.05, len(tv) + 1.15
+    SPAN, TOP = 9.05, len(tv) + 2.05
     vx.set_xlim(0, X4 + 4); vx.set_ylim(TOP - SPAN, TOP)
     vx.set_xticks([]); vx.set_yticks([])
     mono2 = dict(family="monospace", fontsize=FS["mono"] - 1)
@@ -276,8 +281,10 @@ def main():
         vx.text(X2, y, f"{v:.{DP}f}", ha="right", va="center", **mono2)
         vx.plot([X3, X3 + 10], [y, y], color=col, lw=1.8, ls="--")
         vx.text(X4, y, cell, ha="right", va="center", **mono2)
-    vx.set_title(f"solid = mean, dashed = sd\n({len(common)} sets all ran)",
-                 fontsize=FS["lab"] - 4)
+    vx.text(.5, .985, f"solid = mean, dashed = sd"
+            f"   ({len(common)} sets all ran)",
+            transform=vx.transAxes, ha="center", va="top",
+            fontsize=FS["lab"] - 5)
     vx.set_facecolor("#fcfcfa")
     for s_ in vx.spines.values(): s_.set_visible(False)
 
