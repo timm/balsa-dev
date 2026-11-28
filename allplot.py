@@ -177,7 +177,7 @@ def main():
         ax.set_yticks([0, .25, .5, .75, 1, 1.25])
         ax.set_yticks([.125, .375, .625, .875, 1.125], minor=True)
         ax.axhline(1.0, color="#999", lw=1.4, ls=(0, (6, 4)))
-        ax.set_ylabel("MAE / MAE(mean)", fontsize=FS["lab"])
+        ax.set_ylabel("err = MAE/mean(MAE)", fontsize=FS["lab"])
     ax.tick_params(axis="y", which="minor", length=0)
     ax.grid(axis="y", which="major", color="#ddd")
     ax.grid(axis="y", which="minor", color="#b0b0b0", ls=(0, (4, 4)), lw=1)
@@ -233,12 +233,16 @@ def main():
            if any((v2 >= v if mode != "reg" else v2 <= v) and c2 <= c
                   and (v2, c2) != (v, c) for _, v2, _s2, c2 in tv)}
     DP = 2 if mode == "reg" else 0
-    vx.set_xlim(0, 108); vx.set_ylim(-.9, len(tv) - .2)
+    # a wider y range with the rows unchanged pulls them together:
+    # the text is fixed in points, the axis is not
+    vx.set_xlim(0, 108); vx.set_ylim(-1.9, len(tv) + .55)
     vx.set_xticks([]); vx.set_yticks([])
     mono2 = dict(family="monospace", fontsize=FS["mono"] - 1)
     hd = dict(family="monospace", fontsize=FS["mono"] - 3, color="#555")
+    UNIT = {"cls": "AUC", "reg": "err"}.get(mode, "win")
     vx.text(56, len(tv) - .55, "mean", ha="right", va="center", **hd)
-    vx.text(104, len(tv) - .55, "secs/pt", ha="right", va="center", **hd)
+    vx.text(69, len(tv) - .55, "sd", ha="center", va="center", **hd)
+    vx.text(104, len(tv) - .55, f"secs/{UNIT}", ha="right", va="center", **hd)
     prev = None
     for k, (n, v, sv, c) in enumerate(tv):
         y = len(tv) - 1 - k
