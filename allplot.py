@@ -245,14 +245,14 @@ def main():
     NW = 3.3 * max(len(n) for n, *_ in tv)
     X1, X2 = NW + 4, NW + 36          # solid swatch, and the mean
     X3, X4 = NW + 42, NW + 88         # dashed swatch, and secs/unit
-    vx.set_xlim(0, X4 + 4); vx.set_ylim(-1.9, len(tv) + .55)
+    vx.set_xlim(0, X4 + 4); vx.set_ylim(-1.9, len(tv) + 1.15)
     vx.set_xticks([]); vx.set_yticks([])
     mono2 = dict(family="monospace", fontsize=FS["mono"] - 1)
     hd = dict(family="monospace", fontsize=FS["mono"] - 3, color="#555")
     UNIT = {"cls": "AUC", "reg": "err"}.get(mode, "win")
-    vx.text(X2, len(tv) - .55, "mean", ha="right", va="center", **hd)
-    vx.text(X3 + 5, len(tv) - .55, "sd", ha="center", va="center", **hd)
-    vx.text(X4, len(tv) - .55, f"secs/{UNIT}", ha="right", va="center", **hd)
+    vx.text(X2, len(tv) - .05, "mean", ha="right", va="center", **hd)
+    vx.text(X3 + 5, len(tv) - .05, "sd", ha="center", va="center", **hd)
+    vx.text(X4, len(tv) - .05, f"secs/{UNIT}", ha="right", va="center", **hd)
     # every row priced the same way: its total seconds over the points it
     # gains on the worst treatment here.  Stepping from the row above
     # instead would go negative wherever a cheaper treatment scores
