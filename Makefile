@@ -83,7 +83,7 @@ fig1: ## regenerate the paper's opening figure (LOC + the two runtimes)
 	python3 -B fig1.py $(Paper)/loccounts.tex > $(Paper)/fig1.tex
 	echo "wrote $(Paper)/fig1.tex"
 
-reg: regfigs allfigs actfig regtex clstex acttex sesoitex pricetex fig1 ## every generated number in the paper, recomputed
+reg: regfigs allfigs actfig regtex clstex acttex pricetex fig1 ## every generated number in the paper, recomputed
 
 sh: $(Tmp)/bashrc $(Tmp)/nvim.lua ## bash with our prompt; vi = clean nvim
 	bash --rcfile $(Tmp)/bashrc -i
