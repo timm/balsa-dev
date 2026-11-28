@@ -275,7 +275,7 @@ def main():
         # so it has no price of its own
         cell = "baseline" if d <= 0 else ("<1" if c / d < 1 else f"{c/d:,.0f}")
         col, mk = INK[n]
-        vx.text(0, y, n, ha="left", va="center", color=col, **mono2)
+        vx.text(NW, y, n, ha="right", va="center", color=col, **mono2)
         vx.plot([X1, X1 + 10], [y, y], color=col, lw=2.0)
         vx.plot(X1 + 5, y, mk, color=col, ms=5)
         vx.text(X2, y, f"{v:.{DP}f}", ha="right", va="center", **mono2)
