@@ -207,20 +207,30 @@ def main():
     # Underneath the frame it was legible but far from the lines it
     # names; in here the eye goes straight from swatch to curve.
     tx = ax.inset_axes((.02, .05, .4, .4))
-    LEGEND_IN = (1.70, .20 * len(ORDER) + .03)
-    tx.set_xlim(0, 22); tx.set_ylim(0, len(ORDER) + .6)
+    LEGEND_IN = (2.15, .20 * len(ORDER) + .03)
+    tx.set_xlim(0, 28); tx.set_ylim(0, len(ORDER) + .6)
     tx.patch.set_alpha(0); tx.set_xticks([]); tx.set_yticks([])
     for s_ in tx.spines.values(): s_.set_visible(False)
     mono = dict(family="monospace", fontsize=FS["mono"] - 3,
                 bbox=dict(fc="#fcfcfa", ec="none", pad=1))
+    # The mean is worth carrying here -- it is the one number a reader
+    # wants per treatment.  The sd is not: it is the dashed line, which
+    # the eye can already see, and a second column of digits crowds the
+    # names.  One precision for the column, set by the score.
+    DP = 2 if mode == "reg" else 0
+    avg = {}
+    for a in ORDER:
+        ok = [s_ for s_ in sets if mu[(s_, a)] == mu[(s_, a)]]
+        avg[a] = f"{st.fmean([mu[(s_, a)] for s_ in ok]):.{DP}f}"
     for k, a in enumerate(ORDER):
         c, m = INK[a]
         y = len(ORDER) - .4 - k
         tx.text(0, y, a, ha="left", va="center", **mono)
         tx.plot([11.0, 14.2], [y, y], color=c, lw=2.0)
         tx.plot(12.6, y, m, color=c, ms=5)
-        tx.text(15.8, y, "sd", ha="left", va="center", **mono)
-        tx.plot([18.6, 21.6], [y, y], color=c, lw=1.8, ls="--")
+        tx.text(19.4, y, avg[a], ha="right", va="center", **mono)
+        tx.text(20.8, y, "sd", ha="left", va="center", **mono)
+        tx.plot([24.6, 27.6], [y, y], color=c, lw=1.8, ls="--")
 
     bt = sorted((secs[a], a, INK[a][0]) for a in ORDER if secs.get(a))
     bx.bar(range(len(bt)), [b[0] for b in bt], color=[b[2] for b in bt],
