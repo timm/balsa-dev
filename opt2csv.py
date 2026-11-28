@@ -2,11 +2,11 @@
 """opt2csv: an optimization run's .txt into the csv the plots read.
 
 lgbm_opt.py already prints every arm's per-fold SCORE on %folds
-lines -- balsa(1), balsa(30), random and lgbm alike -- so unlike the
+lines -- enuf(1), enuf(30), random and lgbm alike -- so unlike the
 regression pipeline there is nothing to reconstruct here, only to
 transpose:
 
-    data,fold,score_balsa1,score_balsa30,score_random,score_lgbm
+    data,fold,score_enuf1,score_enuf30,score_random,score_lgbm
 
 Each score is 100 * (1 - (got - lo) / (mu - lo)) for that fold's
 labelled winner, against the whole table's min and mean d2h.  100 is
@@ -17,7 +17,7 @@ usage: python3 opt2csv.py runs/opt.txt > runs/opt.csv
 """
 import csv, sys, collections
 
-ARMS = (("balsa(1)", "balsa1"), ("balsa(30)", "balsa30"),
+ARMS = (("enuf(1)", "enuf1"), ("enuf(30)", "enuf30"),
         ("random", "random"), ("lgbm", "lgbm"))
 
 

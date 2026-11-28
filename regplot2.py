@@ -1,5 +1,5 @@
 #!/usr/bin/env python3 -B
-"""regplot2: the ens-balsa-nose figure, for regression.
+"""regplot2: the ens-enuf-nose figure, for regression.
 
 y is rel = MAE / MAE of a learner that always predicts the mean.  So 1.0 is
 the baseline, and LOWER IS BETTER -- the opposite of the AUC figures, hence
@@ -14,7 +14,7 @@ sit in mixed.
 Solid: the mean over the ten 5x2 folds.  Dashed: the spread of those folds,
 as (p90-p10)/2.56.  Left: total run time, log scale, summed over folds.
 
-usage: python3 regplot2.py runs/reg60.csv ens-balsa-reg.png
+usage: python3 regplot2.py runs/reg60.csv ens-enuf-reg.png
 """
 import csv, os, sys, statistics as st
 import matplotlib; matplotlib.use("Agg")
@@ -23,9 +23,9 @@ import numpy as np
 
 MOOT = os.path.expanduser(os.getenv("MOOTREG", "~/gits/moot/regression"))
 # name in the csv, label, colour, marker -- the same ink as the AUC figures
-ARMS = [("balsa1",  "balsa(1)",  "#2ca02c", "^"),
+ARMS = [("enuf1",  "enuf(1)",  "#2ca02c", "^"),
         ("lgbm",    "lgbm(100)", "#2a6fdb", "o"),
-        ("balsa30", "balsa(30)", "#e8613c", "s"),
+        ("enuf30", "enuf(30)", "#e8613c", "s"),
         ("tabicl",  "TabICL",    "#000000", "D")]
 FS = dict(tick=14, lab=14, head=17, mono=14, bar=15)
 
@@ -91,8 +91,8 @@ def main():
         for line in open(txt):
             if line.startswith("#secs"):
                 v = line.split()[3:]
-                secs = {("balsa1" if "(1)" in h else
-                         "balsa30" if "(30)" in h else h): float(x)
+                secs = {("enuf1" if "(1)" in h else
+                         "enuf30" if "(30)" in h else h): float(x)
                         for h, x in zip(head, v)}
     tt = sys.argv[1].rsplit(".", 1)[0] + "-tabicl.txt"
     if os.path.exists(tt):

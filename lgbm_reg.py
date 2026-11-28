@@ -1,5 +1,5 @@
 #!/usr/bin/env python3 -B
-"""lgbm_reg: add LightGBM regression to balsa_eg --reg's table, on
+"""lgbm_reg: add LightGBM regression to enuf_eg --reg's table, on
 the same 5x2 folds.  Reads reg60.dat (data|mae1 mae30 maeMean|secs|
 test row ids), refits LGBMRegressor per fold on the complement of
 the recorded test rows, and prints one table plus %folds lines of
@@ -19,7 +19,7 @@ def load(f):
   head, rows = rows[0], rows[1:]
   # the goal: a ! column if there is one, else the first + or - goal.
   # moot/regression marks it !, moot/optimize marks it + or -.  This is
-  # balsa_eg.yue's own rule, so both rigs score the same column.
+  # enuf_eg.yue's own rule, so both rigs score the same column.
   k = next((i for i, h in enumerate(head) if h.endswith("!")), None)
   if k is None:
     k = next(i for i, h in enumerate(head)
@@ -39,7 +39,7 @@ def load(f):
 
 def main():
   folds, lines = {}, open(sys.argv[1]).readlines()
-  T = ["balsa(1)", "balsa(30)", "mean", "lgbm"]
+  T = ["enuf(1)", "enuf(30)", "mean", "lgbm"]
   for line in lines[1:]:
     f, a, s, t = line.strip().split("|")
     folds.setdefault(f, []).append(([float(v) for v in a.split()],
@@ -54,10 +54,10 @@ def main():
     d  = {t: [] for t in T}
     for a, s, test in fs:
       base = a[2]                        # guess-the-mean mae
-      d["balsa(1)"].append(a[0] / base)
-      d["balsa(30)"].append(a[1] / base)
+      d["enuf(1)"].append(a[0] / base)
+      d["enuf(30)"].append(a[1] / base)
       d["mean"].append(1.0)
-      secs["balsa(1)"] += s[0]; secs["balsa(30)"] += s[1]
+      secs["enuf(1)"] += s[0]; secs["enuf(30)"] += s[1]
       tset  = set(test)
       train = [i for i in ok if i not in tset]
       te    = [i for i in ok if i in tset]
@@ -66,7 +66,7 @@ def main():
       # this corpus trains on fewer than that, where LightGBM made no split
       # at all and every tree was a bare leaf predicting the training mean
       # -- 130 of 590 folds scored exactly 1.000, by configuration rather
-      # than by weakness.  The balsa arms have no such floor (the.leaf=2),
+      # than by weakness.  The enuf arms have no such floor (the.leaf=2),
       # so relaxing this removes a handicap, it does not grant an edge.
       m = lgb.LGBMRegressor(verbose=-1, n_jobs=1,
                             min_child_samples=1, min_child_weight=0.0)

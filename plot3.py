@@ -43,9 +43,9 @@ else:    # the 39 non-SE classify sets, grouped by NAME (some sets may
   G=[(h,fs) for h,fs in G if fs]
   order=[f for _,fs in G for f in fs]
   CAPY,TAB,MONO,LEGIN=52,[.105,.13,.40,.54],9,(1.60,0.76)
-T=[(os.getenv("LAB1","balsa(1)"),0,"#2ca02c","^"),
+T=[(os.getenv("LAB1","enuf(1)"),0,"#2ca02c","^"),
    ("lgbm(100)",2,"#2a6fdb","o"),
-   (os.getenv("LAB30","balsa(30)"),1,"#e8613c","s"),
+   (os.getenv("LAB30","enuf(30)"),1,"#e8613c","s"),
    ("TabICL",3,"#000000","D")]
 # sized for an IEEE 2-col figure: drawn at 2x (14.3in wide), printed at 7.16in,
 # so a FS of n pt prints at n/2 pt

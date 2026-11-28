@@ -1,5 +1,5 @@
 #!/usr/bin/env python3 -B
-"""optplot: the ens-balsa-opt figure, for optimization.
+"""optplot: the ens-enuf-opt figure, for optimization.
 
 Each arm fits a model on the train half, sorts the test half by its
 PREDICTED d2h, pays for the true d2h of the best 5, and keeps the winner.
@@ -15,7 +15,7 @@ One panel per moot/optimize folder.  Solid: the mean over the ten 5x2
 folds.  Dashed: the spread of those folds, as (p90-p10)/2.56.  Left: total
 run time, log scale, summed over folds.
 
-usage: python3 optplot.py runs/opt.csv ens-balsa-opt.png
+usage: python3 optplot.py runs/opt.csv ens-enuf-opt.png
 """
 import csv, os, sys, statistics as st
 import matplotlib; matplotlib.use("Agg")
@@ -24,9 +24,9 @@ import numpy as np
 
 MOOT = os.path.expanduser(os.getenv("MOOTOPT", "~/gits/moot/optimize"))
 # name in the csv, label, colour, marker -- the same ink as the AUC figures
-ARMS = [("balsa1",  "balsa(1)",  "#2ca02c", "^"),
+ARMS = [("enuf1",  "enuf(1)",  "#2ca02c", "^"),
         ("lgbm",    "lgbm(100)", "#2a6fdb", "o"),
-        ("balsa30", "balsa(30)", "#e8613c", "s"),
+        ("enuf30", "enuf(30)", "#e8613c", "s"),
         ("random",  "random",    "#888888", "x")]
 FS = dict(tick=14, lab=14, head=17, mono=14, bar=15)
 MIN_PANEL = 6      # folders thinner than this pool into "other"
@@ -93,8 +93,8 @@ def main():
         for line in open(txt):
             if line.startswith("#secs"):
                 v = line.split()[3:]
-                secs = {("balsa1" if "(1)" in h else
-                         "balsa30" if "(30)" in h else h): float(x)
+                secs = {("enuf1" if "(1)" in h else
+                         "enuf30" if "(30)" in h else h): float(x)
                         for h, x in zip(head, v)}
     tt = sys.argv[1].rsplit(".", 1)[0] + "-tabicl.txt"
     if os.path.exists(tt):

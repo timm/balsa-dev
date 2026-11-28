@@ -1,16 +1,16 @@
 #!/usr/bin/env python3 -B
 """reg2csv: turn a regression run's .dat and .txt into the csv the plots read.
 
-The .dat (from balsa_eg --reg) holds raw MAE per fold:
-    data | mae_balsa1 mae_balsa30 mae_mean | secs | test row ids
+The .dat (from enuf_eg --reg) holds raw MAE per fold:
+    data | mae_enuf1 mae_enuf30 mae_mean | secs | test row ids
 The .txt (from lgbm_reg.py) holds the same folds as RELATIVE mae, on
 %folds lines, with LightGBM added.  An optional third file (from
 tabicl_reg.py) adds TabICL on %folds lines of its own.  This joins them
 into one row per (data, fold), with both the raw and the relative
 numbers:
 
-    data,fold,mae_balsa1,mae_balsa30,mae_mean,mae_lgbm,
-              rel_balsa1,rel_balsa30,rel_lgbm,rel_tabicl
+    data,fold,mae_enuf1,mae_enuf30,mae_mean,mae_lgbm,
+              rel_enuf1,rel_enuf30,rel_lgbm,rel_tabicl
 
 rel_X = mae_X / mae_mean, so 1.0 is no better than predicting the mean.
 mae_lgbm is recovered as rel_lgbm * mae_mean, since the .txt keeps only
@@ -23,8 +23,8 @@ usage: python3 reg2csv.py runs/sereg.dat runs/sereg.txt [runs/sereg-tabicl.txt]
 """
 import sys, collections
 
-ARMS = ("balsa(1)", "balsa(30)", "lgbm")
-OUT  = ("balsa1", "balsa30", "lgbm")
+ARMS = ("enuf(1)", "enuf(30)", "lgbm")
+OUT  = ("enuf1", "enuf30", "lgbm")
 
 
 def main():
@@ -49,8 +49,8 @@ def main():
             _, f, _arm, *vals = line.split()
             tab[f] = [float(v) for v in vals]
 
-    print("data,fold,mae_balsa1,mae_balsa30,mae_mean,mae_lgbm,"
-          "rel_balsa1,rel_balsa30,rel_lgbm,rel_tabicl")
+    print("data,fold,mae_enuf1,mae_enuf30,mae_mean,mae_lgbm,"
+          "rel_enuf1,rel_enuf30,rel_lgbm,rel_tabicl")
     for f in raw:
         if f not in rel: continue                # lgbm skipped this set
         for i, (m1, m30, mmean) in enumerate(raw[f]):

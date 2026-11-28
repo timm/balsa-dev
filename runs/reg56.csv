@@ -1,4 +1,4 @@
-data,fold,mae_balsa1,mae_balsa30,mae_mean,mae_lgbm,rel_balsa1,rel_balsa30,rel_lgbm,rel_tabicl
+data,fold,mae_enuf1,mae_enuf30,mae_mean,mae_lgbm,rel_enuf1,rel_enuf30,rel_lgbm,rel_tabicl
 2dplanes,0,1.08,0.8788,3.601,0.795821,0.3000,0.2440,0.2210,
 2dplanes,1,1.058,0.8734,3.613,0.805699,0.2930,0.2420,0.2230,
 2dplanes,2,1.079,0.8826,3.607,0.804361,0.2990,0.2450,0.2230,

@@ -10,7 +10,7 @@ usage: pypy3 dist_sweep.py runs/active-sets.txt
 """
 # (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 import os, sys, random
-from balsa import the, srand, csv, Tbl, distx, mids
+from enuf import the, srand, csv, Tbl, distx, mids
 from active import optimize, xval, expand
 
 def mkDist(score):

@@ -33,22 +33,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # label, colour, marker -- the same ink as every other figure here
-INK = {"balsa(1)":  ("#2ca02c", "^"), "lgbm(100)": ("#2a6fdb", "o"),
-       "balsa(30)": ("#e8613c", "s"), "TabICL":    ("#000000", "D"),
+INK = {"enuf(1)":  ("#2ca02c", "^"), "lgbm(100)": ("#2a6fdb", "o"),
+       "enuf(30)": ("#e8613c", "s"), "TabICL":    ("#000000", "D"),
        "random":    ("#8a8f98", "v"), "1nn": ("#7b3fa0", "P")}
-ORDER = ["balsa(1)", "lgbm(100)", "balsa(30)", "TabICL"]
+ORDER = ["enuf(1)", "lgbm(100)", "enuf(30)", "TabICL"]
 # `random` -- the same budget spent with no model -- is the floor these
 # are judged against, and sec:active reports it; it is kept out of the
 # figure, where six lines were two too many to follow.
-ACTORDER = ["1nn", "balsa(1)", "lgbm(100)", "balsa(30)", "TabICL"]
+ACTORDER = ["1nn", "enuf(1)", "lgbm(100)", "enuf(30)", "TabICL"]
 FS = dict(tick=14, lab=15, mono=13, bar=15)
 
 
 # The variance split of the paper's Table 7, over the three learners a
-# reader is choosing between.  balsa(1) is left out for the reason that
+# reader is choosing between.  enuf(1) is left out for the reason that
 # table gives: a deliberately crippled single tree would inflate the
 # learner share with a gap nobody is weighing.
-VARARMS = ("lgbm(100)", "balsa(30)", "TabICL")
+VARARMS = ("lgbm(100)", "enuf(30)", "TabICL")
 PARTS   = [("data", "#3d4a5c"), ("learner", "#e8613c"),
            ("fold", "#9aa3ad"), ("other", "#d6dae0")]
 
@@ -81,7 +81,7 @@ def spread(v):
 
 def read_cls(paths):
     "set -> treatment -> folds, plus total seconds per treatment."
-    key = {"1:q16": "balsa(1)", "n30": "balsa(30)",
+    key = {"1:q16": "enuf(1)", "n30": "enuf(30)",
            "lgbm": "lgbm(100)", "tabicl": "TabICL"}
     F, secs = {}, dict.fromkeys(ORDER, 0.0)
     for p in paths:
@@ -101,7 +101,7 @@ def read_act(paths):
     """The acquire-only arms of the active-learning run.  Its tables carry
     their own per-fold seconds, so the runtime bars here are measured on
     exactly the folds the curves are drawn from."""
-    key = {"a.b1": "balsa(1)", "a.b30": "balsa(30)", "a.lgbm": "lgbm(100)",
+    key = {"a.b1": "enuf(1)", "a.b30": "enuf(30)", "a.lgbm": "lgbm(100)",
            "a.tabicl": "TabICL", "a.knn": "1nn"}
     F, secs = {}, dict.fromkeys(ACTORDER, 0.0)
     for p in paths:
@@ -116,7 +116,7 @@ def read_act(paths):
 
 
 def read_reg(paths):
-    key = {"balsa1": "balsa(1)", "balsa30": "balsa(30)",
+    key = {"enuf1": "enuf(1)", "enuf30": "enuf(30)",
            "lgbm": "lgbm(100)", "tabicl": "TabICL"}
     F, secs = {}, dict.fromkeys(ORDER, 0.0)
     for p in paths:
@@ -146,7 +146,7 @@ def main():
         ORDER = ACTORDER
         # `random` is the budget spent without a model: it is the baseline
         # the others are judged against, not a learner being compared
-        VARARMS = ("1nn", "lgbm(100)", "balsa(30)", "TabICL")
+        VARARMS = ("1nn", "lgbm(100)", "enuf(30)", "TabICL")
     nan = float("nan")
     mu = {(s, a): (st.fmean(F[s][a]) if a in F[s] else nan)
           for s in F for a in ORDER}
@@ -156,7 +156,7 @@ def main():
     # others are read against it.  If that treatment missed a set (TabICL
     # is capped by rows in regression), those sets sort last, among
     # themselves by the fallback -- a NaN key would order nothing.
-    SORT = os.getenv("SORTBY", "1nn" if mode == "act" else "balsa(30)")
+    SORT = os.getenv("SORTBY", "1nn" if mode == "act" else "enuf(30)")
     FALL = "lgbm(100)"
     hi = mode != "reg"                     # only rel is small-is-good
     def key(s):

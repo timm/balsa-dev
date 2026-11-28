@@ -1,7 +1,7 @@
 # regression notes: the ensemble helps a little, LightGBM owns big
 # data, TabICL owns everything it can reach
 
-(Updated 2026-11-26 for the Python canon -- balsa.py run under
+(Updated 2026-11-26 for the Python canon -- enuf.py run under
 pypy3, reg56 corpus, TabICL arm included. The original lua-era
 version of this note is in git history; its hypothesis survives
 unchanged, its numbers do not.)
@@ -9,7 +9,7 @@ unchanged, its numbers do not.)
 Scored on `rel_X = mae_X / mae_mean`, so 1.00 is no better than
 always predicting the mean, and **smaller is better**. 56 data sets,
 10 folds (5x2, replayed on recorded row ids), four treatments:
-`balsa1` (one tree), `balsa30` (30 trees, rf = |x|/3 per cut),
+`enuf1` (one tree), `enuf30` (30 trees, rf = |x|/3 per cut),
 `lgbm` (LightGBM, 100 trees), `tabicl` (in-context, on the sets it
 finished). The mean-predictor is the divisor, not a treatment.
 
@@ -33,7 +33,7 @@ both sit in *mixed*.) Best = lowest mean rel-MAE on that set.
 | total | 56 | 0.72 | 0.63 | 0.64 | **0.52** | 1 | 7 | 6 | **42** |
 
 Among the fit-on-this-machine learners the old story holds: LightGBM
-wins the large group outright (0.33 against balsa30's 0.56) and
+wins the large group outright (0.33 against enuf30's 0.56) and
 loses both small groups, where it is level with a single tree. It
 fails to beat the mean-predictor at all on **13 of 56** sets; the
 median size of those is 125 rows, against 418 for the rest
@@ -67,7 +67,7 @@ a variance killer; here it buys an eighth.
 
 ### A specific hypothesis, cheap to test
 
-We optimise for one loss and score with another. In `balsa.py`:
+We optimise for one loss and score with another. In `enuf.py`:
 
     class Num:
       def mid(i): return i.mu          # a leaf predicts its MEAN

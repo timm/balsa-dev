@@ -6,7 +6,7 @@ and the interaction between learner and data set -- each group summing to
 cannot drift from these numbers; --png also draws them as stacked bars.
 
 This is a two-way ANOVA with replication (data set x learner, R folds per
-cell), reported as eta-squared.  balsa(1), the deliberately crippled single
+cell), reported as eta-squared.  enuf(1), the deliberately crippled single
 tree, is left out: the question is what separates learners anyone would use.
 
 Bars are sorted by the learner share, so the groups that trouble the claim

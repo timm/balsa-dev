@@ -1,5 +1,5 @@
 -- vim: set ts=2 sw=2 sts=2 et cc=75:
--- Balsa learner: CSV data, bins, decision trees, forests, and AUC.
+-- Enuf learner: CSV data, bins, decision trees, forests, and AUC.
 -- (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 -- Keep module functions private while reading standard Lua globals.
 local globals = _ENV

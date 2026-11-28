@@ -1,11 +1,11 @@
 ---
 name: lean-lua
-description: Review or rewrite Lua in the user's compact Balsa style. Use for readability passes, generated Lua cleanup, and comparisons with the hand-edited balsa1.lua.
+description: Review or rewrite Lua in the user's compact Enuf style. Use for readability passes, generated Lua cleanup, and comparisons with the hand-edited enuf1.lua.
 ---
 
 # Lean Lua
 
-Use the Data section of `balsa1.lua` as the style reference. Read `Col`,
+Use the Data section of `enuf1.lua` as the style reference. Read `Col`,
 `add`, `zeros`, `Ys`, `yadd`, and `yadds` before rewriting.
 A compact function should be easy to follow from top to bottom. Each line
 should have a visible job, and a short name should keep the same meaning
@@ -28,9 +28,9 @@ throughout the operation.
 - Replace generated accumulator scaffolding with direct loops. Use `out[i]`
   when the loop already supplies the output index, or `out[#out + 1]` to
   append. Share a rule when the reader would otherwise verify it twice.
-- In Balsa style passes, edit only `balsa1.lua`. Preserve signatures,
-  table fields, row and RNG order, and results. Leave `balsa.lua`,
-  `balsa.yue`, `balsa_eg.lua`, and `balsa_eg.yue` untouched.
+- In Enuf style passes, edit only `enuf1.lua`. Preserve signatures,
+  table fields, row and RNG order, and results. Leave `enuf.lua`,
+  `enuf.yue`, `enuf_eg.lua`, and `enuf_eg.yue` untouched.
 
 ## Review
 

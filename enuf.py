@@ -1,6 +1,6 @@
 # vim: set ts=2 sw=2 sts=2 et cc=75:
 """
-balsa: lightweight ensemble trees for classification, regression
+enuf: lightweight ensemble trees for classification, regression
 (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 
 Options:

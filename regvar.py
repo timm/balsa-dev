@@ -14,7 +14,7 @@ rel is used, not raw MAE: regression targets carry their own units, so a
 split on raw MAE only reports that cal.housing has bigger numbers than
 bolts -- it gives the data set 90% and the learner 0.0%.
 
-The learners are balsa(30), LightGBM and TabICL.  balsa(1) is left out,
+The learners are enuf(30), LightGBM and TabICL.  enuf(1) is left out,
 as in the paper's classification split: a deliberately crippled single
 tree would inflate the learner share with a gap no reader is choosing
 between.  The mean-predictor is left out too -- it is the divisor, not a
@@ -29,10 +29,10 @@ usage: python3 regvar.py runs/reg56.csv runs/sereg.csv
 """
 import csv, os, sys, collections, statistics as st
 
-# balsa(1) is left out, as in the paper's classification split: it is a
+# enuf(1) is left out, as in the paper's classification split: it is a
 # deliberately crippled single tree, and the question the decomposition
 # asks is what separates the learners a reader would actually consider.
-THREE = ("balsa30", "lgbm")
+THREE = ("enuf30", "lgbm")
 FOUR  = THREE + ("tabicl",)
 ARMS  = THREE
 

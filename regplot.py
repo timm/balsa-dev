@@ -1,9 +1,9 @@
 #!/usr/bin/env python3 -B
-"""regplot: ens-balsa-reg.png from lgbm_reg.py output.  Per set:
+"""regplot: ens-enuf-reg.png from lgbm_reg.py output.  Per set:
 mean RELATIVE MAE over 5x2 folds (mae / guess-the-mean mae; 0 =
 perfect, 1 = the mean, dashed line), solid lines, sets sorted by
 lgbm; total secs as log bars on the left.  No TabICL at this stage.
-Usage: python3 regplot.py reg60.txt ens-balsa-reg.png (+ .pdf)"""
+Usage: python3 regplot.py reg60.txt ens-enuf-reg.png (+ .pdf)"""
 import sys, numpy as np, matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 L = open(sys.argv[1]).read().splitlines()
@@ -13,12 +13,12 @@ F = {}
 for l in L:
   if l.startswith("%folds"):
     _, f, t, *v = l.split(); F[(f, t)] = [float(x) for x in v]
-TK = ["balsa(1)", "balsa(30)", "lgbm"]
-sets = sorted({f for f, _ in F},        # the gap: where balsa wins
-              key=lambda f: np.mean(F[(f, "balsa(30)")]) -
+TK = ["enuf(1)", "enuf(30)", "lgbm"]
+sets = sorted({f for f, _ in F},        # the gap: where enuf wins
+              key=lambda f: np.mean(F[(f, "enuf(30)")]) -
                             np.mean(F[(f, "lgbm")]))
 d = {f: [float(np.mean(F[(f, t)])) for t in TK] for f in sets}
-T = [("balsa(1)", 0, "#2ca02c", "^"), ("balsa(30)", 1, "#e8613c", "s"),
+T = [("enuf(1)", 0, "#2ca02c", "^"), ("enuf(30)", 1, "#e8613c", "s"),
      ("lgbm(100)", 2, "#2a6fdb", "o")]
 FS = dict(tick=14, lab=14, head=17, mono=14, bar=15)
 fig = plt.figure(figsize=(14.3, 5.2))
@@ -55,8 +55,8 @@ for i, (name, c, m, mu) in enumerate(H):
   tx.plot([12.6, 15.2], [y, y], color=c, lw=2.2)
   tx.plot(13.9, y, m, color=c, ms=6)
   tx.text(29.5, y, f"{mu:.2f}", ha="right", va="center", **mono)
-bt = sorted([(sec[0], "balsa\n(1)", "#2ca02c"),
-             (sec[1], "balsa\n(30)", "#e8613c"),
+bt = sorted([(sec[0], "enuf\n(1)", "#2ca02c"),
+             (sec[1], "enuf\n(30)", "#e8613c"),
              (sec[3], "lgbm\n(100)", "#2a6fdb")])
 bx.bar(range(3), [b[0] for b in bt], color=[b[2] for b in bt],
        width=.84)

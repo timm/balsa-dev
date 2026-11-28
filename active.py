@@ -15,7 +15,7 @@ usage: pypy3 active.py [set ...]      moot/optimize sets > a table
 """
 # (c) 2026 Tim Menzies <timm@ieee.org>, MIT license
 import os, sys, time, random
-from balsa import (the, srand, csv, Tbl, Col, Num, Sym, Forest,
+from enuf import (the, srand, csv, Tbl, Col, Num, Sym, Forest,
                    distx, mids)
 
 the.warm, the.budget, the.check, the.pool = 4, 50, 5, 256

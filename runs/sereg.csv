@@ -1,4 +1,4 @@
-data,fold,mae_balsa1,mae_balsa30,mae_mean,mae_lgbm,rel_balsa1,rel_balsa30,rel_lgbm,rel_tabicl
+data,fold,mae_enuf1,mae_enuf30,mae_mean,mae_lgbm,rel_enuf1,rel_enuf30,rel_lgbm,rel_tabicl
 config/Apache_AllMeasurements,0,83.8,75.1,401.5,69.058,0.2090,0.1870,0.1720,0.1290
 config/Apache_AllMeasurements,1,77.55,74.78,441,65.268,0.1760,0.1700,0.1480,0.1150
 config/Apache_AllMeasurements,2,80.83,72.07,398.5,78.106,0.2030,0.1810,0.1960,0.1250
