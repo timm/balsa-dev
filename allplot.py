@@ -282,7 +282,7 @@ def main():
         vx.plot([X3, X3 + 10], [y, y], color=col, lw=1.8, ls="--")
         vx.text(X4, y, cell, ha="right", va="center", **mono2)
     vx.text(.5, .985, f"solid = mean, dashed = sd"
-            f"   ({len(common)} sets all ran)",
+            f"   ({len(common)} sets)",
             transform=vx.transAxes, ha="center", va="top",
             fontsize=FS["lab"] - 5)
     vx.set_facecolor("#fcfcfa")
