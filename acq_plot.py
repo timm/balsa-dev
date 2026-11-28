@@ -50,19 +50,17 @@ order = sorted(sets, key=gap.get)
 xs = np.arange(len(order))
 
 fig, ax = plt.subplots(figsize=(9, 4.2))
-nsame = 0
-for i, s in enumerate(order):
-  if same(F[(s, "a.knn")], F[(s, "r.knn")]):
-    ax.axvspan(i - .5, i + .5, color="#d9d9d9", lw=0, zorder=0)
-    nsame += 1
+diff = {s: not same(F[(s, "a.knn")], F[(s, "r.knn")]) for s in order}
+nsame = sum(not d for d in diff.values())
 ax.axhline(0, color="#999", lw=1)
 g = st.fmean(gap.values())
-ax.plot(xs, [gap[s] for s in order], color="#7b3fa0", marker="P", ms=4,
-        lw=1.4, zorder=2, label="acquire - random  %+.1f" % g)
+ax.plot(xs, [gap[s] if diff[s] else np.nan for s in order],
+        color="#7b3fa0", marker="P", ms=4, lw=1.4, zorder=2,
+        label="acquire - random  %+.1f" % g)
 ax.set_xlim(-1, len(order))
 ax.set_title("1nn: acquire minus random labelling, %d sets "
-             "(grey = statistically same, %d/%d)"
-             % (len(order), nsame, len(order)), fontsize=12)
+             "(only the %d/%d sets that differ from random)"
+             % (len(order), len(order) - nsame, len(order)), fontsize=12)
 ax.legend(fontsize=10, loc="upper left", framealpha=.9)
 ax.grid(axis="y", color="#eee")
 ax.set_xlabel("optimize set (sorted by gap)", fontsize=11)
