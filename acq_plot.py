@@ -50,18 +50,21 @@ order = sorted(sets, key=gap.get)
 xs = np.arange(len(order))
 
 fig, ax = plt.subplots(figsize=(9, 4.2))
-diff = {s: not same(F[(s, "a.knn")], F[(s, "r.knn")]) for s in order}
-nsame = sum(not d for d in diff.values())
 ax.axhline(0, color="#999", lw=1)
-g = st.fmean(gap.values())
-ax.plot(xs, [gap[s] if diff[s] else np.nan for s in order],
-        color="#7b3fa0", marker="P", ms=4, lw=1.4, zorder=2,
-        label="acquire - random  %+.1f" % g)
-ax.set_xlim(-1, len(order))
-ax.set_title("1nn: acquire minus random labelling, %d sets "
-             "(only the %d/%d sets that differ from random)"
-             % (len(order), len(order) - nsame, len(order)), fontsize=12)
-ax.legend(fontsize=10, loc="upper left", framealpha=.9)
+for arm, c, m, lab in (("a.knn", "#7b3fa0", "P", "1nn(acq)"),
+                       ("a.tabicl", "#000000", "D", "tabicl(acq)")):
+  d = {s: mu[(s, arm)] - mu[(s, "r.knn")] for s in order}
+  ok = {s: not same(F[(s, arm)], F[(s, "r.knn")]) for s in order}
+  n = sum(ok.values())
+  ax.plot(xs, [d[s] if ok[s] else np.nan for s in order],
+          color=c, marker=m, ms=4, lw=1.4, zorder=2,
+          label="%-11s %+5.1f  %2d/%d differ" % (
+            lab, st.fmean(d.values()), n, len(order)))
+ax.set_title("minus random labelling x 1nn, %d sets, sorted by the "
+             "1nn gap (points only where folds differ)" % len(order),
+             fontsize=11)
+ax.legend(fontsize=10, loc="lower center", framealpha=.9,
+          prop={"family": "monospace", "size": 10})
 ax.grid(axis="y", color="#eee")
 ax.set_xlabel("optimize set (sorted by gap)", fontsize=11)
 ax.set_ylabel("win difference", fontsize=11)
@@ -70,6 +73,7 @@ fig.set_facecolor("#fcfcfa")
 ax.set_facecolor("#fcfcfa")
 plt.savefig(sys.argv[-1], dpi=200, bbox_inches="tight")
 plt.savefig(sys.argv[-1].rsplit(".", 1)[0] + ".pdf", bbox_inches="tight")
-print("a.knn %.1f  r.knn %.1f  gap %+.1f  same %d/%d" % (
+print("a.knn %.1f  a.tabicl %.1f  r.knn %.1f" % (
   st.fmean([mu[(s, "a.knn")] for s in sets]),
-  st.fmean([mu[(s, "r.knn")] for s in sets]), g, nsame, len(sets)))
+  st.fmean([mu[(s, "a.tabicl")] for s in sets]),
+  st.fmean([mu[(s, "r.knn")] for s in sets])))
